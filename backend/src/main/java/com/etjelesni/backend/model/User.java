@@ -31,7 +31,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String password;
+    @Column(unique = true)
+    private String microsoftId;
+
+    private LocalDateTime lastLogin;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
