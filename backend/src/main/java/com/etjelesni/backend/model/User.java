@@ -1,5 +1,6 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -31,7 +32,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String password;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.STUDENT;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
