@@ -1,0 +1,210 @@
+.login-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container .row {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container .col-lg-5,
+.login-container .col-md-6 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  padding: 2rem;
+  height: 100vh;
+}
+
+.login-container .col-lg-7,
+.login-container .col-md-6:last-child {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 450px;
+  padding: 2rem;
+}
+
+.input-group {
+  background-color: transparent;
+  border-radius: 0;
+  margin-bottom: 1.5rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-bottom: 1px solid #d0d0d0;
+  padding-bottom: 0.5rem;
+}
+
+.input-group-text {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  padding-right: 0.75rem;
+  color: #999;
+  font-size: 1.2rem;
+}
+
+.input-group .form-control {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0.5rem 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.input-group .form-control:focus {
+  box-shadow: none;
+  background-color: transparent;
+  outline: none;
+}
+
+.input-group .form-control::placeholder {
+  color: #999;
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.btn-login {
+  background-color: #d0d0d0;
+  color: #666;
+  border: none;
+  padding: 0.85rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-login:hover:not(:disabled) {
+  background-color: #c0c0c0;
+  color: #333;
+}
+
+.btn-login:active:not(:disabled) {
+  background-color: #b0b0b0;
+}
+
+.btn-login:disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.alert {
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #666 !important;
+  font-size: 0.85rem;
+}
+
+.image-carousel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a1a; /* Tamna pozadina ako slike ne učitaju */
+}
+
+.carousel-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0; /* Sve slike su nevidljive po defaultu */
+  transition: opacity 1.5s ease-in-out;
+}
+
+.carousel-image.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+@media (max-width: 991px) {
+  /* Sakrivamo desnu kolonu (slike) */
+  .login-container .col-lg-7,
+  .login-container .col-md-6:last-child {
+    display: none !important;
+  }
+
+  .login-container .col-lg-5,
+  .login-container .col-md-6 {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .login-form-wrapper {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-form-wrapper {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+.row.g-0 {
+  --bs-gutter-x: 0;
+}
+
+.row.h-100 {
+  height: 100%;
+}
