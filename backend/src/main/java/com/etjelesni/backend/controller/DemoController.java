@@ -20,15 +20,4 @@ public class DemoController {
 
     }
 
-    @GetMapping("/me")
-    public Map<String, Object> userInfo(@AuthenticationPrincipal OAuth2User principal) {
-        // Ovo vraća sve što Microsoft šalje u ID token i userinfo
-        return principal.getAttributes();
-    }
-
-    @GetMapping("/token")
-    public OAuth2AuthenticationToken token(OAuth2AuthenticationToken authToken) {
-        // Ovo vraća objekt tokena koji sadrži registrationId i authorities
-        return authToken;
-    }
 }

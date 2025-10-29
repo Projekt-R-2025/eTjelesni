@@ -1,5 +1,7 @@
 package com.etjelesni.backend.config;
 
+import com.etjelesni.backend.dto.LoginResponse;
+import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.service.UserService;
 import com.etjelesni.backend.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,15 +40,15 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String fullName = oauth2User.getAttribute("name");
         String firstName = fullName.replace(lastName, "").trim();
 
-        var user = userService.createOrUpdateUser(email, firstName, lastName);
+        User user = userService.createOrGetUser(email, firstName, lastName);
         String jwtToken = jwtService.generateToken(user);
+
+        LoginResponse loginResponse = new LoginResponse(user.getId(), user.getFirstName(), user.getLastName(),
+                user.getEmail(), user.getRole().name(), jwtToken);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
-
-        Map<String, String> tokenResponse = new HashMap<>();
-        tokenResponse.put("token", jwtToken);
-
-        response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
+        response.setCharacterEncoding("utf-8");
+        objectMapper.writeValue(response.getWriter(), loginResponse);
     }
 }
