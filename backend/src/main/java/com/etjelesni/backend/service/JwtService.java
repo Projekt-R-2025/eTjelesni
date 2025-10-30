@@ -37,7 +37,6 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
         claims.put("id", user.getId());
-        claims.put("iss", "etjelesni-backend");
         return buildToken(claims, user, jwtExpiration);
     }
 
@@ -58,6 +57,7 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
+                .setIssuer("etjelesni-backend")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)

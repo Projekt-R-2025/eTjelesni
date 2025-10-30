@@ -13,7 +13,7 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    public Boolean isTokenRevoked(String jwt) {
+    public boolean isTokenRevoked(String jwt) {
         return tokenRepository.findByToken(jwt)
                 .map(Token::isRevoked)
                 .orElse(true);

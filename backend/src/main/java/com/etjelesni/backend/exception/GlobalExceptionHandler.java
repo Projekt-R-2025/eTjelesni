@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
             errorDetail.setProperty("description", "The account is locked");
 
-            return  errorDetail;
+            return errorDetail;
         }
 
         if (exception instanceof AccessDeniedException) {
