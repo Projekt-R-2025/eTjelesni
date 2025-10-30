@@ -1,5 +1,7 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,20 +21,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name is required")
+    @NotBlank
     @Column(nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
+    @NotBlank
     @Column(nullable = false)
     private String lastName;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is required")
+    @Email
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String password;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.STUDENT;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -40,4 +45,9 @@ public class User {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Token> tokens;
+
 }
