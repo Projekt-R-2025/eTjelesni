@@ -25,9 +25,9 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         Map<String, Object> body = Map.of(
-                "errors", Map.of(
-                        "token", List.of("is invalid")
-                )
+                "status", HttpServletResponse.SC_UNAUTHORIZED,
+                "error", "Unauthorized",
+                "message", "Invalid or missing authentication token"
         );
 
         objectMapper.writeValue(response.getWriter(), body);
