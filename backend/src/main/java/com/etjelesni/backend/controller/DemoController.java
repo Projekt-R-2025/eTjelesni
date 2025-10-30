@@ -17,7 +17,6 @@ public class DemoController {
     @GetMapping("/hello")
     public Map<String, String> hello() {
         return Map.of("message", "Hello from the backend!");
-
     }
 
 }

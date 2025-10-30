@@ -102,7 +102,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtService.isTokenValid(jwt, user)) {
                     // CHECK: is token revoked
                     if (Boolean.TRUE.equals(tokenService.isTokenRevoked(jwt))) {
-                        SecurityContextHolder.clearContext();
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token revoked");
                         return;
                     }
