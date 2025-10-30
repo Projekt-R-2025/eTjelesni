@@ -1,7 +1,9 @@
 package com.etjelesni.backend.config;
 
 import com.etjelesni.backend.dto.LoginResponse;
+import com.etjelesni.backend.model.Token;
 import com.etjelesni.backend.model.User;
+import com.etjelesni.backend.repository.TokenRepository;
 import com.etjelesni.backend.service.UserService;
 import com.etjelesni.backend.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +15,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -22,11 +23,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserService userService;
     private final JwtService jwtService;
     private final ObjectMapper objectMapper;
+    private final TokenRepository tokenRepository;
 
-    public OAuth2LoginSuccessHandler(UserService userService, JwtService jwtService, ObjectMapper objectMapper) {
+    public OAuth2LoginSuccessHandler(UserService userService, JwtService jwtService, ObjectMapper objectMapper, TokenRepository tokenRepository) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.objectMapper = objectMapper;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -36,12 +39,26 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String email = oauth2User.getAttribute("email");
         String lastName = oauth2User.getAttribute("family_name");
-
         String fullName = oauth2User.getAttribute("name");
         String firstName = fullName.replace(lastName, "").trim();
 
         User user = userService.createOrGetUser(email, firstName, lastName);
         String jwtToken = jwtService.generateToken(user);
+
+        // Revoke any existing non\-revoked tokens for this user
+        List<Token> activeTokens = tokenRepository.findAllByUserAndRevokedFalse(user);
+        if (!activeTokens.isEmpty()) {
+            for (Token t : activeTokens) {
+                t.setRevoked(true);
+            }
+            tokenRepository.saveAll(activeTokens);
+        }
+
+        // Save the new token
+        Token token = new Token();
+        token.setToken(jwtToken);
+        token.setUser(user);
+        tokenRepository.save(token);
 
         LoginResponse loginResponse = new LoginResponse(user.getId(), user.getFirstName(), user.getLastName(),
                 user.getEmail(), user.getRole().name(), jwtToken);
