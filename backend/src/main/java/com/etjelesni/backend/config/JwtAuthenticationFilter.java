@@ -1,5 +1,7 @@
 package com.etjelesni.backend.config;
 
+import com.etjelesni.backend.exception.InvalidTokenException;
+import com.etjelesni.backend.exception.UserNotFoundException;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.service.JwtService;
 import com.etjelesni.backend.service.TokenService;
@@ -13,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,7 +27,6 @@ import java.util.Optional;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserService userService;
     private final TokenService tokenService;
@@ -39,12 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     );
 
     public JwtAuthenticationFilter(
-            HandlerExceptionResolver handlerExceptionResolver,
             JwtService jwtService,
             UserService userService,
             TokenService tokenService
     ) {
-        this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtService = jwtService;
         this.userService = userService;
         this.tokenService = tokenService;
@@ -92,18 +90,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Optional<User> userOpt = userService.findByEmail(userEmail);
 
                 if (userOpt.isEmpty()) {
-                    handlerExceptionResolver.resolveException(request, response, null,
-                            new UsernameNotFoundException("User not found"));
-                    return;
+                    throw new UserNotFoundException("User not found");
                 }
 
                 User user = userOpt.get();
 
                 if (jwtService.isTokenValid(jwt, user)) {
-                    // CHECK: is token revoked
-                    if (Boolean.TRUE.equals(tokenService.isTokenRevoked(jwt))) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token revoked");
-                        return;
+
+                    if (tokenService.isTokenRevoked(jwt)) {
+                        throw new InvalidTokenException("Invalid token");
                     }
 
                     List<SimpleGrantedAuthority> authorities =
@@ -118,12 +113,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    throw new InvalidTokenException("Invalid token");
                 }
             }
 
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
+            throw new InvalidTokenException(exception.getMessage());
         }
     }
 }

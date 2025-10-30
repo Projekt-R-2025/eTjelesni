@@ -1,5 +1,6 @@
 package com.etjelesni.backend.service;
 
+import com.etjelesni.backend.exception.UserNotFoundException;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
