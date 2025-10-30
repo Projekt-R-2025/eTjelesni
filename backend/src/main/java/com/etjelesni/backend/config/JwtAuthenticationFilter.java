@@ -39,7 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     );
 
     public JwtAuthenticationFilter(
-            HandlerExceptionResolver handlerExceptionResolver,
             JwtService jwtService,
             UserService userService,
             TokenService tokenService
@@ -121,7 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            throw new InvalidTokenException("Invalid token");
+            throw new InvalidTokenException(exception.getMessage());
         }
     }
 }

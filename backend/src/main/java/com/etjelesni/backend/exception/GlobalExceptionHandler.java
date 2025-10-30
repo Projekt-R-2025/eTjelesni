@@ -12,7 +12,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<Map<String, Object>> handleUnauthorized(Exception e) {
+    public ResponseEntity<Map<String, Object>> handleInvalidTokenException(InvalidTokenException e) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         Map<String, Object> body = buildErrorBody(status, e.getMessage());
         return ResponseEntity.status(status).body(body);

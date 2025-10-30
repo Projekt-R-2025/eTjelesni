@@ -19,8 +19,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        throw new UserNotFoundException("User not found exception example");
-        //return userRepository.findAll();
+        return userRepository.findAll();
     }
 
     public User createUser(User user) {
