@@ -44,15 +44,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User user = userService.createOrGetUser(email, firstName, lastName);
         String jwtToken = jwtService.generateToken(user);
 
-        // Revoke any existing non-revoked tokens for this user
-        List<Token> activeTokens = tokenRepository.findAllByUserAndRevokedFalse(user);
-        if (!activeTokens.isEmpty()) {
-            for (Token t : activeTokens) {
-                t.setRevoked(true);
-            }
-            tokenRepository.saveAll(activeTokens);
-        }
-
         // Save the new token
         Token token = new Token();
         token.setToken(jwtToken);
