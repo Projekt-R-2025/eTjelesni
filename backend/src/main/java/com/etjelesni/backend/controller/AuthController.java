@@ -12,8 +12,11 @@ import java.net.URI;
 @RequestMapping("/api")
 public class AuthController {
 
-    @Autowired
-    private TokenService tokenService;
+    private final TokenService tokenService;
+
+    public AuthController(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     @GetMapping("/login")
     public ResponseEntity<Void> loginToMicrosoft() {
