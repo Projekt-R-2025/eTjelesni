@@ -8,6 +8,7 @@ import {
 import './App.css'         // Msn da nije potrebno vise
 import Login from "./components/Login";
 import Home from "./components/Home";
+import OAuthCallback from "./components/OAuthCallback";
 /* import Bike from './components/Bike'; */
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
   //Provjera autentifikacije pri ucitavanju
   useEffect(() => {
     const checkAuth = () => {
-      const userStr = sessionStorage.getItem("user");
+      const userStr = localStorage.getItem("user");
       setIsAuthenticated(!!userStr);
     };
     checkAuth();
@@ -28,12 +29,13 @@ function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   // Komponenta za zasticene rute
   const ProtectedRoute = ({ children }) => {
-    const userStr = sessionStorage.getItem("user");
+    const userStr = localStorage.getItem("user");
     if (!userStr) {
       return <Navigate to="/" />;
     }
@@ -44,8 +46,8 @@ function App() {
     <Router>
       <Routes>
         {/* Root route za autentifikaciju (Login) */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             isAuthenticated ? (
               <Navigate to="/home" replace />
@@ -53,6 +55,12 @@ function App() {
               <Login onAuthenticate={handleAuthentication} />
             )
           }
+        />
+
+        {/* OAuth callback route - prima podatke nakon Microsoft login-a */}
+        <Route
+          path="/oauth/callback"
+          element={<OAuthCallback onAuthenticate={handleAuthentication} />}
         />
 
         {/* Zasticene rute */}
