@@ -35,9 +35,8 @@ const Login = ({ onAuthenticate }) => {
     setLoading(true);
 
     try {
-      // Ovdje je potreban API za backend...
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
