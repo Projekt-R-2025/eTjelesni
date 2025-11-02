@@ -7,7 +7,7 @@ const Home = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const backendBase = import.meta.env.VITE_API_BASE_URL
+  const backendBase = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchUserData = async () => {
