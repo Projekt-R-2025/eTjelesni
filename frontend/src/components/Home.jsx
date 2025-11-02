@@ -4,52 +4,95 @@ import { useNavigate } from 'react-router-dom';
 
 const Home = ({ onLogout }) => {
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Učitaj podatke iz localStorage
-    const userStr = localStorage.getItem('user');
+  const backendBase = import.meta.env.VITE_API_BASE_URL
 
-    if (userStr) {
-      setUserData(JSON.parse(userStr));
-    }
-  }, []);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Prvo provjeri localStorage
+        const userStr = localStorage.getItem('user');
+
+        if (userStr) {
+          setUserData(JSON.parse(userStr));
+          setLoading(false);
+        } else {
+          // Ako nema u localStorage, dohvati s backenda (koristi cookie)
+          console.log('Dohvaćam korisničke podatke s backenda...');
+
+          const response = await fetch(`${backendBase}/api/users/me`, {
+            method: 'GET',
+            credentials: 'include', // Šalje cookie automatski
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          console.log('Response status:', response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
+            localStorage.setItem('user', JSON.stringify(data));
+          } else {
+            // Ako ne može dohvatiti podatke, vrati na login
+            console.error('Neuspješno dohvaćanje korisničkih podataka');
+            navigate('/');
+          }
+        }
+      } catch (error) {
+        console.error('Greška pri dohvaćanju korisničkih podataka:', error);
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate, backendBase]);
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
+      console.log('Šaljem logout zahtjev...');
 
-      if (token) {
-        console.log('Šaljem logout zahtjev sa tokenom:', token.substring(0, 20) + '...');
-
-        // Pošalji logout zahtjev na backend da revokea token
-        const response = await fetch('http://localhost:8080/api/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        console.log('Logout response status:', response.status);
-
-        if (!response.ok) {
-          console.error('Logout nije uspio:', response.status, response.statusText);
-        } else {
-          console.log('Token uspješno revokean na backendu');
+      // Pošalji logout zahtjev na backend da revokea token i obriše cookie
+      const response = await fetch(`${backendBase}/api/logout`, {
+        method: 'POST',
+        credentials: 'include', // Šalje cookie automatski
+        headers: {
+          'Content-Type': 'application/json'
         }
+      });
+
+      console.log('Logout response status:', response.status);
+
+      if (!response.ok) {
+        console.error('Logout nije uspio:', response.status, response.statusText);
+      } else {
+        console.log('Token uspješno revokean na backendu i cookie obrisan');
       }
     } catch (error) {
       console.error('Greška pri odjavi:', error);
     } finally {
       // Uvijek obriši lokalne podatke i odjavi korisnika
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
       onLogout();
       // Preusmjeri na login stranicu
       navigate('/');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Učitavanje...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">

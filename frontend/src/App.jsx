@@ -8,20 +8,40 @@ import {
 import './App.css'         // Msn da nije potrebno vise
 import Login from "./components/Login";
 import Home from "./components/Home";
-import OAuthCallback from "./components/OAuthCallback";
 /* import Bike from './components/Bike'; */
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  //Provjera autentifikacije pri ucitavanju
+  const backendBase = import.meta.env.VITE_API_BASE_URL
+
+  // Check authentication on app load using cookie-based JWT (no localStorage trust)
   useEffect(() => {
-    const checkAuth = () => {
-      const userStr = localStorage.getItem("user");
-      setIsAuthenticated(!!userStr);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${backendBase}/api/users/me`, {
+          method: 'GET',
+          credentials: 'include', // send cookie
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // optionally cache user locally, but do not rely on it for auth decisions
+          const data = await response.json();
+          localStorage.setItem('user', JSON.stringify(data));
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Greška pri provjeri autentifikacije:', error);
+        setIsAuthenticated(false);
+      }
     };
     checkAuth();
-  }, []);
+  }, [backendBase]);
 
   const handleAuthentication = () => {
     setIsAuthenticated(true);
@@ -30,17 +50,9 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
   };
 
-  // Komponenta za zasticene rute
-  const ProtectedRoute = ({ children }) => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) {
-      return <Navigate to="/" />;
-    }
-    return children;
-  };
+  // Protected routing will be handled inline below based on isAuthenticated
 
   return (
     <Router>
@@ -57,22 +69,17 @@ function App() {
           }
         />
 
-        {/* OAuth callback route - prima podatke nakon Microsoft login-a */}
-        <Route
-          path="/oauth/callback"
-          element={<OAuthCallback onAuthenticate={handleAuthentication} />}
-        />
-
         {/* Zasticene rute */}
         <Route
           path="/home"
           element={
-            <ProtectedRoute>
+            isAuthenticated ? (
               <Home onLogout={handleLogout} />
-            </ProtectedRoute>
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
-
 
       </Routes>
     </Router>

@@ -27,7 +27,8 @@ const Login = ({ onAuthenticate }) => {
 
   const handleMicrosoftLogin = () => {
     // Direktan redirect na OAuth2 authorization endpoint
-    window.location.href = 'http://localhost:8080/oauth2/authorization/azure';
+    const backendHost = import.meta.env.VITE_API_BASE_URL;
+    window.location.href = `${backendHost}/oauth2/authorization/azure`;
   };
 
   return (
@@ -39,7 +40,6 @@ const Login = ({ onAuthenticate }) => {
 
             <div className="text-center mb-4">
               <h2 className="mb-2">eTjelesni</h2>
-              <p className="text-muted">Prijavite se sa FER Microsoft računom</p>
             </div>
 
             {/* Microsoft Login Button */}
