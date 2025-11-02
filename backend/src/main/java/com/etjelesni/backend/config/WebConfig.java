@@ -81,7 +81,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // Enable CORS with the configuration source
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Disable CSRF as we're not using session cookies
+                // Disable CSRF because JWT tokens (stored in cookies) are validated on each request
                 .csrf(csrf -> csrf.disable())
 
                 // Configure URL authorization
