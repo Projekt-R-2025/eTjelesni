@@ -1,6 +1,8 @@
 package com.etjelesni.backend.controller;
 
-import com.etjelesni.backend.dto.UserDto;
+import com.etjelesni.backend.dto.user.UserCreateDto;
+import com.etjelesni.backend.dto.user.UserResponseDto;
+import com.etjelesni.backend.dto.user.UserUpdateDto;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -21,20 +23,41 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserResponseDto> getCurrentUser(@AuthenticationPrincipal User user) {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(UserDto.from(user));
+        UserResponseDto response = userService.getCurrentUser(user);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserResponseDto> response = userService.getAllUsers();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+        UserResponseDto response = userService.getUserById((id));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserCreateDto dto) {
+        UserResponseDto response = userService.createUser(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserUpdateDto dto) {
+        UserResponseDto response = userService.updateUser(id, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }
