@@ -12,36 +12,28 @@ const Home = ({ onLogout }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Prvo provjeri localStorage
-        const userStr = localStorage.getItem('user');
+        console.log('Dohvaćam korisničke podatke s backenda...');
 
-        if (userStr) {
-          setUserData(JSON.parse(userStr));
-          setLoading(false);
-        } else {
-          // Ako nema u localStorage, dohvati s backenda (koristi cookie)
-          console.log('Dohvaćam korisničke podatke s backenda...');
-
-          const response = await fetch(`${backendBase}/api/users/me`, {
-            method: 'GET',
-            credentials: 'include', // Šalje cookie automatski
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-
-          console.log('Response status:', response.status);
-
-          if (response.ok) {
-            const data = await response.json();
-            setUserData(data);
-            localStorage.setItem('user', JSON.stringify(data));
-          } else {
-            // Ako ne može dohvatiti podatke, vrati na login
-            console.error('Neuspješno dohvaćanje korisničkih podataka');
-            navigate('/');
+        const response = await fetch(`${backendBase}/api/users/me`, {
+          method: 'GET',
+          credentials: 'include', // Šalje cookie automatski
+          headers: {
+            'Content-Type': 'application/json'
           }
+        });
+
+        console.log('Response status:', response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+          localStorage.setItem('user', JSON.stringify(data));
+        } else {
+          // Ako ne može dohvatiti podatke, vrati na login
+          console.error('Neuspješno dohvaćanje korisničkih podataka');
+          navigate('/');
         }
+
       } catch (error) {
         console.error('Greška pri dohvaćanju korisničkih podataka:', error);
         navigate('/');
