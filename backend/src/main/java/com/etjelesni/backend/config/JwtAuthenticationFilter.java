@@ -1,126 +1,86 @@
 package com.etjelesni.backend.config;
 
-import com.etjelesni.backend.exception.InvalidTokenException;
-import com.etjelesni.backend.exception.UserNotFoundException;
-import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.service.JwtService;
-import com.etjelesni.backend.service.TokenService;
-import com.etjelesni.backend.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserService userService;
-    private final TokenService tokenService;
-
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/api/hello",
-            "/api/login",
-            "/oauth2/authorization/**",
-            "/login/oauth2/**"
-    );
-
-    public JwtAuthenticationFilter(
-            JwtService jwtService,
-            UserService userService,
-            TokenService tokenService
-    ) {
-        this.jwtService = jwtService;
-        this.userService = userService;
-        this.tokenService = tokenService;
-    }
-
-    private boolean isPublic(HttpServletRequest request) {
-        String path = request.getServletPath();
-        for (String pattern : PUBLIC_PATHS) {
-            if (pattern.endsWith("/**")) {
-                String prefix = pattern.substring(0, pattern.length() - 3);
-                if (path.startsWith(prefix)) return true;
-            } else {
-                if (path.equals(pattern)) return true;
-            }
-        }
-        return false;
-    }
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
+            HttpServletResponse response,
+            FilterChain filterChain
     ) throws ServletException, IOException {
-
-        // Skip token processing for public endpoints so tokens sent there are ignored
-        if (isPublic(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String jwt = null;
+        
+        // First try to read the JWT from the Authorization header
         final String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
         }
-
-        try {
-            final String jwt = authHeader.substring(7);
-            final String userEmail = jwtService.extractUsername(jwt);
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (userEmail != null && authentication == null) {
-                Optional<User> userOpt = userService.findByEmail(userEmail);
-
-                if (userOpt.isEmpty()) {
-                    throw new UserNotFoundException("User not found");
-                }
-
-                User user = userOpt.get();
-
-                if (jwtService.isTokenValid(jwt, user)) {
-
-                    if (tokenService.isTokenRevoked(jwt)) {
-                        throw new InvalidTokenException("Invalid token");
+        
+        // If not found in the header, try to read from a cookie
+        if (jwt == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("jwtToken".equals(cookie.getName())) {
+                        jwt = cookie.getValue();
+                        break;
                     }
-
-                    List<SimpleGrantedAuthority> authorities =
-                            List.of(new SimpleGrantedAuthority(user.getRole().name()));
-
-                    // Use lightweight principal (email) instead of the full User entity
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            user.getEmail(),
-                            null,
-                            authorities
-                    );
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                } else {
-                    throw new InvalidTokenException("Invalid token");
                 }
             }
-
-            filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-            throw new InvalidTokenException(exception.getMessage());
         }
+        
+        // If no JWT found, continue the filter chain
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Extract email from token
+        final String userEmail = jwtService.extractUsername(jwt);
+
+        // If email is found and user is not already authenticated
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
     }
+
 }
