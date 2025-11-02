@@ -13,7 +13,7 @@ import Home from "./components/Home";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const backendBase = import.meta.env.VITE_API_BASE_URL
+  const backendBase = import.meta.env.VITE_API_BASE_URL;
 
   // Check authentication on app load using cookie-based JWT (no localStorage trust)
   useEffect(() => {
