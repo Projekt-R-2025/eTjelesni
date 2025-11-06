@@ -125,7 +125,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void sendUnauthorizedJson(HttpServletResponse response, String message, String path) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        String timestamp = java.time.LocalDateTime.now().toString();
         String safeMessage = message.replace("\"", "\\\"");
         String json = String.format("{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}", timestamp, safeMessage, path);
         response.getWriter().write(json);
