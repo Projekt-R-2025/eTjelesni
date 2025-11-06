@@ -1,6 +1,7 @@
 package com.etjelesni.backend.config;
 
 import com.etjelesni.backend.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -20,9 +21,10 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     // Define public paths (patterns) that should skip the JWT filter
     private static final List<String> EXCLUDE_URLS = List.of(
@@ -125,10 +128,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void sendUnauthorizedJson(HttpServletResponse response, String message, String path) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        String timestamp = java.time.LocalDateTime.now().toString();
-        String safeMessage = message.replace("\"", "\\\"");
-        String json = String.format("{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}", timestamp, safeMessage, path);
-        response.getWriter().write(json);
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now().toString());
+        errorResponse.put("status", 401);
+        errorResponse.put("error", "Unauthorized");
+        errorResponse.put("message", message);
+        errorResponse.put("path", path);
+        
+        objectMapper.writeValue(response.getWriter(), errorResponse);
     }
 
 }
