@@ -91,12 +91,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException eje) {
             // Token expired
             SecurityContextHolder.clearContext();
-            sendUnauthorizedJson(response, "JWT expired: " + eje.getMessage(), request.getRequestURI());
+            sendUnauthorizedJson(response, "JWT has expired", request.getRequestURI());
             return;
         } catch (JwtException | IllegalArgumentException e) {
             // Any other JWT parsing/validation error
             SecurityContextHolder.clearContext();
-            sendUnauthorizedJson(response, "Invalid JWT: " + e.getMessage(), request.getRequestURI());
+            sendUnauthorizedJson(response, "Invalid JWT token", request.getRequestURI());
             return;
         }
 
