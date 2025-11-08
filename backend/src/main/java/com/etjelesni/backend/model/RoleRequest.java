@@ -18,7 +18,7 @@ public class RoleRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -32,8 +32,15 @@ public class RoleRequest {
 
     private String reason;
 
-    @ManyToOne
-    @JoinColumn(name = "reviewed_by")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(
+            name = "reviewed_by",
+            nullable = true,
+            foreignKey = @ForeignKey(
+                    name = "fk_role_request_reviewer",
+                    foreignKeyDefinition = "FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL"
+            )
+    )
     private User reviewedBy;
 
     private LocalDateTime reviewedAt;

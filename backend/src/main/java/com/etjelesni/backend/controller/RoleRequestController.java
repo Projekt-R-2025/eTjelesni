@@ -4,7 +4,6 @@ import com.etjelesni.backend.dto.role_request.RoleRequestCreateDto;
 import com.etjelesni.backend.dto.role_request.RoleRequestResponseDto;
 import com.etjelesni.backend.dto.role_request.RoleRequestReviewDto;
 import com.etjelesni.backend.enumeration.RequestStatus;
-import com.etjelesni.backend.model.RoleRequest;
 import com.etjelesni.backend.service.RoleRequestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/role-requests")
 public class RoleRequestController {
 
-    private RoleRequestService roleRequestService;
+    private final RoleRequestService roleRequestService;
 
     public RoleRequestController(RoleRequestService roleRequestService) {
         this.roleRequestService = roleRequestService;
@@ -42,7 +41,7 @@ public class RoleRequestController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<?> approveRoleRequest(
+    public ResponseEntity<RoleRequestResponseDto> approveRoleRequest(
             @PathVariable Long id,
             @RequestBody RoleRequestReviewDto dto) {
         RoleRequestResponseDto response = roleRequestService.reviewRoleRequest(id, RequestStatus.APPROVED, dto);
@@ -50,7 +49,7 @@ public class RoleRequestController {
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<?> rejectRoleRequest(
+    public ResponseEntity<RoleRequestResponseDto> rejectRoleRequest(
             @PathVariable Long id,
             @RequestBody RoleRequestReviewDto dto) {
         RoleRequestResponseDto response = roleRequestService.reviewRoleRequest(id, RequestStatus.REJECTED, dto);

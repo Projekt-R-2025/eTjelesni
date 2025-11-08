@@ -10,6 +10,7 @@ import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,10 +58,13 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+        User user = getUserOrThrow(id);
+        User currentUser = currentUserService.getCurrentUser();
+        if (user.getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
+            userRepository.deleteById(id);
+            return;
         }
-        userRepository.deleteById(id);
+        throw new AccessDeniedException("You do not have permission to delete this user");
     }
 
     public User getUserOrThrow(Long id) {

@@ -14,6 +14,7 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class RoleRequestService {
     private final CurrentUserService currentUserService;
 
 
+    @Transactional(readOnly = true)
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
         User currentUser = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests;
@@ -64,12 +66,14 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequests);
     }
 
+    @Transactional(readOnly = true)
     public List<RoleRequestResponseDto> getMyRoleRequests() {
         User user = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests = roleRequestRepository.findByUser(user);
         return roleRequestMapper.toResponseDto(roleRequests);
     }
 
+    @Transactional
     public RoleRequestResponseDto createRoleRequest(RoleRequestCreateDto dto) {
         User user = userService.getUserOrThrow(dto.getUserId());
 
@@ -92,6 +96,7 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
+    @Transactional
     public RoleRequestResponseDto reviewRoleRequest(Long id, RequestStatus status, RoleRequestReviewDto dto) {
         User reviewer = currentUserService.getCurrentUser();
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
@@ -122,11 +127,15 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
+    @Transactional
     public void deleteRoleRequest(Long id) {
-        if (!roleRequestRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Role request not found with id: " + id);
+        RoleRequest roleRequest = getRoleRequestOrThrow(id);
+        User currentUser = currentUserService.getCurrentUser();
+        if (roleRequest.getUser().getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
+            roleRequestRepository.deleteById(id);
+            return;
         }
-        roleRequestRepository.deleteById(id);
+        throw new AccessDeniedException("You do not have permission to delete this role request");
     }
 
     public RoleRequest getRoleRequestOrThrow(Long id) {

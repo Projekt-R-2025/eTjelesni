@@ -18,7 +18,7 @@ public enum Role {
     public boolean canApprove(Role currentRole, Role requestedRole) {
         if (this == PROFESSOR) {
             // Professor can only approve STUDENT -> LEADER
-            return currentRole == STUDENT && requestedRole == LEADER;
+            return requestedRole == LEADER;
         } else if (this == ADMIN) {
             // Admin can approve any promotion (including to ADMIN)
             return true;

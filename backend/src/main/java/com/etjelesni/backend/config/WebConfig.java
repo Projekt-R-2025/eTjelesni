@@ -85,7 +85,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // Configure URL authorization
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/hello", "api/login").permitAll()
+                                .requestMatchers("/api/hello", "/api/login").permitAll()
                                 .requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll()
                 )
