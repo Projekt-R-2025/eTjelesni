@@ -1,11 +1,10 @@
-package com.etjelesni.backend.service;
+package com.etjelesni.backend.service.auth;
 
 import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;

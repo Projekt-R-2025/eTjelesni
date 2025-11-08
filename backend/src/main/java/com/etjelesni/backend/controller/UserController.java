@@ -3,12 +3,9 @@ package com.etjelesni.backend.controller;
 import com.etjelesni.backend.dto.user.UserCreateDto;
 import com.etjelesni.backend.dto.user.UserResponseDto;
 import com.etjelesni.backend.dto.user.UserUpdateDto;
-import com.etjelesni.backend.model.User;
-import com.etjelesni.backend.service.CurrentUserService;
 import com.etjelesni.backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,4 +55,5 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
 }

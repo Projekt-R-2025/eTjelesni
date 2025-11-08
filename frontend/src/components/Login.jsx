@@ -26,9 +26,9 @@ const Login = ({ onAuthenticate }) => {
   }, [images.length]);
 
   const handleMicrosoftLogin = () => {
-    // Direktan redirect na OAuth2 authorization endpoint
+    // Api login
     const backendHost = import.meta.env.VITE_API_BASE_URL;
-    window.location.href = `${backendHost}/oauth2/authorization/azure`;
+    window.location.href = `${backendHost}/api/login`;
   };
 
   return (

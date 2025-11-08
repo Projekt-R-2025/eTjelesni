@@ -1,0 +1,9 @@
+package com.etjelesni.backend.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+
+}

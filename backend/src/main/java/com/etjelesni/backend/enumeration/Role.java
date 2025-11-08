@@ -15,22 +15,13 @@ public enum Role {
         this.level = level;
     }
 
-    public Role getNextRole() {
-        return switch (this) {
-            case STUDENT -> LEADER;
-            case LEADER -> PROFESSOR;
-            case PROFESSOR -> ADMIN;
-            case ADMIN -> null;
-        };
-    }
-
     public boolean canApprove(Role currentRole, Role requestedRole) {
         if (this == PROFESSOR) {
             // Professor can only approve STUDENT -> LEADER
             return currentRole == STUDENT && requestedRole == LEADER;
         } else if (this == ADMIN) {
             // Admin can approve any promotion (including to ADMIN)
-            return requestedRole.level > currentRole.level;
+            return true;
         }
         // LEADER and STUDENT cannot approve
         return false;

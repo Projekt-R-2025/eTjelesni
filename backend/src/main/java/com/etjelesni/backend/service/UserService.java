@@ -8,23 +8,21 @@ import com.etjelesni.backend.exception.UserNotFoundException;
 import com.etjelesni.backend.mapper.UserMapper;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
+import com.etjelesni.backend.service.auth.CurrentUserService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+
     private final CurrentUserService currentUserService;
 
-    public UserService(UserMapper userMapper, UserRepository userRepository, CurrentUserService currentUserService) {
-        this.userMapper = userMapper;
-        this.userRepository = userRepository;
-        this.currentUserService = currentUserService;
-    }
 
     public UserResponseDto getCurrentUser() {
         User user = currentUserService.getCurrentUser();
@@ -37,8 +35,7 @@ public class UserService {
     }
 
     public UserResponseDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+        User user = getUserOrThrow(id);
         return userMapper.toResponseDto(user);
     }
 
@@ -50,8 +47,7 @@ public class UserService {
     }
 
     public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+        User user = getUserOrThrow(id);
 
         if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());
@@ -65,6 +61,15 @@ public class UserService {
             throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
+    }
+
+    public User getUserOrThrow(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public void updateUserRole(User user, Role newRole) {
+        user.setRole(newRole);
+        userRepository.save(user);
     }
 
 }

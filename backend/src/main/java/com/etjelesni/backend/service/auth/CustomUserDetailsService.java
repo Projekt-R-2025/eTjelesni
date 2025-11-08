@@ -1,4 +1,4 @@
-package com.etjelesni.backend.service;
+package com.etjelesni.backend.service.auth;
 
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;

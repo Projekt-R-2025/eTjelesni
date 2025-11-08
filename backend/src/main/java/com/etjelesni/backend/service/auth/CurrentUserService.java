@@ -1,4 +1,4 @@
-package com.etjelesni.backend.service;
+package com.etjelesni.backend.service.auth;
 
 import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.exception.UserNotFoundException;
@@ -28,19 +28,6 @@ public class CurrentUserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
-    }
-
-    public boolean hasRole(Role role) {
-        try {
-            User user = getCurrentUser();
-            return user.getRole() == role;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean isAdmin() {
-        return hasRole(Role.ADMIN);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.etjelesni.backend.config;
 
-import com.etjelesni.backend.service.JwtService;
+import com.etjelesni.backend.service.auth.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Define public paths (patterns) that should skip the JWT filter
     private static final List<String> EXCLUDE_URLS = List.of(
             "/api/hello",
+            "/api/login",
             "/swagger-ui.html",
             "/swagger-ui/**"
     );

@@ -102,4 +102,24 @@ public class User implements UserDetails {
         return true;
     }
 
+    public boolean hasRole(Role role) {
+        return this.role == role;
+    }
+
+    public boolean isAdmin() {
+        return hasRole(Role.ADMIN);
+    }
+
+    public boolean isProfessor() {
+        return hasRole(Role.PROFESSOR);
+    }
+
+    public boolean isLeader() {
+        return hasRole(Role.LEADER);
+    }
+
+    public boolean isStudent() {
+        return hasRole(Role.STUDENT);
+    }
+
 }
