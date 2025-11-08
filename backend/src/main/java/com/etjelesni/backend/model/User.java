@@ -50,6 +50,14 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role = Role.STUDENT;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<RoleRequest> roleRequests;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -58,9 +66,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -95,6 +100,26 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public boolean hasRole(Role role) {
+        return this.role == role;
+    }
+
+    public boolean isAdmin() {
+        return hasRole(Role.ADMIN);
+    }
+
+    public boolean isProfessor() {
+        return hasRole(Role.PROFESSOR);
+    }
+
+    public boolean isLeader() {
+        return hasRole(Role.LEADER);
+    }
+
+    public boolean isStudent() {
+        return hasRole(Role.STUDENT);
     }
 
 }

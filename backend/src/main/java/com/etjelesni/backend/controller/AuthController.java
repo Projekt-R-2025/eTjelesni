@@ -23,6 +23,12 @@ public class AuthController {
         this.tokenService = tokenService;
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<Void> loginToMicrosoft() {
+        URI microsoftLoginUri = URI.create("/oauth2/authorization/azure");
+        return ResponseEntity.status(HttpStatus.FOUND).location(microsoftLoginUri).build();
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request,
                                        HttpServletResponse response) {

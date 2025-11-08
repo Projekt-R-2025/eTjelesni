@@ -3,16 +3,15 @@ package com.etjelesni.backend.service;
 import com.etjelesni.backend.model.Token;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.TokenRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class TokenService {
 
     private final TokenRepository tokenRepository;
 
-    public TokenService(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
-    }
 
     public void saveToken(String jwt, User user) {
         Token token = new Token();

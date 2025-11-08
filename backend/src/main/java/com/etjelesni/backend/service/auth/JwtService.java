@@ -1,5 +1,6 @@
-package com.etjelesni.backend.service;
+package com.etjelesni.backend.service.auth;
 
+import com.etjelesni.backend.service.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
