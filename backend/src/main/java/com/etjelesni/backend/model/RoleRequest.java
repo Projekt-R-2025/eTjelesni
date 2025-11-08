@@ -32,10 +32,9 @@ public class RoleRequest {
 
     private String reason;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "reviewed_by",
-            nullable = true,
             foreignKey = @ForeignKey(
                     name = "fk_role_request_reviewer",
                     foreignKeyDefinition = "FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL"
