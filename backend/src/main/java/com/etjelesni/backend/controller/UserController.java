@@ -4,6 +4,7 @@ import com.etjelesni.backend.dto.user.UserCreateDto;
 import com.etjelesni.backend.dto.user.UserResponseDto;
 import com.etjelesni.backend.dto.user.UserUpdateDto;
 import com.etjelesni.backend.model.User;
+import com.etjelesni.backend.service.CurrentUserService;
 import com.etjelesni.backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +24,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getCurrentUser(@AuthenticationPrincipal User user) {
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        UserResponseDto response = userService.getCurrentUser(user);
+    public ResponseEntity<UserResponseDto> getCurrentUser() {
+        UserResponseDto response = userService.getCurrentUser();
         return ResponseEntity.ok(response);
     }
 

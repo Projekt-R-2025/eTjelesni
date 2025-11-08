@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Define public paths (patterns) that should skip the JWT filter
     private static final List<String> EXCLUDE_URLS = List.of(
             "/api/hello",
+            "/swagger-ui.html",
             "/swagger-ui/**"
     );
 

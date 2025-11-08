@@ -104,15 +104,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Handle unauthorized requests using a custom AuthenticationEntryPoint
-                // .exceptionHandling(exceptionHandling ->
-                //        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
-                // )
-
-                // Respond to unauthenticated requests with HTTP 401 (Unauthorized)
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-
 
                 // Configure OAuth2 login
                 .oauth2Login(oauth2Login ->

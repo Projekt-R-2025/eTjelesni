@@ -18,13 +18,16 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public UserService(UserMapper userMapper, UserRepository userRepository) {
+    public UserService(UserMapper userMapper, UserRepository userRepository, CurrentUserService currentUserService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
-    public UserResponseDto getCurrentUser(User user) {
+    public UserResponseDto getCurrentUser() {
+        User user = currentUserService.getCurrentUser();
         return userMapper.toResponseDto(user);
     }
 
