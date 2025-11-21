@@ -1,7 +1,6 @@
 package com.etjelesni.backend.model;
 
 import com.etjelesni.backend.enumeration.RequestStatus;
-import com.etjelesni.backend.enumeration.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,21 +9,21 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "role_requests")
+@Table(name = "applications")
 @Data
-public class RoleRequest {
+public class Application {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "applicant_id", nullable = false)
+    private User applicant;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role requestedRole;
+    @ManyToOne
+    @JoinColumn(name = "section_id", nullable = false)
+    private Section section;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
