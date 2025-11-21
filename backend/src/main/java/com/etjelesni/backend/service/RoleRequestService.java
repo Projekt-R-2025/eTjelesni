@@ -30,7 +30,6 @@ public class RoleRequestService {
     private final CurrentUserService currentUserService;
 
 
-    @Transactional(readOnly = true)
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
         User currentUser = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests;
@@ -66,14 +65,12 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequests);
     }
 
-    @Transactional(readOnly = true)
     public List<RoleRequestResponseDto> getMyRoleRequests() {
         User user = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests = roleRequestRepository.findByUser(user);
         return roleRequestMapper.toResponseDto(roleRequests);
     }
 
-    @Transactional
     public RoleRequestResponseDto createRoleRequest(RoleRequestCreateDto dto) {
         User user = userService.getUserOrThrow(dto.getUserId());
 
@@ -96,7 +93,6 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
-    @Transactional
     public RoleRequestResponseDto reviewRoleRequest(Long id, RequestStatus status, RoleRequestReviewDto dto) {
         User reviewer = currentUserService.getCurrentUser();
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
@@ -127,7 +123,6 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
-    @Transactional
     public void deleteRoleRequest(Long id) {
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
