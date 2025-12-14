@@ -24,8 +24,7 @@ Aplikacija podržava **višestruke istovremene sesije po korisniku (Multi-Device
 
 API dokumentacija dostupna je putem **Swagger UI-ja** (springdoc-openapi).
 
-Tijekom lokalnog razvoja dokumentacija je dostupna na:
-- `http://localhost:8080/swagger-ui/index.html`  
+Tijekom lokalnog razvoja dokumentacija je dostupna na: `http://localhost:8080/swagger-ui/index.html`  
 
 Swagger prikazuje sve dostupne endpointe, potrebne parametre, sheme zahtjeva i odgovora te omogućuje slanje testnih poziva izravno iz preglednika.
 
