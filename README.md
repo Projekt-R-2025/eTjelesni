@@ -50,16 +50,22 @@ Prije pokretanja aplikacije potrebno je postaviti frontend i backend environment
 ### Frontend
 
 Koraci za pokretanje:
-1. `cd frontend`
-2. `npm install`
-3. `npm run dev`
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 Nakon pokretanja, frontend aplikacija bit će dostupna na: `http://localhost:5173`
 
 ### Backend (API)
 
 Koraci za pokretanje:
-1. `cd backend`
-2. `./mvnw spring-boot:run`
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
 
 Nakon pokretanja, backend aplikacija bit će dostupna na: `http://localhost:8080`.
