@@ -8,7 +8,7 @@ import {
 import './App.css'         // Msn da nije potrebno vise
 import Login from "./components/Login";
 import Home from "./components/Home";
-/* import Bike from './components/Bike'; */
+import Bike from './components/Bike';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -64,7 +64,7 @@ function App() {
             isAuthenticated ? (
               <Navigate to="/home" replace />
             ) : (
-              <Login onAuthenticate={handleAuthentication} />
+              <Home onAuthenticate={handleAuthentication} />
             )
           }
         />
@@ -80,8 +80,19 @@ function App() {
             )
           }
         />
+        <Route
+          path="/bike"
+          element={
+            isAuthenticated ? (
+              <Bike onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
 
       </Routes>
+
     </Router>
   );
 }
