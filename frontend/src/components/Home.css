@@ -1,0 +1,19 @@
+/* Right-align the Bike and logout actions and give them some breathing room */
+.home-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.bike-btn {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border-width: 2px;
+    padding: 0.5rem 1rem;
+}
+
+.bike-btn:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}

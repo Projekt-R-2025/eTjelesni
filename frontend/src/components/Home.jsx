@@ -89,16 +89,16 @@ const Home = ({ onLogout }) => {
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! </h1>
-        <button className="btn">
-            <Link to="/bike" className="nav-link">ZA DEV SVRHE: BIKE</Link>
-        </button>
-        <button
-          className="btn btn-danger"
-          onClick={handleLogout}
-        >
-          Odjavi se
-        </button>
+        <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! 🏐</h1>
+        <div className="home-actions">
+          <Link to="/bike" className="btn btn-outline-primary bike-btn">Za dev svrhe: Bike</Link>
+          <button
+            className="btn btn-danger"
+            onClick={handleLogout}
+          >
+            Odjavi se
+          </button>
+        </div>
       </div>
 
       {/* Korisnički podaci */}
