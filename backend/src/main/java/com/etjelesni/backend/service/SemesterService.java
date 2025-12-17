@@ -24,8 +24,7 @@ public class SemesterService {
 
     private final SemesterMapper semesterMapper;
     private final SemesterRepository semesterRepository;
-
-    private final UserService userService;
+    
     private final CurrentUserService currentUserService;
 
 
@@ -49,6 +48,8 @@ public class SemesterService {
         Semester semester = getSemesterOrThrow(id);
 
         if (dto.getName() != null) semester.setName(dto.getName());
+        if (dto.getStartDate() != null) semester.setStartDate(dto.getStartDate());
+        if (dto.getEndDate() != null) semester.setEndDate(dto.getEndDate());
 
         Semester updatedSemester = semesterRepository.save(semester);
         return semesterMapper.toResponseDto(updatedSemester);
@@ -57,7 +58,7 @@ public class SemesterService {
     public void deleteSemester(Long id) {
         Semester semester = getSemesterOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
-        if (true || currentUser.isAdmin()) {
+        if (currentUser.isProfessor() || currentUser.isAdmin()) {
             semesterRepository.deleteById(id);
             return;
         }
@@ -65,7 +66,7 @@ public class SemesterService {
     }
 
     public Semester getSemesterOrThrow(Long id) {
-        return semesterRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role request not found with id: " + id));
+        return semesterRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Semester not found with id: " + id));
     }
 
 
