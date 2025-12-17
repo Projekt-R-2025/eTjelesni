@@ -1,6 +1,6 @@
 import './Home.css';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
 const Home = ({ onLogout }) => {
   const [userData, setUserData] = useState(null);
@@ -89,7 +89,10 @@ const Home = ({ onLogout }) => {
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! 🏐</h1>
+        <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! </h1>
+        <button className="btn">
+            <Link to="/bike" className="nav-link">ZA DEV SVRHE: BIKE</Link>
+        </button>
         <button
           className="btn btn-danger"
           onClick={handleLogout}
