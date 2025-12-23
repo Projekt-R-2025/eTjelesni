@@ -50,4 +50,5 @@ public class SectionController {
         sectionService.deleteSection(id);
         return ResponseEntity.noContent().build();
     }
+
 }

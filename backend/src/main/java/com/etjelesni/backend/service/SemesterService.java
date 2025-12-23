@@ -69,5 +69,4 @@ public class SemesterService {
         return semesterRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Semester not found with id: " + id));
     }
 
-
 }

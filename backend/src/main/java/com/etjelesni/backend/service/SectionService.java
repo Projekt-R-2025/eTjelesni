@@ -9,10 +9,8 @@ import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.Semester;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.SectionRepository;
-import com.etjelesni.backend.repository.SemesterRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +22,9 @@ public class SectionService {
 
     private final SectionMapper sectionMapper;
     private final SectionRepository sectionRepository;
-    private final SemesterRepository semesterRepository;
 
     private final CurrentUserService currentUserService;
+    private final SemesterService semesterService;
 
     public List<SectionResponseDto> getAllSections() {
         List<Section> sections = sectionRepository.findAll();
@@ -38,16 +36,10 @@ public class SectionService {
         return sectionMapper.toResponseDto(section);
     }
 
-    private Section getSectionOrThrow(Long id) {
-        return sectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
-    }
-
     public SectionResponseDto createSection(SectionCreateDto dto) {
         Section section = sectionMapper.toEntity(dto);
 
-        Semester semester = semesterRepository.findById(dto.getSemesterId())
-                .orElseThrow(() -> new ResourceNotFoundException("Semestar ne postoji"));
-
+        Semester semester = semesterService.getSemesterOrThrow(dto.getSemesterId());
         section.setSemester(semester);
 
         sectionRepository.save(section);
@@ -73,5 +65,10 @@ public class SectionService {
         }
         throw new AccessDeniedException("You do not have permission to delete this section");
     }
+
+    private Section getSectionOrThrow(Long id) {
+        return sectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+    }
+
 }
 

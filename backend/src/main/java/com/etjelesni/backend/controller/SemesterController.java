@@ -32,7 +32,7 @@ public class SemesterController {
         return ResponseEntity.ok(response);
     }
 
-     @PostMapping
+    @PostMapping
     public ResponseEntity<SemesterResponseDto> createSemester(@RequestBody SemesterCreateDto dto) {
          SemesterResponseDto response = semesterService.createSemester(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
