@@ -14,7 +14,6 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,8 +25,8 @@ public class RoleRequestService {
     private final RoleRequestMapper roleRequestMapper;
     private final RoleRequestRepository roleRequestRepository;
 
-    private final UserService userService;
     private final CurrentUserService currentUserService;
+    private final UserService userService;
 
 
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
