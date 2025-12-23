@@ -23,5 +23,3 @@ public interface NotificationMapper {
     // SECTION
     Notification toEntity(SectionNotificationCreateDto dto);
 }
-
-

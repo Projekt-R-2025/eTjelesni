@@ -28,8 +28,9 @@ public class NotificationController {
     }
 
     @GetMapping("/section/{id}")
-    public List<NotificationResponseDto> getSectionNotifications(@PathVariable Long id) {
-        return notificationService.getSectionNotifications(id);
+    public ResponseEntity<List<NotificationResponseDto>> getSectionNotifications(@PathVariable Long id) {
+        List<NotificationResponseDto> response = notificationService.getSectionNotifications(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -40,7 +41,7 @@ public class NotificationController {
 
     @PostMapping("/general")
     public ResponseEntity<NotificationResponseDto> createGeneralNotification(@RequestBody GeneralNotificationCreateDto dto) {
-         NotificationResponseDto response = notificationService.createGeneralNotification(dto);
+        NotificationResponseDto response = notificationService.createGeneralNotification(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

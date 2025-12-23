@@ -53,11 +53,11 @@ public class SectionService {
         if (dto.getPassingPoints() != null) section.setPassingPoints(dto.getPassingPoints());
 
         Section updatedSection = sectionRepository.save(section);
-
         return sectionMapper.toResponseDto(updatedSection);
     }
 
     public void deleteSection(Long id) {
+        Section section = getSectionOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
         if (currentUser.isProfessor() || currentUser.isAdmin()) {
             sectionRepository.deleteById(id);
@@ -66,7 +66,7 @@ public class SectionService {
         throw new AccessDeniedException("You do not have permission to delete this section");
     }
 
-    private Section getSectionOrThrow(Long id) {
+    public Section getSectionOrThrow(Long id) {
         return sectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
     }
 

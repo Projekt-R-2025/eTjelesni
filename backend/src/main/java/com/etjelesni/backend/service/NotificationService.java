@@ -4,16 +4,13 @@ import com.etjelesni.backend.dto.notification.GeneralNotificationCreateDto;
 import com.etjelesni.backend.dto.notification.NotificationResponseDto;
 import com.etjelesni.backend.dto.notification.NotificationUpdateDto;
 import com.etjelesni.backend.dto.notification.SectionNotificationCreateDto;
-import com.etjelesni.backend.dto.semester.SemesterResponseDto;
 import com.etjelesni.backend.enumeration.NotificationType;
 import com.etjelesni.backend.exception.ResourceNotFoundException;
 import com.etjelesni.backend.mapper.NotificationMapper;
 import com.etjelesni.backend.model.Notification;
 import com.etjelesni.backend.model.Section;
-import com.etjelesni.backend.model.Semester;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.NotificationRepository;
-import com.etjelesni.backend.repository.SectionRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,23 +25,19 @@ public class NotificationService {
     private final NotificationMapper notificationMapper;
     private final NotificationRepository notificationRepository;
 
-    private final SectionRepository sectionRepository;
-
     private final CurrentUserService currentUserService;
+    private final SectionService sectionService;
 
 
     public List<NotificationResponseDto> getAllGenericNotifications() {
-        List<Notification> notifications = notificationRepository.findAllByType(com.etjelesni.backend.enumeration.NotificationType.GENERAL);
+        List<Notification> notifications = notificationRepository.findAllByType(NotificationType.GENERAL);
         return notificationMapper.toResponseDto(notifications);
     }
 
-    public List<NotificationResponseDto> getSectionNotifications(Long id) {
+    public List<NotificationResponseDto> getSectionNotifications(Long sectionId) {
+        Section section = sectionService.getSectionOrThrow(sectionId);
         List<Notification> notifications =
-                notificationRepository.findAllByTypeAndSectionId(
-                        NotificationType.SECTION,
-                        id
-                );
-
+                notificationRepository.findAllByTypeAndSection(NotificationType.SECTION, section);
         return notificationMapper.toResponseDto(notifications);
     }
 
@@ -53,11 +46,11 @@ public class NotificationService {
         return notificationMapper.toResponseDto(notification);
     }
 
-
     public NotificationResponseDto createGeneralNotification(GeneralNotificationCreateDto dto) {
         Notification notification = notificationMapper.toEntity(dto);
 
         notification.setType(NotificationType.GENERAL);
+        notification.setCreatedBy(currentUserService.getCurrentUser());
 
         notificationRepository.save(notification);
         return notificationMapper.toResponseDto(notification);
@@ -67,17 +60,15 @@ public class NotificationService {
         Notification notification = notificationMapper.toEntity(dto);
 
         notification.setType(NotificationType.SECTION);
+        notification.setCreatedBy(currentUserService.getCurrentUser());
 
-        Section section = sectionRepository.findById(dto.getSectionId())
-                .orElseThrow(() -> new RuntimeException("Section ne postoji"));
-
+        Section section = sectionService.getSectionOrThrow(dto.getSectionId());
         notification.setSection(section);
 
         notificationRepository.save(notification);
+
         return notificationMapper.toResponseDto(notification);
     }
-
-
 
     public NotificationResponseDto updateNotification(Long id, NotificationUpdateDto dto) {
         Notification notification = getNotificationOrThrow(id);
@@ -92,7 +83,7 @@ public class NotificationService {
     public void deleteNotification(Long id) {
         Notification notification = getNotificationOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
-        if (currentUser.isProfessor() || currentUser.isAdmin()) {
+        if (currentUser.isLeader() || currentUser.isProfessor() || currentUser.isAdmin()) {
             notificationRepository.deleteById(id);
             return;
         }
@@ -102,6 +93,5 @@ public class NotificationService {
     public Notification getNotificationOrThrow(Long id) {
         return notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
     }
-
 
 }
