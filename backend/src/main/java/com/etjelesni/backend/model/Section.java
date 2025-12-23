@@ -45,10 +45,6 @@ public class Section {
     )
     private List<User> leaders;
 
-    @ManyToOne
-    @JoinColumn(name = "professor_id", nullable = false)
-    private User professor;
-
     @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE)
     private List<Session> sessions;
 
