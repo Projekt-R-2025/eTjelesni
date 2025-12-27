@@ -1,6 +1,6 @@
 package com.etjelesni.backend.dto.section;
 
-import com.etjelesni.backend.model.User;
+import com.etjelesni.backend.dto.user.UserResponseDto;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +13,7 @@ public class SectionResponseDto {
     private Boolean isLocked;
     private Boolean isBikeSection;
     private Long semesterId;
-    private List<User> leaders;
+    private List<UserResponseDto> leaders;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
