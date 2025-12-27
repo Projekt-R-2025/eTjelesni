@@ -12,9 +12,11 @@ import java.util.List;
 public interface SectionMapper {
 
     @Mapping(target = "semesterId", source = "semester.id")
+    @Mapping(target = "leaders", source = "leaders")
     SectionResponseDto toResponseDto(Section section);
 
-    List<SectionResponseDto> toResponseDto(List<Section> sections);
+    List<SectionResponseDto> toResponseDtoList(List<Section> sections);
 
     Section toEntity(SectionCreateDto dto);
+
 }

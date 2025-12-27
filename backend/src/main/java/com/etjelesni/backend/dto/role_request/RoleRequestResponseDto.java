@@ -12,6 +12,7 @@ public class RoleRequestResponseDto {
     private Long id;
     private UserResponseDto user;
     private Role requestedRole;
+    private Long requestedSectionId;
     private RequestStatus status;
     private String reason;
     private UserResponseDto reviewedBy;

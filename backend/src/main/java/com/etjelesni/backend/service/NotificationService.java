@@ -31,14 +31,14 @@ public class NotificationService {
 
     public List<NotificationResponseDto> getAllGenericNotifications() {
         List<Notification> notifications = notificationRepository.findAllByType(NotificationType.GENERAL);
-        return notificationMapper.toResponseDto(notifications);
+        return notificationMapper.toResponseDtoList(notifications);
     }
 
     public List<NotificationResponseDto> getSectionNotifications(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
         List<Notification> notifications =
                 notificationRepository.findAllByTypeAndSection(NotificationType.SECTION, section);
-        return notificationMapper.toResponseDto(notifications);
+        return notificationMapper.toResponseDtoList(notifications);
     }
 
     public NotificationResponseDto getNotificationById(Long id) {

@@ -30,7 +30,7 @@ public class SemesterService {
 
      public List<SemesterResponseDto> getAllSemesters() {
         List<Semester> semesters = semesterRepository.findAll();
-        return semesterMapper.toResponseDto(semesters);
+        return semesterMapper.toResponseDtoList(semesters);
     }
 
     public SemesterResponseDto getSemesterById(Long id) {

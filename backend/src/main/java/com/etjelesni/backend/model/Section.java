@@ -8,7 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "sections")
@@ -37,13 +39,8 @@ public class Section {
     @JoinColumn(name = "semester_id", nullable = false)
     private Semester semester;
 
-    @ManyToMany
-    @JoinTable(
-        name = "section_leaders",
-        joinColumns = @JoinColumn(name = "section_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> leaders;
+    @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<SectionLeader> sectionLeaders;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE)
     private List<Session> sessions;
@@ -58,5 +55,14 @@ public class Section {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public List<User> getLeaders() {
+        if (sectionLeaders == null) {
+            return List.of();
+        }
+        return sectionLeaders.stream()
+                             .map(SectionLeader::getLeader)
+                             .toList();
+    }
 
 }

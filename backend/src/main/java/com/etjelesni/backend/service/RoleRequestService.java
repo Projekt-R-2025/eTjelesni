@@ -9,6 +9,7 @@ import com.etjelesni.backend.exception.ResourceNotFoundException;
 import com.etjelesni.backend.mapper.RoleRequestMapper;
 import com.etjelesni.backend.model.RoleRequest;
 import com.etjelesni.backend.model.User;
+import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.repository.RoleRequestRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class RoleRequestService {
 
     private final CurrentUserService currentUserService;
     private final UserService userService;
+    private final SectionService sectionService;
 
 
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
@@ -61,34 +63,65 @@ public class RoleRequestService {
             }
         }
 
-        return roleRequestMapper.toResponseDto(roleRequests);
+        return roleRequestMapper.toResponseDtoList(roleRequests);
     }
 
     public List<RoleRequestResponseDto> getMyRoleRequests() {
         User user = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests = roleRequestRepository.findByUser(user);
-        return roleRequestMapper.toResponseDto(roleRequests);
+        return roleRequestMapper.toResponseDtoList(roleRequests);
     }
 
     public RoleRequestResponseDto createRoleRequest(RoleRequestCreateDto dto) {
         User user = userService.getUserOrThrow(dto.getUserId());
+        Role requestedRole = dto.getRequestedRole();
 
-        if (user.getRole() == dto.getRequestedRole()) {
+        // Prevent requesting the same role (except LEADER which can be for multiple sections)
+        if (user.getRole() == requestedRole && requestedRole != Role.LEADER) {
             throw new IllegalStateException("You cannot request the same role you already have");
         }
 
-        Role requestedRole = dto.getRequestedRole();
-        if (roleRequestRepository.existsByUserAndRequestedRoleAndStatus(user, requestedRole, RequestStatus.PENDING)) {
-            throw new IllegalStateException("You already have a pending request for the role: " + requestedRole);
+        // Validate section requirement for LEADER role
+        Section section = null;
+        if (requestedRole == Role.LEADER) {
+            if (dto.getRequestedSectionId() == null) {
+                throw new IllegalArgumentException("Section ID is required when requesting LEADER role");
+            }
+            section = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
+
+            // Check if user is already a leader of this section
+            if (sectionService.isUserLeaderOfSection(user, section)) {
+                throw new IllegalStateException("You are already a leader of this section");
+            }
+        } else {
+            if (dto.getRequestedSectionId() != null) {
+                throw new IllegalArgumentException("Section ID should only be provided for LEADER role requests");
+            }
+        }
+
+        // Prevent multiple same pending requests
+        if (requestedRole == Role.LEADER) {
+            if (roleRequestRepository.existsByUserAndRequestedRoleAndRequestedSectionAndStatus(
+                    user, requestedRole, section, RequestStatus.PENDING)) {
+                throw new IllegalStateException("You already have a pending request for LEADER role for this section");
+            }
+        } else {
+            if (roleRequestRepository.existsByUserAndRequestedRoleAndStatus(user, requestedRole, RequestStatus.PENDING)) {
+                throw new IllegalStateException("You already have a pending request for the role: " + requestedRole);
+            }
         }
 
         RoleRequest roleRequest = new RoleRequest();
+
         roleRequest.setUser(user);
         roleRequest.setRequestedRole(dto.getRequestedRole());
         roleRequest.setReason(dto.getReason());
         roleRequest.setStatus(RequestStatus.PENDING);
-        roleRequestRepository.save(roleRequest);
+        if (requestedRole == Role.LEADER) {
+            roleRequest.setRequestedSection(section);
+        }
 
+        roleRequestRepository.save(roleRequest);
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
@@ -116,7 +149,11 @@ public class RoleRequestService {
 
         // If approved, update the user's role
         if (status == RequestStatus.APPROVED) {
-            userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
+            if (roleRequest.getRequestedRole() == Role.LEADER) {
+                sectionService.assignLeaderToSection(requestUser, roleRequest.getRequestedSection());
+            } else {
+                userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
+            }
         }
 
         return roleRequestMapper.toResponseDto(roleRequest);

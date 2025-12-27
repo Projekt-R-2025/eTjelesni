@@ -32,7 +32,7 @@ public class UserService {
 
     public List<UserResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return userMapper.toResponseDto(users);
+        return userMapper.toResponseDtoList(users);
     }
 
     public UserResponseDto getUserById(Long id) {

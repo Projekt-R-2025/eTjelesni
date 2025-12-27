@@ -6,8 +6,10 @@ import com.etjelesni.backend.dto.section.SectionUpdateDto;
 import com.etjelesni.backend.exception.ResourceNotFoundException;
 import com.etjelesni.backend.mapper.SectionMapper;
 import com.etjelesni.backend.model.Section;
+import com.etjelesni.backend.model.SectionLeader;
 import com.etjelesni.backend.model.Semester;
 import com.etjelesni.backend.model.User;
+import com.etjelesni.backend.repository.SectionLeaderRepository;
 import com.etjelesni.backend.repository.SectionRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
@@ -22,13 +24,14 @@ public class SectionService {
 
     private final SectionMapper sectionMapper;
     private final SectionRepository sectionRepository;
+    private final SectionLeaderRepository sectionLeaderRepository;
 
     private final CurrentUserService currentUserService;
     private final SemesterService semesterService;
 
     public List<SectionResponseDto> getAllSections() {
         List<Section> sections = sectionRepository.findAll();
-        return sectionMapper.toResponseDto(sections);
+        return sectionMapper.toResponseDtoList(sections);
     }
 
     public SectionResponseDto getSectionById(Long id) {
@@ -68,6 +71,17 @@ public class SectionService {
 
     public Section getSectionOrThrow(Long id) {
         return sectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+    }
+
+    public boolean isUserLeaderOfSection(User user, Section section) {
+        return sectionLeaderRepository.existsByLeaderAndSection(user, section);
+    }
+
+    public void assignLeaderToSection(User user, Section section) {
+        SectionLeader sectionLeader = new SectionLeader();
+        sectionLeader.setLeader(user);
+        sectionLeader.setSection(section);
+        sectionLeaderRepository.save(sectionLeader);
     }
 
 }
