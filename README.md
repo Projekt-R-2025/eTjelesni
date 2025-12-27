@@ -13,10 +13,6 @@ eTjelesni je web aplikacija koja se sastoji od odvojenog frontend i backend dije
 
 Autentifikacija korisnika provodi se putem **Microsoft FER računa**, koji predstavlja jedini dopušteni način prijave u aplikaciju. Pristup aplikaciji omogućen je isključivo korisnicima s važećim FER Microsoft identitetom, čime se osigurava kontroliran i ograničen pristup sustavu.
 
-Nakon uspješne autentifikacije, aplikacija koristi **JWT (JSON Web Token)** za autorizaciju korisničkih zahtjeva. JWT se pohranjuje u **HTTP cookie**, koji se automatski šalje pri svakom zahtjevu prema API-ju, čime se omogućuje sigurna i stateless autorizacija.
-
-Aplikacija podržava **višestruke istovremene sesije po korisniku (Multi-Device Sessions)**. Korisnik može biti prijavljen na više uređaja paralelno, a odjava na jednom uređaju neće automatski prekinuti aktivne sesije na ostalim uređajima.
-
 
 ## API
 
