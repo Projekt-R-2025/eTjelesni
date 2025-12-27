@@ -15,11 +15,12 @@ public interface NotificationMapper {
     @Mapping(source = "section.id", target = "sectionId")
     NotificationResponseDto toResponseDto(Notification notification);
 
-    List<NotificationResponseDto> toResponseDto(List<Notification> notifications);
+    List<NotificationResponseDto> toResponseDtoList(List<Notification> notifications);
 
     // GENERAL
     Notification toEntity(GeneralNotificationCreateDto dto);
 
     // SECTION
     Notification toEntity(SectionNotificationCreateDto dto);
+
 }

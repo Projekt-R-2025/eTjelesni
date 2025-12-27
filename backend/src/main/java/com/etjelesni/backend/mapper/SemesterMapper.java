@@ -10,6 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SemesterMapper {
     SemesterResponseDto toResponseDto(Semester semester);
-    List<SemesterResponseDto> toResponseDto(List<Semester> semesters);
+    List<SemesterResponseDto> toResponseDtoList(List<Semester> semesters);
     Semester toEntity(SemesterCreateDto dto);
 }
