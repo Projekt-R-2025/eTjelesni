@@ -114,10 +114,6 @@ public class User implements UserDetails {
         return hasRole(Role.PROFESSOR);
     }
 
-    public boolean isLeader() {
-        return hasRole(Role.LEADER);
-    }
-
     public boolean isStudent() {
         return hasRole(Role.STUDENT);
     }

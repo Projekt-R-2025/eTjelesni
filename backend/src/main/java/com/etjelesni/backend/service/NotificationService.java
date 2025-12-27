@@ -83,7 +83,7 @@ public class NotificationService {
     public void deleteNotification(Long id) {
         Notification notification = getNotificationOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
-        if (currentUser.isLeader() || currentUser.isProfessor() || currentUser.isAdmin()) {
+        if (currentUser.isProfessor() || currentUser.isAdmin()) {
             notificationRepository.deleteById(id);
             return;
         }
