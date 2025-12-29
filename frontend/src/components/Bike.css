@@ -1,50 +1,28 @@
-.inputs {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.inputs input {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.error {
-    color: red;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
 .obrub {
-    min-width: 100vw;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     min-height: 35vh;
     display: flex;
-    justify-content: center;
-    padding: 0.5rem 0;
-    padding-bottom: 4vh;
+    padding: 0;
     position: relative;
     overflow: hidden;
+    justify-content: start;
+    background-image: url('../../public/images/bikeBackground.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 .oglasna-grid {
     display: grid;
     gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    width: 90%;
-    margin: 0 auto;
+    grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
+    width: 100%;
+    margin: 0;
     padding: 2rem;
-    text-align: center;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
     border-radius: 8px;
-    border: 3px solid #007bff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    justify-items: start;
 
 }
 
@@ -54,8 +32,11 @@
     padding: 18px;
     border-radius: 8px;
     margin-bottom: 2%;
+    text-align: start;
+    margin-left: 2rem;
     border: 1px solid black;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    min-width: 70%;
 }
 
 .naslov {
@@ -63,7 +44,7 @@
     padding-bottom: 2vh;
     text-align: center;
     margin-bottom: -1vh;
-    min-width: 100vw;
+    min-width: 100%;
     color: #000000;
 }
 
@@ -147,30 +128,49 @@
     background-color: #a71d2a;
 }
 
-.mapa {
-    width: 90%;
-    height: 60vh;
-    margin: 0 auto 2vh;
-    border: none;
-    border-radius: 8px;
-}
-
-.mapaOkvir {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .naslovOglasa {
     margin-bottom: 0.5rem;
-    color: #007bff;
+    margin-left: 2rem;
 }
 
-.pridruziSe {
+.opis {
+    margin-bottom: 0.5rem;
+    margin-left: 5rem;
+}
+
+.ruta {
+    margin-bottom: 0.5rem;
+    margin-left: 3rem;
+}
+
+.pregledajRutu {
     margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    align-self: flex-start;
+}
+
+.pregledajRutu:hover {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+
+.pridruziSe {
+    margin-top: -2.8rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    margin-left: 13rem;
 }
 
 .pridruziSe button {
