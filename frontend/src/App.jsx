@@ -12,6 +12,7 @@ import Bike from './components/Bike';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const backendBase = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,6 +39,8 @@ function App() {
       } catch (error) {
         console.error('Greška pri provjeri autentifikacije:', error);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
     checkAuth();
@@ -53,6 +56,10 @@ function App() {
   };
 
   // Protected routing will be handled inline below based on isAuthenticated
+
+  if (isLoading) {
+    return <div className="text-center mt-5"><p>Učitavanje...</p></div>;
+  }
 
   return (
     <Router>
