@@ -152,7 +152,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
-        response.sendRedirect(frontendUrl + "/home");
+        response.sendRedirect(frontendUrl);
     }
 
 }
