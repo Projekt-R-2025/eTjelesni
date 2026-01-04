@@ -14,10 +14,10 @@ const LoginCallback = ({ onAuthenticate }) => {
                 const token = urlParams.get('token');
 
                 if (token) {
-                    // Spremimo token u localStorage
+                    // Spremi token u localStorage
                     setToken(token);
 
-                    // Obavijestimo App da je korisnik autentificiran
+                    // Obavijesti App da je korisnik autentificiran
                     onAuthenticate();
 
                     // Preusmjeri na home
