@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import './Bike.css';
 import initialData from './podatci.js';
+import notifications from './notifications.js';
 
 function Bike() {
     const [data, setData] = useState(initialData);
@@ -53,37 +54,51 @@ function Bike() {
 
     return (
         <>
-            <h1 className="naslov">🚴🏼 OGLASNA PLOČA 🚴🏼</h1>
+
             <div className="obrub">
-                <div className="oglasna-grid">
-                    {data.map((ad) => (
-                        <div
-                            key={ad.id}
-                            className="oglas-item"
-                        >
-                            <h3 className='naslovOglasa'>{ad.title}</h3>
-                            <p className='opis'>{ad.description}</p>
-                            <p className='ruta'>
-                                <strong>📍A:</strong> {ad.A}
-                            </p>
-                            <p className='ruta'>
-                                <strong>📍B:</strong> {ad.B}
-                            </p>
-                            <button
-                                className='pregledajRutu'
-                                onClick={() => openGoogleMaps(ad.A, ad.B)}
-                            >
-                                🗺️ Prikaži rutu
-                            </button>
-                            <div className='pridruziSe'>
-                                {selectedId === null ? (
-                                    <button onClick={() => joinGroup(ad.id)}>Pridruži se</button>
-                                ) : selectedId === ad.id ? (
-                                    <button onClick={leaveGroup}>Napusti grupu</button>
-                                ) : null}
-                            </div>
+                <div className="obavijesti">
+                    {notifications.map((note) => (
+                        <div key={note.id} className="obavijest-item">
+                            <h4>{note.title}</h4>
+                            <p>{note.content}</p>
                         </div>
                     ))}
+                </div>
+                <div className="razdvojnik">
+                    <div className="naslov">
+                        <h1>🚴🏼 OGLASNA PLOČA 🚴🏼</h1>
+                    </div>
+
+                    <div className="oglasna-grid">
+                        {data.map((ad) => (
+                            <div
+                                key={ad.id}
+                                className="oglas-item"
+                            >
+                                <h3 className='naslovOglasa'>{ad.title}</h3>
+                                <p className='opis'>{ad.description}</p>
+                                <p className='ruta'>
+                                    <strong>📍A:</strong> {ad.A}
+                                </p>
+                                <p className='ruta'>
+                                    <strong>📍B:</strong> {ad.B}
+                                </p>
+                                <button
+                                    className='pregledajRutu'
+                                    onClick={() => openGoogleMaps(ad.A, ad.B)}
+                                >
+                                    Prikaži rutu
+                                </button>
+                                <div className='pridruziSe'>
+                                    {selectedId === null ? (
+                                        <button onClick={() => joinGroup(ad.id)}>Pridruži se</button>
+                                    ) : selectedId === ad.id ? (
+                                        <button onClick={leaveGroup}>Napusti grupu</button>
+                                    ) : null}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <button className="tipkaZaDodavanje" onClick={openForm}>
                     +
