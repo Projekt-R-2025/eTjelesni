@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,12 +47,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    @Value("${app.cookie.secure}")
-    private boolean cookieSecure;
-
-    @Value("${app.cookie.same-site}")
-    private String cookieSameSite;
-
     private final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
     @Bean
@@ -62,8 +55,8 @@ public class WebConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
-        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -126,7 +119,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
 
-        log.info("OAuth2 Authentication Successful, redirecting to frontend home");
+        log.info("OAuth2 Authentication Successful, redirecting to frontend with JWT");
         User user = customOAuth2UserService.saveUser(oauth2User);
 
         String email = user.getEmail();
@@ -134,24 +127,14 @@ public class WebConfig implements WebMvcConfigurer {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         String jwt = jwtService.generateToken(userDetails, userId); // Include userId in JWT
-        log.info("Generated JWT: [{}]", jwt);
+        log.info("Generated JWT for user: {}", email);
 
         // Save the new token to DB
         tokenService.saveToken(jwt, user);
 
-        // Create cookie with environment-based settings
-        // Local: secure=false, sameSite=Lax (works on HTTP)
-        // Production: secure=true, sameSite=None (required for cross-domain HTTPS)
-        ResponseCookie cookie = ResponseCookie.from("jwtToken", jwt)
-                .path("/")
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .sameSite(cookieSameSite)
-                .maxAge(24 * 60 * 60)
-                .build();
-
-        response.addHeader("Set-Cookie", cookie.toString());
-        response.sendRedirect(frontendUrl);
+        // Redirect to frontend callback page with token as URL parameter
+        String redirectUrl = frontendUrl + "/login/callback?token=" + jwt;
+        response.sendRedirect(redirectUrl);
     }
 
 }

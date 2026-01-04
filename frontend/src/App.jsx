@@ -7,36 +7,49 @@ import {
 } from "react-router-dom";
 import './App.css'         // Msn da nije potrebno vise
 import Login from "./components/Login";
+import LoginCallback from "./components/LoginCallback";
 import Home from "./components/Home";
 import Bike from './components/Bike';
+import { hasToken, removeToken, getToken } from './utils/token';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const backendBase = import.meta.env.VITE_API_BASE_URL;
 
-  // Check authentication on app load using cookie-based JWT (no localStorage trust)
+  // Check authentication on app load using Bearer token from localStorage
   useEffect(() => {
     const checkAuth = async () => {
+      // Provjeri postoji li token u localStorage
+      if (!hasToken()) {
+        setIsAuthenticated(false);
+        return;
+      }
+
       try {
+        const token = getToken();
+
+        // Pokušaj dohvatiti korisničke podatke s tokenom
         const response = await fetch(`${backendBase}/api/users/me`, {
           method: 'GET',
-          credentials: 'include', // send cookie
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         });
 
         if (response.ok) {
-          // optionally cache user locally, but do not rely on it for auth decisions
           const data = await response.json();
           localStorage.setItem('user', JSON.stringify(data));
           setIsAuthenticated(true);
         } else {
+          // Token je nevažeći ili istekao
+          removeToken();
           setIsAuthenticated(false);
         }
       } catch (error) {
         console.error('Greška pri provjeri autentifikacije:', error);
+        removeToken();
         setIsAuthenticated(false);
       }
     };
@@ -50,6 +63,7 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("user");
+    removeToken();
   };
 
   // Protected routing will be handled inline below based on isAuthenticated
@@ -67,6 +81,12 @@ function App() {
               <Login onAuthenticate={handleAuthentication} />
             )
           }
+        />
+
+        {/* OAuth callback ruta */}
+        <Route
+          path="/login/callback"
+          element={<LoginCallback onAuthenticate={handleAuthentication} />}
         />
 
         {/* Zasticene rute */}
