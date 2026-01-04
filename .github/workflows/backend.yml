@@ -1,0 +1,20 @@
+name: Backend CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+
+jobs:
+ deploy:
+   name: Deploy Backend to Render
+   runs-on: ubuntu-latest
+   if: github.ref == 'refs/heads/main'
+   steps:
+     - name: Trigger Render Deploy Hook
+       run: curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
