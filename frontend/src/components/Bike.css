@@ -1,51 +1,60 @@
-.inputs {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.inputs input {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.error {
-    color: red;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
 .obrub {
-    min-width: 100vw;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     min-height: 35vh;
     display: flex;
-    justify-content: center;
-    padding: 0.5rem 0;
-    padding-bottom: 4vh;
+    flex-direction: row;
+    padding: 0;
     position: relative;
     overflow: hidden;
+    justify-content: start;
+    background-image: url('../../public/images/bikeBackground2.jpg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.obavijesti {
+    flex: 3;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.obavijest-item {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: start;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .oglasna-grid {
     display: grid;
     gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    width: 90%;
+    backdrop-filter: blur(10px);
+    border: 1px solid black;
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    border-radius: 8px;
+    width: 100%;
+    max-width: 960px;
     margin: 0 auto;
     padding: 2rem;
-    text-align: center;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    justify-items: stretch;
 
-    border-radius: 8px;
-    border: 3px solid #007bff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
 
+.razdvojnik {
+    flex: 2;
+    width: 100%;
+    padding: 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .oglas-item {
@@ -54,8 +63,15 @@
     padding: 18px;
     border-radius: 8px;
     margin-bottom: 2%;
+    text-align: center;
+    margin-left: 0;
     border: 1px solid black;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .naslov {
@@ -63,7 +79,7 @@
     padding-bottom: 2vh;
     text-align: center;
     margin-bottom: -1vh;
-    min-width: 100vw;
+    min-width: 100%;
     color: #000000;
 }
 
@@ -147,47 +163,65 @@
     background-color: #a71d2a;
 }
 
-.mapa {
-    width: 90%;
-    height: 60vh;
-    margin: 0 auto 2vh;
-    border: none;
-    border-radius: 8px;
-}
-
-.mapaOkvir {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .naslovOglasa {
     margin-bottom: 0.5rem;
-    color: #007bff;
 }
 
+.opis {
+    margin-bottom: 0.5rem;
+}
+
+.ruta {
+    margin-bottom: 0.5rem;
+}
+
+.pregledajRutu {
+    margin-top: 0.25rem;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    border: 2px solid #007bff;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #007bff, #2596ff);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    align-self: center;
+}
+
+.pregledajRutu:hover {
+    background: linear-gradient(135deg, #0056b3, #1f7fd9);
+    border-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+}
+
+
 .pridruziSe {
-    margin-top: 1rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    margin: 0;
 }
 
 .pridruziSe button {
-    padding: 0.6rem 1.5rem;
-    font-size: 1rem;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    background-color: #007bff;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.95rem;
+    border: 2px solid #28a745;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #28a745, #2fc060);
     color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    transition: all 0.2s ease;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.35);
 }
 
 .pridruziSe button:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    background: linear-gradient(135deg, #1e7e34, #26a653);
+    border-color: #1e7e34;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
 }
