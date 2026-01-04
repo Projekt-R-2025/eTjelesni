@@ -43,7 +43,7 @@ function App() {
           localStorage.setItem('user', JSON.stringify(data));
           setIsAuthenticated(true);
         } else {
-          // Token je nevažeći ili istekao
+          // Token je nevažeći ili istekao - ukloni ga
           removeToken();
           setIsAuthenticated(false);
         }
