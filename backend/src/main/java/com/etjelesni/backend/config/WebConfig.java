@@ -27,7 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
@@ -49,23 +48,21 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    private final Logger log = LoggerFactory.getLogger(WebConfig.class);
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins(frontendUrl)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+    @Value("${app.cookie.same-site}")
+    private String cookieSameSite;
+
+    private final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -142,12 +139,14 @@ public class WebConfig implements WebMvcConfigurer {
         // Save the new token to DB
         tokenService.saveToken(jwt, user);
 
-
+        // Create cookie with environment-based settings
+        // Local: secure=false, sameSite=Lax (works on HTTP)
+        // Production: secure=true, sameSite=None (required for cross-domain HTTPS)
         ResponseCookie cookie = ResponseCookie.from("jwtToken", jwt)
                 .path("/")
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
                 .maxAge(24 * 60 * 60)
                 .build();
 
