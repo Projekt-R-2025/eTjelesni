@@ -1,6 +1,7 @@
 package com.etjelesni.backend.config;
 
 
+import com.etjelesni.backend.model.Token;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.service.auth.CustomOAuth2UserService;
 import com.etjelesni.backend.service.auth.JwtService;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,12 +48,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    @Value("${app.cookie.secure}")
-    private boolean cookieSecure;
-
-    @Value("${app.cookie.same-site}")
-    private String cookieSameSite;
-
     private final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
     @Bean
@@ -82,7 +76,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // Configure URL authorization
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/hello", "/api/login").permitAll()
+                                .requestMatchers("/api/hello", "/api/login", "/api/auth/set-cookie").permitAll()
                                 .requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll()
                 )
@@ -133,25 +127,18 @@ public class WebConfig implements WebMvcConfigurer {
         Long userId = user.getId();
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        String jwt = jwtService.generateToken(userDetails, userId); // Include userId in JWT
-        log.info("Generated JWT: [{}]", jwt);
+        String jwt = jwtService.generateToken(userDetails, userId);
+        log.info("Generated JWT token");
 
-        // Save the new token to DB
-        tokenService.saveToken(jwt, user);
+        // Save the token to DB and get the ID
+        Token savedToken = tokenService.saveToken(jwt, user);
+        Long tokenId = savedToken.getId();
 
-        // Create cookie with environment-based settings
-        // Local: secure=false, sameSite=Lax (works on HTTP)
-        // Production: secure=true, sameSite=None (required for cross-domain HTTPS)
-        ResponseCookie cookie = ResponseCookie.from("jwtToken", jwt)
-                .path("/")
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .sameSite(cookieSameSite)
-                .maxAge(24 * 60 * 60)
-                .build();
+        // Send only the token ID (not the actual JWT) in URL for security
+        String redirectUrl = frontendUrl + "/auth/callback?tokenId=" + tokenId;
 
-        response.addHeader("Set-Cookie", cookie.toString());
-        response.sendRedirect(frontendUrl);
+        log.info("Redirecting to frontend with tokenId: [{}]", tokenId);
+        response.sendRedirect(redirectUrl);
     }
 
 }

@@ -9,13 +9,14 @@ import './App.css'         // Msn da nije potrebno vise
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Bike from './components/Bike';
+import AuthCallback from './components/AuthCallback';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const backendBase = import.meta.env.VITE_API_BASE_URL;
 
-  // Check authentication on app load using cookie-based JWT (no localStorage trust)
+  // Check authentication on app load using cookie
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -57,6 +58,12 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Auth callback route - handles Safari cookie fix */}
+        <Route
+          path="/auth/callback"
+          element={<AuthCallback onAuthenticate={handleAuthentication} />}
+        />
+
         {/* Root route za autentifikaciju (Login) */}
         <Route
           path="/"
