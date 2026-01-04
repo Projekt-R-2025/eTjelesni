@@ -16,5 +16,9 @@ jobs:
    runs-on: ubuntu-latest
    if: github.ref == 'refs/heads/main'
    steps:
-     - name: Trigger Render Deploy Hook
-       run: curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+    - name: Deploy to Production
+      uses: johnbeynon/render-deploy-action@v0.0.8
+      with:
+        service-id: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        api-key: ${{ secrets.RENDER_API_KEY }}
+        wait-for-success: true
