@@ -17,7 +17,7 @@ function App() {
 
   const backendBase = import.meta.env.VITE_API_BASE_URL;
 
-  // Check authentication on app load using Bearer token from localStorage
+  // Provjera autentifikacije pri učitavanju aplikacije koristeći Bearer token iz localStorage
   useEffect(() => {
     const checkAuth = async () => {
       // Provjeri postoji li token u localStorage
