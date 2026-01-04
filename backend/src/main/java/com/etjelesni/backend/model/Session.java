@@ -18,6 +18,10 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
+    private String description;
+
     private Integer capacity;
 
     @NotNull
@@ -31,6 +35,10 @@ public class Session {
     @NotNull
     @Column(nullable = false)
     private LocalDateTime endTime;
+
+    private String startLocation;
+
+    private String endLocation;
 
     @ManyToOne
     @JoinColumn(name = "section_id", nullable = false)
