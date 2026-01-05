@@ -1,4 +1,4 @@
-name: Backend CI/CD Pipeline
+name: Backend
 
 on:
   push:
@@ -17,8 +17,8 @@ jobs:
    if: github.ref == 'refs/heads/main'
    steps:
     - name: Deploy to Production
-      uses: johnbeynon/render-deploy-action@747373cdb7b9b3f561438e063ee0815b71584f1b
+      uses: JorgeLNJunior/render-deploy@v1.4.7
       with:
-        service-id: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
-        api-key: ${{ secrets.RENDER_API_KEY }}
-        wait-for-success: true
+        service_id: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        api_key: ${{ secrets.RENDER_API_KEY }}
+        wait_deploy: true
