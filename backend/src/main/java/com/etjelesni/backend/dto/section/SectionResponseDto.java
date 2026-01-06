@@ -12,7 +12,6 @@ public class SectionResponseDto {
     private Integer passingPoints;
     private Boolean isLocked;
     private Boolean isBikeSection;
-    private Long semesterId;
     private List<UserResponseDto> leaders;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

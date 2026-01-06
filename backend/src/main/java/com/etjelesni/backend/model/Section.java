@@ -35,10 +35,6 @@ public class Section {
     @Column(nullable = false)
     private Boolean isBikeSection = false;
 
-    @ManyToOne
-    @JoinColumn(name = "semester_id", nullable = false)
-    private Semester semester;
-
     @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<SectionLeader> sectionLeaders;
 

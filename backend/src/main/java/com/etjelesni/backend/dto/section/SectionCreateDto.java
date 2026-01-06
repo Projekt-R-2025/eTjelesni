@@ -7,5 +7,4 @@ public class SectionCreateDto {
     private String name;
     private Integer passingPoints;
     private Boolean isBikeSection;
-    private Long semesterId;
 }
