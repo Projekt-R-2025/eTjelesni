@@ -7,7 +7,6 @@ import com.etjelesni.backend.exception.ResourceNotFoundException;
 import com.etjelesni.backend.mapper.SectionMapper;
 import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.SectionLeader;
-import com.etjelesni.backend.model.Semester;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.SectionLeaderRepository;
 import com.etjelesni.backend.repository.SectionRepository;
@@ -27,7 +26,6 @@ public class SectionService {
     private final SectionLeaderRepository sectionLeaderRepository;
 
     private final CurrentUserService currentUserService;
-    private final SemesterService semesterService;
 
     public List<SectionResponseDto> getAllSections() {
         List<Section> sections = sectionRepository.findAll();
@@ -41,10 +39,6 @@ public class SectionService {
 
     public SectionResponseDto createSection(SectionCreateDto dto) {
         Section section = sectionMapper.toEntity(dto);
-
-        Semester semester = semesterService.getSemesterOrThrow(dto.getSemesterId());
-        section.setSemester(semester);
-
         sectionRepository.save(section);
         return sectionMapper.toResponseDto(section);
     }

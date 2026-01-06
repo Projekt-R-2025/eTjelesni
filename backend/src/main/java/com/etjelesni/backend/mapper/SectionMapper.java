@@ -11,7 +11,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface SectionMapper {
 
-    @Mapping(target = "semesterId", source = "semester.id")
     @Mapping(target = "leaders", source = "leaders")
     SectionResponseDto toResponseDto(Section section);
 
