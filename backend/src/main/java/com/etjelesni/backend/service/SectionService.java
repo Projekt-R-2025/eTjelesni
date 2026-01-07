@@ -47,6 +47,7 @@ public class SectionService {
         Section section = getSectionOrThrow(id);
 
         if (dto.getName() != null) section.setName(dto.getName());
+        if (dto.getSectionType() != null) section.setSectionType(dto.getSectionType());
         if (dto.getPassingPoints() != null) section.setPassingPoints(dto.getPassingPoints());
 
         Section updatedSection = sectionRepository.save(section);

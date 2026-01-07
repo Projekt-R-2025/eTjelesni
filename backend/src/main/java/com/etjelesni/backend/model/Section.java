@@ -1,5 +1,6 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.SectionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,9 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "sections")
@@ -32,8 +31,10 @@ public class Section {
     @Column(nullable = false)
     private Boolean isLocked = false;
 
+    @NotNull
     @Column(nullable = false)
-    private Boolean isBikeSection = false;
+    @Enumerated(EnumType.STRING)
+    private SectionType sectionType = SectionType.OSTALO;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<SectionLeader> sectionLeaders;
