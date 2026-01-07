@@ -14,4 +14,5 @@ public class UserResponseDto {
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer currentPoints;
 }

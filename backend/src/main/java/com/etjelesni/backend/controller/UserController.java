@@ -56,4 +56,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/points/reset")
+    public ResponseEntity<String> resetAllStudentsPointsToZero() {
+        userService.resetAllStudentsPointsToZero();
+        return ResponseEntity.ok("Students' points are reset to 0.");
+    }
+
 }

@@ -9,6 +9,7 @@ import com.etjelesni.backend.mapper.UserMapper;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,17 @@ public class UserService {
     public void updateUserRole(User user, Role newRole) {
         user.setRole(newRole);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public int resetAllStudentsPointsToZero() {
+        User currentUser = currentUserService.getCurrentUser();
+
+        if (currentUser == null || !currentUser.isProfessor()) {
+            throw new AccessDeniedException("You do not have permission to reset students' points.");
+        }
+
+        return userRepository.resetPointsByRoles(List.of(Role.STUDENT, Role.LEADER));
     }
 
 }
