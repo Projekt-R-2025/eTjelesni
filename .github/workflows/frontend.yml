@@ -12,7 +12,7 @@ jobs:
    runs-on: ubuntu-latest
    if: github.ref == 'refs/heads/main'
    steps:
-    - name: Deploy to Production
+    - name: Deploy and monitor progress
       uses: JorgeLNJunior/render-deploy@v1.4.7
       with:
         service_id: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
