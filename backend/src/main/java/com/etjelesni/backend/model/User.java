@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.etjelesni.backend.model.SectionLeader;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -47,8 +47,7 @@ public class User implements UserDetails {
 
     private String password;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private Integer currentPoints;
 
     @Enumerated(EnumType.STRING)
@@ -62,6 +61,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<RoleRequest> roleRequests;
+
+    @OneToMany(mappedBy = "leader", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<SectionLeader> leadingSections;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
