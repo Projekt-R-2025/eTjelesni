@@ -88,4 +88,13 @@ public class UserService {
         return userRepository.resetPointsByRoles(List.of(Role.STUDENT, Role.LEADER));
     }
 
+    public void updateLeadingSections(User user, Long sectionId) {
+        List<Long> leadingSectionIds = user.getLeadingSectionIds();
+        if (!leadingSectionIds.contains(sectionId)) {
+            leadingSectionIds.add(sectionId);
+            user.setLeadingSectionIds(leadingSectionIds);
+            userRepository.save(user);
+        }
+    }
+
 }

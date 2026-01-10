@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.etjelesni.backend.model.SectionLeader;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,7 +48,6 @@ public class User implements UserDetails {
 
     private String password;
 
-    @Column
     private Integer currentPoints;
 
     @Enumerated(EnumType.STRING)
@@ -62,9 +62,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<RoleRequest> roleRequests;
 
-    @OneToMany(mappedBy = "leader", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<SectionLeader> leadingSections;
+    private List<Long> leadingSectionIds = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
