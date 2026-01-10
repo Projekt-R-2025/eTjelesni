@@ -26,6 +26,7 @@ public class SectionService {
     private final SectionLeaderRepository sectionLeaderRepository;
 
     private final CurrentUserService currentUserService;
+    private final UserService userService;
 
     public List<SectionResponseDto> getAllSections() {
         List<Section> sections = sectionRepository.findAll();
@@ -77,6 +78,8 @@ public class SectionService {
         sectionLeader.setLeader(user);
         sectionLeader.setSection(section);
         sectionLeaderRepository.save(sectionLeader);
+
+        userService.updateLeadingSections(user, section.getId());
     }
 
 }
