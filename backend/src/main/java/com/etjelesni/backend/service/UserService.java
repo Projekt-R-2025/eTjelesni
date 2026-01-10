@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,6 +45,8 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         User user = userMapper.toEntity(dto);
         user.setRole(Role.STUDENT);
+        user.setCurrentPoints(0);
+        user.setLeadingSectionIds(new ArrayList<>());
         userRepository.save(user);
         return userMapper.toResponseDto(user);
     }
