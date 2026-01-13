@@ -48,4 +48,18 @@ public class AttendanceController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/attendances/{id}/approve")
+    public ResponseEntity<AttendanceResponseDto> approveAttendance(@PathVariable Long id) {
+        AttendanceResponseDto response = attendanceService.approveAttendance(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/attendances/{id}/reject")
+    public ResponseEntity<AttendanceResponseDto> rejectAttendance(@PathVariable Long id) {
+        AttendanceResponseDto response = attendanceService.rejectAttendance(id);
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

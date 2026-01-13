@@ -84,8 +84,8 @@ public class UserService {
     public int resetAllStudentsPointsToZero() {
         User currentUser = currentUserService.getCurrentUser();
 
-        if (currentUser == null || !currentUser.isProfessor()) {
-            throw new AccessDeniedException("You do not have permission to reset students' points.");
+        if (currentUser.isStudent()) {
+            throw new AccessDeniedException("You do not have permission to reset students points.");
         }
 
         return userRepository.resetPointsByRoles(List.of(Role.STUDENT, Role.LEADER));
@@ -98,6 +98,12 @@ public class UserService {
             user.setLeadingSectionIds(leadingSectionIds);
             userRepository.save(user);
         }
+    }
+
+    public void increasePoints(User user, Integer points) {
+        int currentPoints = user.getCurrentPoints() != null ? user.getCurrentPoints() : 0;
+        user.setCurrentPoints(currentPoints + points);
+        userRepository.save(user);
     }
 
 }
