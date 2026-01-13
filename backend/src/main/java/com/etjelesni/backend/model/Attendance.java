@@ -1,5 +1,6 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.RequestStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,8 +19,9 @@ public class Attendance {
 
     private Boolean cancelled;
 
-    // moguce da nece trebati
-    private String cancellationReason;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status = RequestStatus.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)

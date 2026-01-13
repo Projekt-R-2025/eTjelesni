@@ -32,6 +32,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setRole(Role.STUDENT);
             newUser.setFirstName(oauth2User.getAttribute("given_name"));
             newUser.setLastName(oauth2User.getAttribute("family_name"));
+            newUser.setCurrentPoints(0);
 
             log.info("Creating new user with email: {}", email);
 

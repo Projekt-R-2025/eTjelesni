@@ -1,6 +1,7 @@
 package com.etjelesni.backend.dto.attendance;
 
 
+import com.etjelesni.backend.enumeration.RequestStatus;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 public class AttendanceResponseDto {
     private Long id;
     private Boolean cancelled;
-    private String cancellationReason;
+    private RequestStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long sessionId;

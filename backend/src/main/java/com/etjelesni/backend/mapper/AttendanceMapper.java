@@ -23,7 +23,6 @@ public interface AttendanceMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "cancelled", ignore = true)
-    @Mapping(target = "cancellationReason", ignore = true)
     @Mapping(target = "session", source = ".")
     Attendance toEntity(Session session);
 }
