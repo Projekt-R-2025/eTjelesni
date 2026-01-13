@@ -18,6 +18,7 @@ public class Attendance {
 
     private Boolean cancelled;
 
+    // moguce da nece trebati
     private String cancellationReason;
 
     @ManyToOne

@@ -7,5 +7,6 @@ import lombok.Data;
 public class RoleRequestCreateDto {
     private Long userId;
     private Role requestedRole;
+    private Long requestedSectionId;
     private String reason;
 }

@@ -1,0 +1,21 @@
+package com.etjelesni.backend.mapper;
+
+import com.etjelesni.backend.dto.section.SectionCreateDto;
+import com.etjelesni.backend.dto.section.SectionResponseDto;
+import com.etjelesni.backend.model.Section;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
+public interface SectionMapper {
+
+    @Mapping(target = "leaders", source = "leaders")
+    SectionResponseDto toResponseDto(Section section);
+
+    List<SectionResponseDto> toResponseDtoList(List<Section> sections);
+
+    Section toEntity(SectionCreateDto dto);
+
+}

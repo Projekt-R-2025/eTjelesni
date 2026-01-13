@@ -1,6 +1,7 @@
 import './Home.css';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import { removeToken, getToken } from '../utils/token';
 
 const Home = ({ onLogout }) => {
   const [userData, setUserData] = useState(null);
@@ -14,11 +15,13 @@ const Home = ({ onLogout }) => {
       try {
         console.log('Dohvaćam korisničke podatke s backenda...');
 
+        const token = getToken();
+
         const response = await fetch(`${backendBase}/api/users/me`, {
           method: 'GET',
-          credentials: 'include', // Šalje cookie automatski
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -31,11 +34,13 @@ const Home = ({ onLogout }) => {
         } else {
           // Ako ne može dohvatiti podatke, vrati na login
           console.error('Neuspješno dohvaćanje korisničkih podataka');
+          removeToken();
           navigate('/');
         }
 
       } catch (error) {
         console.error('Greška pri dohvaćanju korisničkih podataka:', error);
+        removeToken();
         navigate('/');
       } finally {
         setLoading(false);
@@ -49,12 +54,14 @@ const Home = ({ onLogout }) => {
     try {
       console.log('Šaljem logout zahtjev...');
 
-      // Pošalji logout zahtjev na backend da revokea token i obriše cookie
+      const token = getToken();
+
+      // Pošalji logout zahtjev na backend (opcionalno, ako backend ima logout endpoint)
       const response = await fetch(`${backendBase}/api/logout`, {
         method: 'POST',
-        credentials: 'include', // Šalje cookie automatski
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -63,13 +70,14 @@ const Home = ({ onLogout }) => {
       if (!response.ok) {
         console.error('Logout nije uspio:', response.status, response.statusText);
       } else {
-        console.log('Token uspješno revokean na backendu i cookie obrisan');
+        console.log('Token uspješno revokean na backendu');
       }
     } catch (error) {
       console.error('Greška pri odjavi:', error);
     } finally {
       // Uvijek obriši lokalne podatke i odjavi korisnika
       localStorage.removeItem('user');
+      removeToken(); // Ukloni JWT token iz localStorage
       onLogout();
       // Preusmjeri na login stranicu
       navigate('/');
@@ -90,12 +98,15 @@ const Home = ({ onLogout }) => {
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! 🏐</h1>
-        <button
-          className="btn btn-danger"
-          onClick={handleLogout}
-        >
-          Odjavi se
-        </button>
+        <div className="home-actions">
+          <Link to="/bike" className="btn btn-outline-primary bike-btn">Za dev svrhe: Bike</Link>
+          <button
+            className="btn btn-danger"
+            onClick={handleLogout}
+          >
+            Odjavi se
+          </button>
+        </div>
       </div>
 
       {/* Korisnički podaci */}

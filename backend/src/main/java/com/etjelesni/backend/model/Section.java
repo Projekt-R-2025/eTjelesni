@@ -1,5 +1,6 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.SectionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,24 +31,13 @@ public class Section {
     @Column(nullable = false)
     private Boolean isLocked = false;
 
+    @NotNull
     @Column(nullable = false)
-    private Boolean isBikeSection = false;
+    @Enumerated(EnumType.STRING)
+    private SectionType sectionType = SectionType.OSTALO;
 
-    @ManyToOne
-    @JoinColumn(name = "semester_id", nullable = false)
-    private Semester semester;
-
-    @ManyToMany
-    @JoinTable(
-        name = "section_leaders",
-        joinColumns = @JoinColumn(name = "section_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> leaders;
-
-    @ManyToOne
-    @JoinColumn(name = "professor_id", nullable = false)
-    private User professor;
+    @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<SectionLeader> sectionLeaders;
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.REMOVE)
     private List<Session> sessions;
@@ -62,5 +52,14 @@ public class Section {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public List<User> getLeaders() {
+        if (sectionLeaders == null) {
+            return List.of();
+        }
+        return sectionLeaders.stream()
+                             .map(SectionLeader::getLeader)
+                             .toList();
+    }
 
 }

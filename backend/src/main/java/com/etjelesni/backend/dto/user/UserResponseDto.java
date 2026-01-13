@@ -4,6 +4,7 @@ import com.etjelesni.backend.enumeration.Role;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class UserResponseDto {
@@ -12,6 +13,8 @@ public class UserResponseDto {
     private String lastName;
     private String email;
     private Role role;
+    private Integer currentPoints;
+    private List<Long> leadingSectionIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

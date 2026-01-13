@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,7 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
@@ -51,22 +49,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins(frontendUrl)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -129,7 +119,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
 
-        log.info("OAuth2 Authentication Successful, redirecting to frontend home");
+        log.info("OAuth2 Authentication Successful, redirecting to frontend with JWT");
         User user = customOAuth2UserService.saveUser(oauth2User);
 
         String email = user.getEmail();
@@ -137,22 +127,14 @@ public class WebConfig implements WebMvcConfigurer {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         String jwt = jwtService.generateToken(userDetails, userId); // Include userId in JWT
-        log.info("Generated JWT: [{}]", jwt);
+        log.info("Generated JWT for user: {}", email);
 
         // Save the new token to DB
         tokenService.saveToken(jwt, user);
 
-
-        ResponseCookie cookie = ResponseCookie.from("jwtToken", jwt)
-                .path("/")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .maxAge(24 * 60 * 60)
-                .build();
-
-        response.addHeader("Set-Cookie", cookie.toString());
-        response.sendRedirect(frontendUrl + "/home");
+        // Redirect to frontend callback page with token as URL parameter
+        String redirectUrl = frontendUrl + "/login/callback?token=" + jwt;
+        response.sendRedirect(redirectUrl);
     }
 
 }

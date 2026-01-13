@@ -1,38 +1,40 @@
 package com.etjelesni.backend.model;
 
+import com.etjelesni.backend.enumeration.NotificationType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "semesters")
+@Table(name = "notifications")
 @Data
-public class Semester {
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String name;
-
     @NotNull
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private String title;
 
-    @NotNull
+    private String body;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private NotificationType type;
 
-    @OneToMany(mappedBy = "semester", cascade = CascadeType.REMOVE)
-    private List<Section> sections;
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

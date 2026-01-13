@@ -26,6 +26,10 @@ public class RoleRequest {
     @Column(nullable = false)
     private Role requestedRole;
 
+    @ManyToOne
+    @JoinColumn(name = "requested_section_id")
+    private Section requestedSection;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;

@@ -9,10 +9,12 @@ import com.etjelesni.backend.mapper.UserMapper;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,7 +34,7 @@ public class UserService {
 
     public List<UserResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return userMapper.toResponseDto(users);
+        return userMapper.toResponseDtoList(users);
     }
 
     public UserResponseDto getUserById(Long id) {
@@ -43,6 +45,8 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         User user = userMapper.toEntity(dto);
         user.setRole(Role.STUDENT);
+        user.setCurrentPoints(0);
+        user.setLeadingSectionIds(new ArrayList<>());
         userRepository.save(user);
         return userMapper.toResponseDto(user);
     }
@@ -74,6 +78,26 @@ public class UserService {
     public void updateUserRole(User user, Role newRole) {
         user.setRole(newRole);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public int resetAllStudentsPointsToZero() {
+        User currentUser = currentUserService.getCurrentUser();
+
+        if (currentUser == null || !currentUser.isProfessor()) {
+            throw new AccessDeniedException("You do not have permission to reset students' points.");
+        }
+
+        return userRepository.resetPointsByRoles(List.of(Role.STUDENT, Role.LEADER));
+    }
+
+    public void updateLeadingSections(User user, Long sectionId) {
+        List<Long> leadingSectionIds = user.getLeadingSectionIds();
+        if (!leadingSectionIds.contains(sectionId)) {
+            leadingSectionIds.add(sectionId);
+            user.setLeadingSectionIds(leadingSectionIds);
+            userRepository.save(user);
+        }
     }
 
 }

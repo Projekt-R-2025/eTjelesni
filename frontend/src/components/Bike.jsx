@@ -187,6 +187,11 @@ function Bike() {
         window.open(url, '_blank');
     }
 
+    function openGoogleMaps(pointA, pointB) {
+        const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pointA)}&destination=${encodeURIComponent(pointB)}&travelmode=walking`;
+        window.open(url, '_blank');
+    }
+
     return (
         <>
 

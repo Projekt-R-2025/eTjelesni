@@ -14,8 +14,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.etjelesni.backend.model.SectionLeader;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,6 +48,8 @@ public class User implements UserDetails {
 
     private String password;
 
+    private Integer currentPoints;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.STUDENT;
@@ -57,6 +61,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<RoleRequest> roleRequests;
+
+    private List<Long> leadingSectionIds = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -112,10 +118,6 @@ public class User implements UserDetails {
 
     public boolean isProfessor() {
         return hasRole(Role.PROFESSOR);
-    }
-
-    public boolean isLeader() {
-        return hasRole(Role.LEADER);
     }
 
     public boolean isStudent() {
