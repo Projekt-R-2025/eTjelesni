@@ -1,0 +1,30 @@
+.containerTreninzi {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.containerTreninzi h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.trenutniTreninzi {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+.trenutniTreninzi:empty::before {
+    content: "Nema trenutnih treninga";
+    display: block;
+    text-align: center;
+    color: #6c757d;
+    font-size: 1.2rem;
+    padding: 60px 20px;
+}

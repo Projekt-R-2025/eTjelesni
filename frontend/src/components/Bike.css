@@ -126,6 +126,8 @@
 }
 
 .forma input[type="text"],
+.forma input[type="number"],
+.forma input[type="datetime-local"],
 .forma textarea {
     width: 100%;
     padding: 0.5rem;
@@ -134,6 +136,15 @@
     border-radius: 5px;
     font-size: 1rem;
     resize: vertical;
+}
+
+.forma input[type="number"],
+.forma input[type="datetime-local"] {
+    font-family: inherit;
+}
+
+.forma input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
 }
 
 .forma button {
@@ -168,11 +179,21 @@
 }
 
 .opis {
-    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    width: 100%;
 }
 
 .ruta {
-    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    width: 100%;
 }
 
 .pregledajRutu {
@@ -224,4 +245,38 @@
     border-color: #1e7e34;
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
+}
+
+.info-detalji {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0;
+}
+
+.info-red {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.info-red strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.info-red span {
+    color: #666;
+}
+
+.vrijeme-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
 }
