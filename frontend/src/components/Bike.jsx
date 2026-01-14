@@ -25,7 +25,7 @@ function Bike() {
         const fetchBikeSectionAndSessions = async () => {
             try {
                 const token = getToken();
-                const response = await fetch('http://localhost:8080/api/sections', {
+                const response = await fetch(`${backendBase}/api/sections`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -42,7 +42,7 @@ function Bike() {
                         console.log('Bike section ID:', bikeSection.id);
 
                         // Dohvati notifikacije za BIKE sekciju
-                        const notificationsResponse = await fetch(`http://localhost:8080/api/notifications/section/${bikeSection.id}`, {
+                        const notificationsResponse = await fetch(`${backendBase}/api/notifications/section/${bikeSection.id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -57,7 +57,7 @@ function Bike() {
                         }
 
                         // Dohvati sve sesije za BIKE sekciju
-                        const sessionsResponse = await fetch(`http://localhost:8080/api/sessions/section/${bikeSection.id}`, {
+                        const sessionsResponse = await fetch(`${backendBase}/api/sessions/section/${bikeSection.id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -105,7 +105,7 @@ function Bike() {
 
         for (const session of sessions) {
             try {
-                const response = await fetch(`http://localhost:8080/api/sessions/${session.id}/attendances`, {
+                const response = await fetch(`${backendBase}/api/sessions/${session.id}/attendances`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -173,7 +173,7 @@ function Bike() {
                 sectionId: bikeSectionId
             };
 
-            const response = await fetch('http://localhost:8080/api/sessions', {
+            const response = await fetch(`${backendBase}/api/sessions`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
