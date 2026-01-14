@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import './Bike.css';
 import { getToken } from '../utils/token.js';
 
+const backendBase = import.meta.env.VITE_API_BASE_URL;
+
 function Bike() {
     const [data, setData] = useState([]);
     const [notifications, setNotifications] = useState([]);
