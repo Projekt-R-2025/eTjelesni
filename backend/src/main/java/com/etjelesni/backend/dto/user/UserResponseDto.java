@@ -13,6 +13,7 @@ public class UserResponseDto {
     private String lastName;
     private String email;
     private Role role;
+    private Long sectionId;
     private Integer currentPoints;
     private List<Long> leadingSectionIds;
     private LocalDateTime createdAt;

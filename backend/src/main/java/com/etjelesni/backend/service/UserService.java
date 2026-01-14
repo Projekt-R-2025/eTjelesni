@@ -6,6 +6,7 @@ import com.etjelesni.backend.dto.user.UserUpdateDto;
 import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.exception.UserNotFoundException;
 import com.etjelesni.backend.mapper.UserMapper;
+import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
@@ -77,6 +78,11 @@ public class UserService {
 
     public void updateUserRole(User user, Role newRole) {
         user.setRole(newRole);
+        userRepository.save(user);
+    }
+
+    public void updateUserSection(User user, Section newSection) {
+        user.setSection(newSection);
         userRepository.save(user);
     }
 
