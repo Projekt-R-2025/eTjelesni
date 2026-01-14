@@ -1,7 +1,6 @@
 package com.etjelesni.backend.repository;
 
 import com.etjelesni.backend.enumeration.RequestStatus;
-import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.model.Application;
 import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.User;
@@ -14,7 +13,5 @@ import java.util.List;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
     boolean existsByApplicantAndSectionAndStatus(User applicant, Section requestedSection, RequestStatus status);
     List<Application> findByStatus(RequestStatus status);
-    //List<Application> findByStatusAndRequestedRole(RequestStatus status, Role requestedRole);
     List<Application> findByApplicant(User applicant);
-    //List<Application> findByRequestedRole(Role requestedRole);
 }

@@ -62,8 +62,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<RoleRequest> roleRequests;
 
-    //@ManyToOne
-    //@JoinColumn(name = "section_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "section_id")
     @JsonIgnore

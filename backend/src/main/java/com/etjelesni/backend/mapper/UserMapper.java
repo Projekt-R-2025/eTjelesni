@@ -4,12 +4,14 @@ import com.etjelesni.backend.dto.user.UserCreateDto;
 import com.etjelesni.backend.dto.user.UserResponseDto;
 import com.etjelesni.backend.model.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(source = "section.id", target = "sectionId")
     UserResponseDto toResponseDto(User user);
 
     List<UserResponseDto> toResponseDtoList(List<User> users);

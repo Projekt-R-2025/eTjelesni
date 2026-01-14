@@ -4,7 +4,6 @@ import com.etjelesni.backend.dto.application.ApplicationCreateDto;
 import com.etjelesni.backend.dto.application.ApplicationResponseDto;
 import com.etjelesni.backend.dto.application.ApplicationReviewDto;
 import com.etjelesni.backend.enumeration.RequestStatus;
-import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.exception.ResourceNotFoundException;
 import com.etjelesni.backend.mapper.ApplicationMapper;
 import com.etjelesni.backend.model.Application;
@@ -33,42 +32,49 @@ public class ApplicationService {
 
     public List<ApplicationResponseDto> getAllApplications(String status) {
         User currentUser = currentUserService.getCurrentUser();
-        List<Application> applications;
 
-        if (status != null && !status.isBlank()) {
-            // attempt to convert string to enum
-            RequestStatus queryParamStatus;
-            try {
-                queryParamStatus = RequestStatus.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid query parameter status: " + status);
-            }
+        // Admin and professors can see all applications
+        if (currentUser.isAdmin() || currentUser.isProfessor()) {
+            List<Application> applications;
 
-            // filter by status
-            //Admini i profesori mogu sve
-            if (currentUser.isAdmin() || currentUser.isProfessor()) {
+            if (status != null && !status.isBlank()) {
+                RequestStatus queryParamStatus;
+                try {
+                    queryParamStatus = RequestStatus.valueOf(status.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid query parameter status: " + status);
+                }
                 applications = applicationRepository.findByStatus(queryParamStatus);
-            }
-            //ZASAD MICEM JER NE POSTOJI IS LEADER
-            /* else if (currentUser.isLeader()) {
-                applications = applicationRepository.findByStatusAndRequestedSection(queryParamStatus, Role.LEADER);
-            }  */ else {
-                throw new AccessDeniedException("You do not have permission to view role requests");
-            }
-        } else {
-            // if there is no status parameter, return all
-            if (currentUser.isAdmin() || currentUser.isProfessor()) {
+            } else {
                 applications = applicationRepository.findAll();
             }
-            //ISTO KAO GORE
-            /* else if (currentUser.isProfessor()) {
-                applications = applicationRepository.findByRequestedRole(Role.LEADER);
-            } */ else {
-                throw new AccessDeniedException("You do not have permission to view all role requests");
-            }
+
+            return applicationMapper.toResponseDtoList(applications);
         }
 
-        return applicationMapper.toResponseDtoList(applications);
+        // Section leaders can see applications for their sections
+        List<Long> leadingSectionIds = currentUser.getLeadingSectionIds();
+        if (leadingSectionIds != null && !leadingSectionIds.isEmpty()) {
+            List<Application> applications = applicationRepository.findAll().stream()
+                    .filter(app -> leadingSectionIds.contains(app.getSection().getId()))
+                    .toList();
+
+            if (status != null && !status.isBlank()) {
+                RequestStatus queryParamStatus;
+                try {
+                    queryParamStatus = RequestStatus.valueOf(status.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid query parameter status: " + status);
+                }
+                applications = applications.stream()
+                        .filter(app -> app.getStatus() == queryParamStatus)
+                        .toList();
+            }
+
+            return applicationMapper.toResponseDtoList(applications);
+        }
+
+        throw new AccessDeniedException("You do not have permission to view applications");
     }
 
     public List<ApplicationResponseDto> getMyApplications() {
@@ -81,28 +87,10 @@ public class ApplicationService {
         User applicant = userService.getUserOrThrow(dto.getUserId());
         Section requestedSection = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
 
-
-        // Prevent requesting the same section
-        if (applicant.getSection() == requestedSection) {
-            throw new IllegalStateException("You cannot request the same role you already have");
+        // Prevent requesting the same section the user is already in
+        if (applicant.getSection() != null && applicant.getSection().getId().equals(requestedSection.getId())) {
+            throw new IllegalStateException("You are already assigned to this section");
         }
-
-        // Validate section requirement for LEADER role NEBITNO
-        /* if (requestedRole == Role.LEADER) {
-            if (dto.getRequestedSectionId() == null) {
-                throw new IllegalArgumentException("Section ID is required when requesting LEADER role");
-            }
-            section = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
-
-            // Check if user is already a leader of this section
-            if (sectionService.isUserLeaderOfSection(user, section)) {
-                throw new IllegalStateException("You are already a leader of this section");
-            }
-        } else {
-            if (dto.getRequestedSectionId() != null) {
-                throw new IllegalArgumentException("Section ID should only be provided for LEADER role requests");
-            }
-        } */
 
         // Prevent multiple same pending requests
         if (applicationRepository.existsByApplicantAndSectionAndStatus(applicant, requestedSection, RequestStatus.PENDING)) {
@@ -130,8 +118,9 @@ public class ApplicationService {
 
         User requestUser = application.getApplicant();
 
-        // Vidi je li reviewer admin ili profesor
-        if (!(reviewer.isAdmin() || reviewer.isProfessor())) {
+        // Check if the reviewer has permission (admin, professor, or section leader)
+        boolean isLeaderOfSection = sectionService.isUserLeaderOfSection(reviewer, application.getSection());
+        if (!(reviewer.isAdmin() || reviewer.isProfessor() || isLeaderOfSection)) {
             throw new AccessDeniedException("You do not have permission to review this application");
         }
 
@@ -153,7 +142,7 @@ public class ApplicationService {
     public void deleteApplication(Long id) {
         Application application = getApplicationOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();
-        if (application.getApplicant().getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
+        if (application.getApplicant().getId().equals(currentUser.getId())) {
             applicationRepository.deleteById(id);
             return;
         }
