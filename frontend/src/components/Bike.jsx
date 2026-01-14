@@ -17,6 +17,7 @@ function Bike() {
     const [newStartTime, setNewStartTime] = useState('');
     const [newEndTime, setNewEndTime] = useState('');
     const [bikeSectionId, setBikeSectionId] = useState(null);
+    const [attendanceCounts, setAttendanceCounts] = useState({});
 
     useEffect(() => {
         const fetchBikeSectionAndSessions = async () => {
@@ -78,6 +79,9 @@ function Bike() {
                             }));
                             setData(formattedData);
                             console.log('Loaded sessions:', formattedData);
+
+                            // Dohvati broj polaznika za svaku sesiju
+                            fetchAttendanceCounts(sessions);
                         }
                     } else {
                         console.log('No BIKE section found');
@@ -93,17 +97,40 @@ function Bike() {
         fetchBikeSectionAndSessions();
     }, []);
 
+    const fetchAttendanceCounts = async (sessions) => {
+        const token = getToken();
+        const counts = {};
+
+        for (const session of sessions) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/sessions/${session.id}/attendances`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const attendances = await response.json();
+                    counts[session.id] = attendances.length;
+                } else {
+                    counts[session.id] = 0;
+                }
+            } catch (error) {
+                console.error(`Error fetching attendances for session ${session.id}:`, error);
+                counts[session.id] = 0;
+            }
+        }
+
+        setAttendanceCounts(counts);
+    };
+
     function joinGroup(id) {
-        setData(prevData => prevData.map(ad =>
-            ad.id === id ? { ...ad, capacity: ad.capacity - 1 } : ad
-        ));
         setSelectedId(id);
     }
 
     function leaveGroup() {
-        setData(prevData => prevData.map(ad =>
-            ad.id === selectedId ? { ...ad, capacity: ad.capacity + 1 } : ad
-        ));
         setSelectedId(null);
     }
 
@@ -230,8 +257,8 @@ function Bike() {
                                         <span>{ad.B}</span>
                                     </div>
                                     <div className='info-red'>
-                                        <strong>👥 Preostali apacitet:</strong>
-                                        <span>{ad.capacity || 'N/A'}</span>
+                                        <strong>👥 Prijavljeni:</strong>
+                                        <span>{attendanceCounts[ad.id] !== undefined ? `${attendanceCounts[ad.id]} / ${ad.capacity}` : (ad.capacity || 'N/A')}</span>
                                     </div>
                                     <div className='info-red'>
                                         <strong>⭐ Bodovi:</strong>
