@@ -1,23 +1,59 @@
 .containerTreninzi {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    justify-content: start;
+    background-image: url('images/treninzipozadina.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.pozadina {
+    background-image: url('images/treninzipozadina.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.pozadina h1 {
+    text-align: center;
+    color: #000000;
+    margin: 0;
+    padding: 10px 0;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: transparent;
 }
 
 .containerTreninzi h1 {
     text-align: center;
-    color: #333;
+    color: #000000;
     margin-bottom: 30px;
     font-size: 2.5rem;
     font-weight: bold;
+    background: transparent;
 }
 
 .trenutniTreninzi {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-height: 400px;
+    flex: 2;
+    width: 100%;
+    padding: 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .trenutniTreninzi:empty::before {
@@ -27,4 +63,309 @@
     color: #6c757d;
     font-size: 1.2rem;
     padding: 60px 20px;
+}
+
+.sessions-grid {
+    display: grid;
+    gap: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid black;
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    border-radius: 8px;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 2rem;
+    justify-items: stretch;
+}
+
+.session-card {
+    background: #fafafa;
+    color: black;
+    padding: 18px;
+    border-radius: 8px;
+    margin-bottom: 2%;
+    text-align: center;
+    margin-left: 0;
+    border: 1px solid black;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.session-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.session-card h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.session-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0;
+}
+
+.session-details p {
+    margin: 0;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+
+.session-details strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.create-session-button-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.create-session-btn {
+    position: absolute !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    width: 60px !important;
+    height: 60px !important;
+    border-color: #007bff !important;
+    border-radius: 50% !important;
+    background-color: white !important;
+    color: #007bff !important;
+    font-size: 2rem !important;
+    cursor: pointer !important;
+    z-index: 1001 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+
+.form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.form-modal {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.form-modal h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.form-modal input,
+.form-modal textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.form-modal textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-modal input:focus,
+.form-modal textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save,
+.btn-cancel {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #0056b3;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #545b62;
+}
+
+.pridruziSe {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0 0 0;
+    gap: 12px;
+}
+
+.pridruziSe button {
+    padding: 0.6rem 1.4rem;
+    font-size: 0.95rem;
+    border: 2px solid #28a745;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #28a745, #2fc060);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.35);
+    width: 100%;
+    max-width: 200px;
+}
+
+.pridruziSe button:hover {
+    background: linear-gradient(135deg, #1e7e34, #26a653);
+    border-color: #1e7e34;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
+}
+
+.attendance-status {
+    display: block;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #007bff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.approvals-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.approvals-section h2 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.approvals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.approval-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.approval-card h4 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.approval-card p {
+    margin: 10px 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.approval-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.approve-btn,
+.cancel-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.approve-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
 }

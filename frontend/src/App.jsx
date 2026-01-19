@@ -10,6 +10,8 @@ import Login from "./components/Login";
 import LoginCallback from "./components/LoginCallback";
 import Home from "./components/Home";
 import Bike from './components/Bike';
+import Treninzi from './components/Treninzi';
+import SectionCreate from './components/SectionCreate';
 import { hasToken, removeToken, getToken } from './utils/token';
 
 function App() {
@@ -105,6 +107,26 @@ function App() {
           element={
             isAuthenticated ? (
               <Bike onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+        <Route
+          path="/treninzi"
+          element={
+            isAuthenticated ? (
+              <Treninzi onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+        <Route
+          path="/sectionCreate"
+          element={
+            isAuthenticated ? (
+              <SectionCreate onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
