@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Treninzi.css';
 import { getToken } from '../utils/token.js';
+import Navbar from './Navbar';
 
 const backendBase = import.meta.env.VITE_API_BASE_URL;
 
@@ -457,7 +458,7 @@ function Treninzi() {
     return (
         <>
 
-
+            <Navbar />
             <div className="pozadina">
                 <h1>Treninzi</h1>
                 <div className="containerTreninzi">
