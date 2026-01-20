@@ -5,13 +5,17 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import './App.css'         // Msn da nije potrebno vise
+import './App.css'
 import Login from "./components/Login";
 import LoginCallback from "./components/LoginCallback";
 import Home from "./components/Home";
 import Bike from './components/Bike';
+import Sekcija from './components/Sekcija';
+import Prijave from './components/Prijave';
+import Korisnik from './components/Korisnik';
 import Treninzi from './components/Treninzi';
 import SectionCreate from './components/SectionCreate';
+import Konzultacije from './components/Konzultacije';
 import { hasToken, removeToken, getToken } from './utils/token';
 
 function App() {
@@ -112,6 +116,40 @@ function App() {
             )
           }
         />
+
+        <Route
+          path="/sekcija"
+          element={
+            isAuthenticated ? (
+              <Sekcija onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        <Route
+          path="/prijave"
+          element={
+            isAuthenticated ? (
+              <Prijave onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        <Route
+          path="/korisnik"
+          element={
+            isAuthenticated ? (
+              <Korisnik onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
         <Route
           path="/treninzi"
           element={
@@ -122,11 +160,23 @@ function App() {
             )
           }
         />
+
         <Route
           path="/sectionCreate"
           element={
             isAuthenticated ? (
               <SectionCreate onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        <Route
+          path="/konzultacije"
+          element={
+            isAuthenticated ? (
+              <Konzultacije onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )
