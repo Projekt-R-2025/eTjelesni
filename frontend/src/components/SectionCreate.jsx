@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getToken } from '../utils/token';
 import './SectionCreate.css';
+import Navbar from './Navbar';
 
 function SectionCreate() {
     const sectionTypeOptions = [
@@ -99,66 +100,69 @@ function SectionCreate() {
     // UI
 
     return (
-        <div className="section-create-container">
-            <div className="section-create-card">
-                <h2>Kreiraj Novu Sekciju</h2>
+        <>
+            <Navbar />
+            <div className="section-create-container">
+                <div className="section-create-card">
+                    <h2>Kreiraj Novu Sekciju</h2>
 
-                {message.text && (
-                    <div className={`message ${message.type}`}>
-                        {message.text}
-                    </div>
-                )}
+                    {message.text && (
+                        <div className={`message ${message.type}`}>
+                            {message.text}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="section-form">
-                    <div className="form-group">
-                        <label htmlFor="sectionType">Tip sekcije</label>
-                        <select
-                            id="sectionType"
-                            value={formData.sectionType}
-                            onChange={handleTypeChange}
-                            className="select-input"
-                        >
-                            {sectionTypeOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <form onSubmit={handleSubmit} className="section-form">
+                        <div className="form-group">
+                            <label htmlFor="sectionType">Tip sekcije</label>
+                            <select
+                                id="sectionType"
+                                value={formData.sectionType}
+                                onChange={handleTypeChange}
+                                className="select-input"
+                            >
+                                {sectionTypeOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="name">Naziv sekcije</label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={formData.name}
-                            onChange={handleNameChange}
-                            required
-                            placeholder="Unesite naziv sekcije"
-                            className="text-input"
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label htmlFor="name">Naziv sekcije</label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={formData.name}
+                                onChange={handleNameChange}
+                                required
+                                placeholder="Unesite naziv sekcije"
+                                className="text-input"
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="passingPoints">Bodovi za Prolaz</label>
-                        <input
-                            type="number"
-                            id="passingPoints"
-                            value={formData.passingPoints}
-                            onChange={handlePassingPointsChange}
-                            required
-                            min="0"
-                            placeholder="Unesite broj bodova"
-                            className="number-input"
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label htmlFor="passingPoints">Bodovi za Prolaz</label>
+                            <input
+                                type="number"
+                                id="passingPoints"
+                                value={formData.passingPoints}
+                                onChange={handlePassingPointsChange}
+                                required
+                                min="0"
+                                placeholder="Unesite broj bodova"
+                                className="number-input"
+                            />
+                        </div>
 
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? 'Kreiram...' : 'Kreiraj Sekciju'}
-                    </button>
-                </form>
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? 'Kreiram...' : 'Kreiraj Sekciju'}
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

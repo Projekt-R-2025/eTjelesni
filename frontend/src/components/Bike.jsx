@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import './Bike.css';
+import Navbar from './Navbar';
 import { getToken } from '../utils/token.js';
 
 const backendBase = import.meta.env.VITE_API_BASE_URL;
@@ -487,7 +488,7 @@ function Bike() {
 
     return (
         <>
-
+            <Navbar />
             <div className="obrub">
                 <div className="razdvojnik2">
                     <div className="naslov">
