@@ -1,0 +1,19 @@
+.okvirZK {
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    margin-left: calc(-50vw + 50%);
+}
+
+.sadrzajKonzultacije {
+    text-align: left;
+    margin-left: 5vw;
+}
+
+p {
+    margin-left: 5vw;
+}
+
+li {
+    margin-left: 5vw;
+}
