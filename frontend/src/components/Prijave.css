@@ -1,0 +1,257 @@
+/* === POCETNI DIO === */
+.prijave-page {
+  padding: 20px;
+  position: relative;
+}
+
+.back-global {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 48px;
+  cursor: pointer;
+}
+
+.page-title {
+  margin-top: 70px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 50px;
+  margin-top: 40px;
+}
+
+.prijava-card {
+  width: 300px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-top {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+.card-top p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.card-top span {
+  color: #1fa463;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card-bottom {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.card-bottom.image {
+  background: url("/images/roleReq.png") center/cover no-repeat;
+}
+
+.card-bottom.image2 {
+  background: url("/images/trofej.png") center/cover no-repeat;
+}
+
+/* === FORME DIO === */
+
+.form-page {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.form-card {
+  width: 560px;
+  padding: 30px 40px 35px;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.form-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.form-card-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.card-back {
+  background-color: #1e73d8;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.form-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-card label {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: start;
+  gap: 16px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.form-card input,
+.form-card select,
+.form-card textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-card input:disabled {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.form-card textarea {
+  height: 90px;
+  resize: none;
+}
+
+.primary-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  background-color: #1e73d8;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background-color: #155ab0;
+}
+
+.message {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 500;
+}
+
+/* === POTVRDE PRIJAVA === */
+
+.approval-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.approval-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.approval-name {
+  font-weight: 600;
+  width: 200px;
+}
+
+.approval-reason {
+  flex: 1;
+  margin: 0 20px;
+  color: #333;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn {
+  background: #22c55e;
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 42px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.approve-btn:hover {
+  background: #1eb553;
+}
+
+.reject-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 42px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reject-btn:hover {
+  background: #dc3030;
+}
+
+/* === LOADING I PRAZNO STANJE === */
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #666;
+}
+
+.no-prijave {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+  font-size: 1rem;
+}
