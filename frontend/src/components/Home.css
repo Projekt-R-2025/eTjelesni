@@ -1,19 +1,320 @@
-/* Right-align the Bike and logout actions and give them some breathing room */
-.home-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+/* PAGE */
+#root {
+    padding: 0%;
 }
 
-.bike-btn {
+.home-page {
+    background: none;
+}
+
+.home-content {
+    margin-top: 3%;
+    background-image: url("/images/fer.png");
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    min-height: 550px;  
+    padding: 2rem 1rem;
+}
+
+/* OBAVIJEST CARDS */
+.obavijest-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    max-width: 620px;
+    margin: 1.2rem auto;
+    padding: 1.2rem 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    text-align: left;
+}
+
+.obavijest-card h3 {
+    margin: 0 0 0.6rem 0;
+    font-size: 1.1rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    border-width: 2px;
-    padding: 0.5rem 1rem;
+    text-align: left;
+    color: #333;
 }
 
-.bike-btn:hover {
-    background-color: #0d6efd;
-    color: #fff;
+.obavijest-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #444;
+    text-align: left;
+}
+
+.obavijest-date {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.5rem;
+}
+
+.obavijest-actions {
+    margin-top: 0.8rem;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.btn-edit {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-edit:hover {
+    background-color: #1976D2;
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+
+.btn-add-obavijest {
+    display: block;
+    margin: 2rem auto;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-add-obavijest:hover {
+    background-color: #43A047;
+}
+
+/* PRIJAVI SE */
+.btn-prijavi-se {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #00c853;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-prijavi-se:hover {
+    background-color: #00b848;
+}
+
+/* LOADING I ERROR */
+.loading-container,
+.error-container,
+.no-obavijesti {
+    text-align: center;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    max-width: 620px;
+    margin: 1.2rem auto;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.loading-container p,
+.no-obavijesti p {
+    color: #666;
+    margin: 0;
+}
+
+.error-container p {
+    color: #dc3545;
+    margin: 0 0 1rem 0;
+}
+
+.btn-retry {
+    padding: 0.5rem 1rem;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-retry:hover {
+    background-color: #1976D2;
+}
+
+/* DELETE CONFIRMATION */
+.delete-confirm {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+}
+
+.delete-confirm p {
+    margin: 0 0 0.75rem 0;
+    font-weight: 500;
+    color: #856404;
+}
+
+.btn-confirm-yes {
+    padding: 0.4rem 0.8rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+.btn-confirm-yes:hover {
+    background-color: #c82333;
+}
+
+.btn-confirm-no {
+    padding: 0.4rem 0.8rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-confirm-no:hover {
+    background-color: #545b62;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content h2 {
+    margin: 0 0 1.5rem 0;
+    color: white;
+    font-size: 1.3rem;
+    background-color: #2196F3;
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel {
+    padding: 0.75rem 1.5rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #545b62;
+}
+
+.btn-submit {
+    padding: 0.75rem 1.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #43A047;
+}
+
+.btn-submit:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
 }

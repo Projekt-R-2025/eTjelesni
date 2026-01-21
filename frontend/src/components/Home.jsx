@@ -1,142 +1,320 @@
-import './Home.css';
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from "react-router-dom";
-import { removeToken, getToken } from '../utils/token';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { getToken } from "../utils/token";
+import Navbar from "../components/Navbar";
+import "./home.css";
+
+const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 const Home = ({ onLogout }) => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+    // User state
+    const [userData, setUserData] = useState(null);
+    
+    // Obavijesti state
+    const [obavijesti, setObavijesti] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // Modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingObavijest, setEditingObavijest] = useState(null);
+    const [formData, setFormData] = useState({ title: "", body: "" });
+    const [submitting, setSubmitting] = useState(false);
+    
+    // Delete confirmation state
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const backendBase = import.meta.env.VITE_API_BASE_URL;
+    const isJoined = Boolean(userData?.sectionId);
+    const canEdit = userData?.role === "PROFESSOR";
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        console.log('Dohvaćam korisničke podatke s backenda...');
+    // Dohvati korisnika
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = getToken();
+                if (!token) return;
 
-        const token = getToken();
+                const response = await fetch(`${backendBase}/api/users/me`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
 
-        const response = await fetch(`${backendBase}/api/users/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserData(data);
+                }
+            } catch (error) {
+                console.error("Greška pri dohvaćanju korisnika:", error);
+            }
+        };
 
-        console.log('Response status:', response.status);
+        fetchUserData();
+    }, []);
 
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-          localStorage.setItem('user', JSON.stringify(data));
-        } else {
-          // Ako ne može dohvatiti podatke, vrati na login
-          console.error('Neuspješno dohvaćanje korisničkih podataka');
-          removeToken();
-          navigate('/');
+    // Dohvati generalne obavijesti
+    const fetchObavijesti = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const token = getToken();
+            
+            const response = await fetch(`${backendBase}/api/notifications/general`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Greška pri dohvaćanju obavijesti");
+            }
+
+            const data = await response.json();
+            setObavijesti(data);
+        } catch (err) {
+            console.error("Fetch obavijesti error:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-
-      } catch (error) {
-        console.error('Greška pri dohvaćanju korisničkih podataka:', error);
-        removeToken();
-        navigate('/');
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchUserData();
-  }, [navigate, backendBase]);
+    useEffect(() => {
+        fetchObavijesti();
+    }, []);
 
-  const handleLogout = async () => {
-    try {
-      console.log('Šaljem logout zahtjev...');
+    // Otvori modal za novu obavijest
+    const handleNewObavijest = () => {
+        setEditingObavijest(null);
+        setFormData({ title: "", body: "" });
+        setModalOpen(true);
+    };
 
-      const token = getToken();
+    // Otvori modal za uređivanje
+    const handleEdit = (obavijest) => {
+        setEditingObavijest(obavijest);
+        setFormData({ title: obavijest.title, body: obavijest.body });
+        setModalOpen(true);
+    };
 
-      // Pošalji logout zahtjev na backend (opcionalno, ako backend ima logout endpoint)
-      const response = await fetch(`${backendBase}/api/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+    // Zatvori modal
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setEditingObavijest(null);
+        setFormData({ title: "", body: "" });
+    };
+
+    // Submit forme (dodaj ili uredi)
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+
+        try {
+            const token = getToken();
+            let response;
+
+            if (editingObavijest) {
+                // PUT - uređivanje postojeće obavijesti
+                response = await fetch(`${backendBase}/api/notifications/${editingObavijest.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: formData.title,
+                        body: formData.body
+                    })
+                });
+            } else {
+                // POST - nova obavijest
+                response = await fetch(`${backendBase}/api/notifications/general`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: formData.title,
+                        body: formData.body
+                    })
+                });
+            }
+
+            if (!response.ok) {
+                throw new Error(editingObavijest ? "Greška pri uređivanju obavijesti" : "Greška pri dodavanju obavijesti");
+            }
+
+            // Ponovno dohvati obavijesti
+            await fetchObavijesti();
+            handleCloseModal();
+        } catch (err) {
+            console.error("Submit error:", err);
+            alert(err.message);
+        } finally {
+            setSubmitting(false);
         }
-      });
+    };
 
-      console.log('Logout response status:', response.status);
+    // Brisanje obavijesti
+    const handleDelete = async (id) => {
+        try {
+            const token = getToken();
+            
+            const response = await fetch(`${backendBase}/api/notifications/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
 
-      if (!response.ok) {
-        console.error('Logout nije uspio:', response.status, response.statusText);
-      } else {
-        console.log('Token uspješno revokean na backendu');
-      }
-    } catch (error) {
-      console.error('Greška pri odjavi:', error);
-    } finally {
-      // Uvijek obriši lokalne podatke i odjavi korisnika
-      localStorage.removeItem('user');
-      removeToken(); // Ukloni JWT token iz localStorage
-      onLogout();
-      // Preusmjeri na login stranicu
-      navigate('/');
-    }
-  };
+            if (!response.ok) {
+                throw new Error("Greška pri brisanju obavijesti");
+            }
 
-  if (loading) {
+            // Ponovno dohvati obavijesti
+            await fetchObavijesti();
+            setDeleteConfirm(null);
+        } catch (err) {
+            console.error("Delete error:", err);
+            alert(err.message);
+        }
+    };
+
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Učitavanje...</span>
+        <div className="home-page">
+            <Navbar onLogout={onLogout} />
+
+            {/* HOME CONTENT */}
+            <main className="home-content">
+                
+                {/* Loading state */}
+                {loading && (
+                    <div className="loading-container">
+                        <p>Učitavanje obavijesti...</p>
+                    </div>
+                )}
+
+                {/* Error state */}
+                {error && (
+                    <div className="error-container">
+                        <p>Greška: {error}</p>
+                        <button onClick={fetchObavijesti} className="btn-retry">
+                            Pokušaj ponovno
+                        </button>
+                    </div>
+                )}
+
+                {/* Obavijesti lista */}
+                {!loading && !error && obavijesti.length === 0 && (
+                    <div className="no-obavijesti">
+                        <p>Nema obavijesti za prikaz.</p>
+                    </div>
+                )}
+
+                {!loading && !error && obavijesti.map(o => (
+                    <div key={o.id} className="obavijest-card">
+                        <h3>{o.title}</h3>
+                        <p>{o.body}</p>
+                        <span className="obavijest-date">
+                            {new Date(o.createdAt).toLocaleDateString('hr-HR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </span>
+
+                        {canEdit && (
+                            <div className="obavijest-actions">
+                                <button className="btn-edit" onClick={() => handleEdit(o)}>
+                                    Uredi
+                                </button>
+                                <button className="btn-delete" onClick={() => setDeleteConfirm(o.id)}>
+                                    Obriši
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Delete confirmation */}
+                        {deleteConfirm === o.id && (
+                            <div className="delete-confirm">
+                                <p>Jeste li sigurni da želite obrisati ovu obavijest?</p>
+                                <button className="btn-confirm-yes" onClick={() => handleDelete(o.id)}>
+                                    Da, obriši
+                                </button>
+                                <button className="btn-confirm-no" onClick={() => setDeleteConfirm(null)}>
+                                    Odustani
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {canEdit && (
+                    <button className="btn-add-obavijest" onClick={handleNewObavijest}>
+                        + Nova obavijest
+                    </button>
+                )}
+            </main>
+
+            {/* Modal za dodavanje/uređivanje obavijesti */}
+            {modalOpen && (
+                <div className="modal-overlay" onClick={handleCloseModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2>{editingObavijest ? "Uredi obavijest" : "Nova obavijest"}</h2>
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="title">Naslov</label>
+                                <input
+                                    type="text"
+                                    id="title"
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    required
+                                    placeholder="Unesite naslov obavijesti"
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label htmlFor="body">Tekst obavijesti</label>
+                                <textarea
+                                    id="body"
+                                    value={formData.body}
+                                    onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+                                    required
+                                    placeholder="Unesite tekst obavijesti"
+                                    rows={5}
+                                />
+                            </div>
+                            
+                            <div className="modal-actions">
+                                <button type="button" className="btn-cancel" onClick={handleCloseModal}>
+                                    Odustani
+                                </button>
+                                <button type="submit" className="btn-submit" disabled={submitting}>
+                                    {submitting ? "Spremanje..." : (editingObavijest ? "Spremi promjene" : "Dodaj obavijest")}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {!isJoined && (
+                <Link to="/prijave" className="btn-prijavi-se">
+                    PRIJAVI SE
+                </Link>
+            )}
         </div>
-      </div>
     );
-  }
-
-  return (
-    <div className="container mt-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Dobrodošli {userData?.firstName || 'Korisnik'}! 🏐</h1>
-        <div className="home-actions">
-          <Link to="/bike" className="btn btn-outline-primary bike-btn">Za dev svrhe: Bike</Link>
-          <button
-            className="btn btn-danger"
-            onClick={handleLogout}
-          >
-            Odjavi se
-          </button>
-        </div>
-      </div>
-
-      {/* Korisnički podaci */}
-      <div className="card">
-        <div className="card-header bg-primary text-white">
-          <h5 className="mb-0">Korisnički podaci</h5>
-        </div>
-        <div className="card-body">
-          {userData ? (
-            <div>
-              <div className="mb-3">
-                <strong>Ime:</strong>
-                <p className="text-muted mb-0">{userData.firstName}</p>
-              </div>
-              <div className="mb-3">
-                <strong>Prezime:</strong>
-                <p className="text-muted mb-0">{userData.lastName}</p>
-              </div>
-              <div className="mb-3">
-                <strong>Email:</strong>
-                <p className="text-muted mb-0">{userData.email}</p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted">Učitavanje korisničkih podataka...</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 };
 
 export default Home;
