@@ -39,16 +39,23 @@ const Login = ({ onAuthenticate }) => {
           <div className="login-form-wrapper">
 
             <div className="text-center mb-4">
-              <h2 className="mb-2">eTjelesni</h2>
+              <div className="login-header">
+                <img
+                  src="../public/images/fer_logo_1.svg"
+                  alt="FER logo"
+                  className="fer-logo"
+                />
+                <h2 className="login-title">eTjelesni</h2>
+              </div>
             </div>
 
             {/* Microsoft Login Button */}
             <button
               onClick={handleMicrosoftLogin}
-              className="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center"
-              style={{ gap: '10px' }}
+              className="btn btn-microsoft w-100 d-flex align-items-center justify-content-center"
+              style={{ gap: "10px" }}
             >
-              <i className="bi bi-microsoft" style={{ fontSize: '1.5rem' }}></i>
+              <i className="bi bi-microsoft" style={{ fontSize: "1.4rem" }}></i>
               Prijava s Microsoft računom
             </button>
 
@@ -67,8 +74,9 @@ const Login = ({ onAuthenticate }) => {
             {images.map((image, index) => (
               <div
                 key={index}
-                className={`carousel-image ${index === currentImageIndex ? 'active' : ''
-                  }`}
+                className={`carousel-image ${
+                  index === currentImageIndex ? "active" : ""
+                }`}
                 style={{ backgroundImage: `url(${image})` }}
               />
             ))}

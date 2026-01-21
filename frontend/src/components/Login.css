@@ -84,6 +84,25 @@
   font-weight: 300;
 }
 
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transform: translateX(-8px);
+}
+
+.fer-logo {
+  height: 3.1rem;
+  width: auto;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1;
+}
+
 .btn-login {
   background-color: #d0d0d0;
   color: #666;
