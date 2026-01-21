@@ -47,6 +47,8 @@ public class NotificationService {
     }
 
     public NotificationResponseDto createGeneralNotification(GeneralNotificationCreateDto dto) {
+        hasPermissionForGeneralNotification();
+
         Notification notification = notificationMapper.toEntity(dto);
 
         notification.setType(NotificationType.GENERAL);
@@ -57,12 +59,13 @@ public class NotificationService {
     }
 
     public NotificationResponseDto createSectionNotification(SectionNotificationCreateDto dto) {
+        Section section = sectionService.getSectionOrThrow(dto.getSectionId());
+        hasPermissionForSectionNotification(section);
+
         Notification notification = notificationMapper.toEntity(dto);
 
         notification.setType(NotificationType.SECTION);
         notification.setCreatedBy(currentUserService.getCurrentUser());
-
-        Section section = sectionService.getSectionOrThrow(dto.getSectionId());
         notification.setSection(section);
 
         notificationRepository.save(notification);
@@ -72,6 +75,7 @@ public class NotificationService {
 
     public NotificationResponseDto updateNotification(Long id, NotificationUpdateDto dto) {
         Notification notification = getNotificationOrThrow(id);
+        hasPermissionForNotification(notification);
 
         if (dto.getTitle() != null) notification.setTitle(dto.getTitle());
         if (dto.getBody() != null) notification.setBody(dto.getBody());
@@ -82,16 +86,37 @@ public class NotificationService {
 
     public void deleteNotification(Long id) {
         Notification notification = getNotificationOrThrow(id);
-        User currentUser = currentUserService.getCurrentUser();
-        if (currentUser.isProfessor() || currentUser.isAdmin()) {
-            notificationRepository.deleteById(id);
-            return;
-        }
-        throw new AccessDeniedException("You do not have permission to delete this notification");
+        hasPermissionForNotification(notification);
+
+        notificationRepository.deleteById(id);
     }
 
     public Notification getNotificationOrThrow(Long id) {
         return notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
+    }
+
+    // Permission check methods
+
+    private void hasPermissionForGeneralNotification() {
+        User currentUser = currentUserService.getCurrentUser();
+        if (!currentUser.isProfessor() && !currentUser.isAdmin()) {
+            throw new AccessDeniedException("You do not have permission to manage general notifications");
+        }
+    }
+
+    private void hasPermissionForSectionNotification(Section section) {
+        User currentUser = currentUserService.getCurrentUser();
+        if (!currentUser.isProfessor() && !currentUser.isAdmin() && !sectionService.isUserLeaderOfSection(currentUser, section)) {
+            throw new AccessDeniedException("You do not have permission to manage this section notification");
+        }
+    }
+
+    private void hasPermissionForNotification(Notification notification) {
+        if (notification.getType() == NotificationType.GENERAL) {
+            hasPermissionForGeneralNotification();
+        } else {
+            hasPermissionForSectionNotification(notification.getSection());
+        }
     }
 
 }
