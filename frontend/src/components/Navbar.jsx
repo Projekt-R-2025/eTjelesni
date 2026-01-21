@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { removeToken, getToken } from "../utils/token";
 import "./Navbar.css";
 
@@ -7,6 +7,7 @@ const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 const Navbar = ({ onLogout }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [userData, setUserData] = useState(null);
 
@@ -95,6 +96,9 @@ const Navbar = ({ onLogout }) => {
                     <aside className="sidebar">
                         <Link to="/home" className="sidebar-button" onClick={closeSidebar}>HOME</Link>
                         <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
+                         {location.pathname.startsWith("/sekcija") && (
+                            <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>
+                        )}
                         {userData?.role === "PROFESSOR" && (
                             <Link to="/sectionCreate" className="sidebar-button" onClick={closeSidebar}>NOVA SEKCIJA</Link>
                         )}
