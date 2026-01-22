@@ -15,7 +15,7 @@ import Prijave from './components/Prijave';
 import Korisnik from './components/Korisnik';
 import Treninzi from './components/Treninzi';
 import SectionCreate from './components/SectionCreate';
-import Konzultacije from './components/Konzultacije';
+import Konzultacije from './components/konzultacije';
 import { hasToken, removeToken, getToken } from './utils/token';
 
 function App() {
