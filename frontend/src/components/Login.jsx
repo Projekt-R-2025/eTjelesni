@@ -41,7 +41,7 @@ const Login = ({ onAuthenticate }) => {
             <div className="text-center mb-4">
               <div className="login-header">
                 <img
-                  src="../public/images/fer_logo_1.svg"
+                  src="/images/FER_logo_1.svg"
                   alt="FER logo"
                   className="fer-logo"
                 />
