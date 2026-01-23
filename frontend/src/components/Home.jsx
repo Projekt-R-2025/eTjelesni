@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getToken } from "../utils/token";
 import Navbar from "../components/Navbar";
-import "./home.css";
+import "./Home.css";
 
 const backendBase = import.meta.env.VITE_API_BASE_URL;
 
