@@ -7,7 +7,10 @@ import Navbar from "../components/Navbar";
 const Korisnik = ({ onLogout }) => {
   const [userData, setUserData] = useState(null);
   const [sectionName, setSectionName] = useState(null);
+  const [sectionData, setSectionData] = useState(null);
+  const [leadingSections, setLeadingSections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [resetMessage, setResetMessage] = useState(null);
   const navigate = useNavigate();
 
   const backendBase = import.meta.env.VITE_API_BASE_URL;
@@ -41,9 +44,26 @@ const Korisnik = ({ onLogout }) => {
             });
 
             if (sectionResponse.ok) {
-              const sectionData = await sectionResponse.json();
-              setSectionName(sectionData.name);
+              const sectionDataRes = await sectionResponse.json();
+              setSectionName(sectionDataRes.name);
+              setSectionData(sectionDataRes);
             }
+          }
+
+          // Ako korisnik vodi sekcije, dohvati njihove podatke
+          if (data.leadingSectionIds && data.leadingSectionIds.length > 0) {
+            const sectionsPromises = data.leadingSectionIds.map(sectionId =>
+              fetch(`${backendBase}/api/sections/${sectionId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              }).then(res => res.ok ? res.json() : null)
+            );
+
+            const sectionsData = await Promise.all(sectionsPromises);
+            setLeadingSections(sectionsData.filter(section => section !== null));
           }
         } else {
           console.error('Neuspješno dohvaćanje korisničkih podataka');
@@ -79,6 +99,32 @@ const Korisnik = ({ onLogout }) => {
     }
   };
 
+  const handleResetPoints = async () => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${backendBase}/api/users/points/reset`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setResetMessage({ type: 'success', text: 'Bodovi su uspješno resetirani' });
+        setTimeout(() => setResetMessage(null), 3000);
+      } else {
+        console.error('Neuspješno resetiranje bodova');
+        setResetMessage({ type: 'error', text: 'Greška pri resetiranju bodova' });
+        setTimeout(() => setResetMessage(null), 3000);
+      }
+    } catch (error) {
+      console.error('Greška pri slanju zahtjeva:', error);
+      setResetMessage({ type: 'error', text: 'Greška pri resetiranju bodova' });
+      setTimeout(() => setResetMessage(null), 3000);
+    }
+  };
+
   if (loading) {
     return (
       <div className="korisnik-page">
@@ -99,7 +145,7 @@ const Korisnik = ({ onLogout }) => {
           <div className="korisnik-card-header">
             <h2>Korisnički podaci</h2>
           </div>
-          
+
           <div className="korisnik-card-body">
             {userData ? (
               <div className="korisnik-data-grid">
@@ -112,28 +158,16 @@ const Korisnik = ({ onLogout }) => {
                     <span className="korisnik-label">Prezime:</span>
                     <span className="korisnik-value">{userData.lastName}</span>
                   </div>
-                  <div className="korisnik-data-item">
-                    <span className="korisnik-label">Email:</span>
-                    <span className="korisnik-value">{userData.email}</span>
-                  </div>
                 </div>
 
                 <div className="korisnik-data-column">
                   <div className="korisnik-data-item">
+                    <span className="korisnik-label">Email:</span>
+                    <span className="korisnik-value">{userData.email}</span>
+                  </div>
+                  <div className="korisnik-data-item">
                     <span className="korisnik-label">Uloga:</span>
                     <span className="korisnik-value">{getRoleName(userData.role)}</span>
-                  </div>
-                  <div className="korisnik-data-item">
-                    <span className="korisnik-label">Bodovi:</span>
-                    <span className="korisnik-value">
-                      {userData.role === 'PROFESSOR' || userData.role === 'ADMIN' ? '—' : userData.currentPoints ?? 0}
-                    </span>
-                  </div>
-                  <div className="korisnik-data-item">
-                    <span className="korisnik-label">Sekcija:</span>
-                    <span className="korisnik-value">
-                      {userData.role === 'PROFESSOR' || userData.role === 'ADMIN' ? '—' : (sectionName || "Nije upisana")}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -142,6 +176,80 @@ const Korisnik = ({ onLogout }) => {
             )}
           </div>
         </div>
+
+        {userData && userData.role !== 'PROFESSOR' && userData.role !== 'ADMIN' && (
+          <div className="korisnik-card">
+            <div className="korisnik-card-header">
+              <h2>Moja aktivnost</h2>
+            </div>
+            <div className="korisnik-card-body">
+              <div className="korisnik-data-grid">
+                <div className="korisnik-data-column">
+                  <div className="korisnik-data-item">
+                    <span className="korisnik-label">Sekcija:</span>
+                    <span className="korisnik-value">{sectionName || "Nije upisana"}</span>
+                  </div>
+                </div>
+                <div className="korisnik-data-column">
+                  <div className="korisnik-data-item">
+                    <span className="korisnik-label">Bodovi:</span>
+                    {!userData.sectionId ? (
+                      <span className="korisnik-value">—</span>
+                    ) : (
+                      <span
+                        className={`korisnik-value ${sectionData && userData.currentPoints >= sectionData.passingPoints ? 'passing' : ''
+                          }`}
+                      >
+                        {userData.currentPoints ?? 0} / {sectionData?.passingPoints ?? 0}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
+
+        {userData && leadingSections.length > 0 && (
+          <div className="korisnik-card">
+            <div className="korisnik-card-header">
+              <h2>Voditelj sekcija</h2>
+            </div>
+            <div className="korisnik-card-body">
+              <div className="leading-sections-list">
+                {leadingSections.map((section) => (
+                  <div key={section.id} className="leading-section-item">
+                    <span className="section-name">{section.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {userData && (userData.role === 'PROFESSOR' || userData.role === 'ADMIN') && (
+          <div className="korisnik-card">
+            <div className="korisnik-card-body reset-points-section">
+              <div className="reset-points-content">
+                <p className="reset-points-text">
+                  Postavi svim studentima broj bodova na nula. Akcija koja se smije provoditi samo početkom novog semestra.
+                </p>
+                <button
+                  className="reset-points-btn"
+                  onClick={handleResetPoints}
+                >
+                  Resetiraj bodove
+                </button>
+              </div>
+              {resetMessage && (
+                <div className={`reset-message reset-message-${resetMessage.type}`}>
+                  {resetMessage.text}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
