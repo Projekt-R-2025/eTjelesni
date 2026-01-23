@@ -9,25 +9,18 @@ eTjelesni je web aplikacija koja se sastoji od odvojenog frontend i backend dije
 - Baza podataka: PostgreSQL
 - Build/Dependency: Maven, npm
 
-## Autentifikacija i autorizacija
+
+## Autentifikacija
 
 Autentifikacija korisnika provodi se putem **Microsoft FER računa**, koji predstavlja jedini dopušteni način prijave u aplikaciju. Pristup aplikaciji omogućen je isključivo korisnicima s važećim FER Microsoft identitetom, čime se osigurava kontroliran i ograničen pristup sustavu.
 
-
-## API
-
-### Dokumentacija
-
-API dokumentacija dostupna je putem **Swagger UI-ja** (springdoc-openapi).
-
-Tijekom lokalnog razvoja dokumentacija je dostupna na: `http://localhost:8080/swagger-ui/index.html`  
-
-Swagger prikazuje sve dostupne endpointe, potrebne parametre, sheme zahtjeva i odgovora te omogućuje slanje testnih poziva izravno iz preglednika.
+## Deployment
+Cijeli projekt hostan je na **[Renderu](https://etjelesni.onrender.com)**, a svaki push na `main` branch automatski pokreće deploy preko **GitHub Actions**.
 
 
-## Frontend
+## API Dokumentacija
 
-Generalne informacije ...
+[API dokumentacija](https://etjelesni-api.onrender.com/swagger-ui/index.html) generirana je pomoću **Swagger UI-ja** i omogućuje pregled svih endpointova, potrebnih parametara, shema zahtjeva i odgovora, te slanje testnih poziva izravno iz preglednika.
 
 
 ## Lokalno pokretanje
