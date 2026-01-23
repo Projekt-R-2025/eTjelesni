@@ -66,6 +66,8 @@ const Korisnik = ({ onLogout }) => {
   // Mapiranje role na hrvatski
   const getRoleName = (role) => {
     switch (role) {
+      case 'ADMIN':
+        return 'Administrator';
       case 'PROFESSOR':
         return 'Profesor';
       case 'LEADER':
@@ -123,11 +125,15 @@ const Korisnik = ({ onLogout }) => {
                   </div>
                   <div className="korisnik-data-item">
                     <span className="korisnik-label">Bodovi:</span>
-                    <span className="korisnik-value">{userData.currentPoints ?? 0}</span>
+                    <span className="korisnik-value">
+                      {userData.role === 'PROFESSOR' || userData.role === 'ADMIN' ? '—' : userData.currentPoints ?? 0}
+                    </span>
                   </div>
                   <div className="korisnik-data-item">
                     <span className="korisnik-label">Sekcija:</span>
-                    <span className="korisnik-value">{sectionName || "Nije upisana"}</span>
+                    <span className="korisnik-value">
+                      {userData.role === 'PROFESSOR' || userData.role === 'ADMIN' ? '—' : (sectionName || "Nije upisana")}
+                    </span>
                   </div>
                 </div>
               </div>
