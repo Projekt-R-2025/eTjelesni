@@ -10,6 +10,7 @@ import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.UserRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import com.etjelesni.backend.service.permission.PermissionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -26,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final CurrentUserService currentUserService;
+    private final PermissionService permissionService;
 
 
     public UserResponseDto getCurrentUser() {
@@ -34,42 +36,54 @@ public class UserService {
     }
 
     public List<UserResponseDto> getAllUsers() {
+        permissionService.requireCanManageUser();
+
         List<User> users = userRepository.findAll();
         return userMapper.toResponseDtoList(users);
     }
 
     public UserResponseDto getUserById(Long id) {
+        permissionService.requireCanManageUser();
+
         User user = getUserOrThrow(id);
         return userMapper.toResponseDto(user);
     }
 
     public UserResponseDto createUser(UserCreateDto dto) {
+        permissionService.requireCanManageUser();
+
         User user = userMapper.toEntity(dto);
         user.setRole(Role.STUDENT);
         user.setCurrentPoints(0);
         user.setLeadingSectionIds(new ArrayList<>());
         userRepository.save(user);
+
         return userMapper.toResponseDto(user);
     }
 
     public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
-        User user = getUserOrThrow(id);
+        permissionService.requireCanManageUser();
 
+        User user = getUserOrThrow(id);
         if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());
-
         User updatedUser = userRepository.save(user);
+
         return userMapper.toResponseDto(updatedUser);
     }
 
     public void deleteUser(Long id) {
+        permissionService.requireCanManageUser();
+
         User user = getUserOrThrow(id);
-        User currentUser = currentUserService.getCurrentUser();
-        if (user.getId().equals(currentUser.getId()) || currentUser.isAdmin()) {
-            userRepository.deleteById(id);
-            return;
-        }
-        throw new AccessDeniedException("You do not have permission to delete this user");
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public void resetAllStudentsPointsToZero() {
+        permissionService.requireCanManageUser();
+
+        userRepository.resetAllPoints();
     }
 
     public User getUserOrThrow(Long id) {
@@ -84,26 +98,6 @@ public class UserService {
     public void updateUserSection(User user, Section newSection) {
         user.setSection(newSection);
         userRepository.save(user);
-    }
-
-    @Transactional
-    public int resetAllStudentsPointsToZero() {
-        User currentUser = currentUserService.getCurrentUser();
-
-        if (currentUser.isStudent()) {
-            throw new AccessDeniedException("You do not have permission to reset students points.");
-        }
-
-        return userRepository.resetPointsByRoles(List.of(Role.STUDENT, Role.LEADER));
-    }
-
-    public void updateLeadingSections(User user, Long sectionId) {
-        List<Long> leadingSectionIds = user.getLeadingSectionIds();
-        if (!leadingSectionIds.contains(sectionId)) {
-            leadingSectionIds.add(sectionId);
-            user.setLeadingSectionIds(leadingSectionIds);
-            userRepository.save(user);
-        }
     }
 
     public void increasePoints(User user, Integer points) {

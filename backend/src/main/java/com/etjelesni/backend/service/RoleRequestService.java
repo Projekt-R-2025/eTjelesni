@@ -29,6 +29,7 @@ public class RoleRequestService {
     private final CurrentUserService currentUserService;
     private final UserService userService;
     private final SectionService sectionService;
+    private final SectionLeaderService sectionLeaderService;
 
 
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
@@ -90,7 +91,7 @@ public class RoleRequestService {
             section = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
 
             // Check if user is already a leader of this section
-            if (sectionService.isUserLeaderOfSection(user, section)) {
+            if (sectionLeaderService.isUserLeaderOfSection(user, section)) {
                 throw new IllegalStateException("You are already a leader of this section");
             }
         } else {
@@ -150,7 +151,7 @@ public class RoleRequestService {
         // If approved, update the user's role
         if (status == RequestStatus.APPROVED) {
             if (roleRequest.getRequestedRole() == Role.LEADER) {
-                sectionService.assignLeaderToSection(requestUser, roleRequest.getRequestedSection());
+                sectionLeaderService.assignLeaderToSection(requestUser, roleRequest.getRequestedSection());
             } else {
                 userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
             }

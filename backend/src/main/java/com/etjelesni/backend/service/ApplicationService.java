@@ -28,6 +28,7 @@ public class ApplicationService {
     private final CurrentUserService currentUserService;
     private final UserService userService;
     private final SectionService sectionService;
+    private final SectionLeaderService sectionLeaderService;
 
 
     public List<ApplicationResponseDto> getAllApplications(String status) {
@@ -119,7 +120,7 @@ public class ApplicationService {
         User requestUser = application.getApplicant();
 
         // Check if the reviewer has permission (admin, professor, or section leader)
-        boolean isLeaderOfSection = sectionService.isUserLeaderOfSection(reviewer, application.getSection());
+        boolean isLeaderOfSection = sectionLeaderService.isUserLeaderOfSection(reviewer, application.getSection());
         if (!(reviewer.isAdmin() || reviewer.isProfessor() || isLeaderOfSection)) {
             throw new AccessDeniedException("You do not have permission to review this application");
         }

@@ -9,6 +9,7 @@ import com.etjelesni.backend.model.Attendance;
 import com.etjelesni.backend.model.Session;
 import com.etjelesni.backend.repository.AttendanceRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -25,42 +26,50 @@ public class AttendanceService {
     private final CurrentUserService currentUserService;
     private final UserService userService;
     private final SessionService sessionService;
+    private final PermissionService permissionService;
 
 
     public List<AttendanceResponseDto> getAllAttendances() {
+        permissionService.requireCanViewAllAttendances();
+
         List<Attendance> attendances = attendanceRepository.findAllByCancelledFalseOrCancelledIsNull();
         return attendanceMapper.toResponseDtoList(attendances);
     }
 
     public AttendanceResponseDto getAttendanceById(Long attendanceId) {
         Attendance attendance = getAttendanceOrThrow(attendanceId);
+
+        permissionService.requireCanViewAttendance(attendance);
+
         return attendanceMapper.toResponseDto(attendance);
     }
 
     public List<AttendanceResponseDto> getSessionAttendances(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
+
+        permissionService.requireCanViewSessionAttendances(session);
+
         List<Attendance> attendances = attendanceRepository.findAllBySessionAndNotCancelled(session);
         return attendanceMapper.toResponseDtoList(attendances); // safe because associations are initialized
     }
 
     public AttendanceResponseDto createAttendance(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
-        Attendance attendance = attendanceMapper.toEntity(session);
 
+        permissionService.requireCanCreateAttendance(session);
+
+        Attendance attendance = attendanceMapper.toEntity(session);
         attendance.setStudent(currentUserService.getCurrentUser());
         attendance.setCancelled(false);
-
         attendanceRepository.save(attendance);
+
         return attendanceMapper.toResponseDto(attendance);
     }
 
     public AttendanceResponseDto cancelAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
-        // Only the student who created the attendance can cancel it
-        if (!attendance.getStudent().getId().equals(currentUserService.getCurrentUser().getId())) {
-            throw new AccessDeniedException("You do not have permission to cancel this attendance.");
-        }
+        permissionService.requireCanCancelAttendance(attendance);
 
         // Check if already cancelled
         if (Boolean.TRUE.equals(attendance.getCancelled())) {
@@ -79,9 +88,9 @@ public class AttendanceService {
     }
 
     public AttendanceResponseDto approveAttendance(Long id) {
-        hasPermissionsToChangeStatus();
-
         Attendance attendance = getAttendanceOrThrow(id);
+
+        permissionService.requireCanApproveAttendance(attendance);
 
         canChangeAttendanceStatus(attendance);
 
@@ -94,9 +103,9 @@ public class AttendanceService {
     }
 
     public AttendanceResponseDto rejectAttendance(Long id) {
-        hasPermissionsToChangeStatus();
-
         Attendance attendance = getAttendanceOrThrow(id);
+
+        permissionService.requireCanApproveAttendance(attendance);
 
         canChangeAttendanceStatus(attendance);
 
@@ -113,12 +122,6 @@ public class AttendanceService {
     public void canChangeAttendanceStatus(Attendance attendance) {
         if (attendance.getStatus() != RequestStatus.PENDING) {
             throw new IllegalStateException("Only pending attendance requests can be changed.");
-        }
-    }
-
-    public void hasPermissionsToChangeStatus() {
-        if (currentUserService.getCurrentUser().getRole() == com.etjelesni.backend.enumeration.Role.STUDENT) {
-            throw new AccessDeniedException("You do not have permission to change the status of this attendance.");
         }
     }
 
