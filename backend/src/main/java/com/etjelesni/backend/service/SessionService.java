@@ -9,9 +9,9 @@ import com.etjelesni.backend.model.Session;
 import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.repository.SessionRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -23,11 +23,11 @@ public class SessionService {
     private final SessionRepository sessionRepository;
 
     private final SectionService sectionService;
-    private final CurrentUserService currentUserService;
+    private final PermissionService permissionService;
+    
 
     public List<SessionResponseDto> getAllSessions(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
-
         List<Session> sessions = sessionRepository.findAllBySectionId(sectionId);
         return sessionMapper.toResponseDtoList(sessions);
     }
@@ -38,26 +38,27 @@ public class SessionService {
     }
 
     public SessionResponseDto createSession(SessionCreateDto dto) {
-        Session session = sessionMapper.toEntity(dto);
-
         Section section = sectionService.getSectionOrThrow(dto.getSectionId());
-        session.setSection(section);
 
+        permissionService.requireCanManageSession(section);
+
+        Session session = sessionMapper.toEntity(dto);
+        session.setSection(section);
         sessionRepository.save(session);
+
         return sessionMapper.toResponseDto(session);
     }
 
     public void deleteSession(Long id) {
         Session session = getSessionOrThrow(id);
-        User currentUser = currentUserService.getCurrentUser();
-        if (currentUser.isProfessor() || currentUser.isAdmin()) {
-            sessionRepository.deleteById(id);
-            return;
-        }
-        throw new AccessDeniedException("You do not have permission to delete this session");
+
+        permissionService.requireCanManageSession(session.getSection());
+
+        sessionRepository.delete(session);
     }
 
     public Session getSessionOrThrow(Long id) {
         return sessionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Session not found with id: " + id));
     }
+
 }
