@@ -52,7 +52,7 @@ const Login = ({ onAuthenticate }) => {
             {/* Microsoft Login Button */}
             <button
               onClick={handleMicrosoftLogin}
-              className="btn btn-microsoft w-100 d-flex align-items-center justify-content-center"
+              className="btn btn-microsoft align-items-center justify-content-center"
               style={{ gap: "10px" }}
             >
               <i className="bi bi-microsoft" style={{ fontSize: "1.4rem" }}></i>
