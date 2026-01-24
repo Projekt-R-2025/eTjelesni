@@ -1,0 +1,75 @@
+/* USERS PAGE */
+.users-page {
+    padding: 20px;
+}
+
+.table-wrapper {
+    max-width: 95vw;
+    margin: 0 auto;
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 880px;
+    table-layout: auto;
+}
+
+.users-table th,
+.users-table td {
+    text-align: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.users-table thead th {
+    background-color: #f8fafc;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #475569;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.empty-cell {
+    padding: 18px 0;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.points-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 14px;
+    background-color: #e2e8f0;
+    color: #0f172a;
+    font-weight: 600;
+    min-width: 86px;
+}
+
+.points-pill.pass {
+    background-color: #ecfdf3;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.message.error {
+    text-align: center;
+    color: #b91c1c;
+    font-weight: 600;
+    margin-top: 16px;
+}
