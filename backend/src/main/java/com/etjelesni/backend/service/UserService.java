@@ -27,6 +27,7 @@ public class UserService {
 
     private final CurrentUserService currentUserService;
     private final PermissionService permissionService;
+    private final SectionService sectionService;
 
 
     public UserResponseDto getCurrentUser() {
@@ -38,6 +39,14 @@ public class UserService {
         permissionService.requireCanManageUser();
 
         List<User> users = userRepository.findAll();
+        return userMapper.toResponseDtoList(users);
+    }
+
+    public List<UserResponseDto> getUsersBySectionId(Long sectionId) {
+        Section section = sectionService.getSectionOrThrow(sectionId);
+        permissionService.requireCanViewSectionMembers(section);
+
+        List<User> users = userRepository.findBySectionId(sectionId);
         return userMapper.toResponseDtoList(users);
     }
 

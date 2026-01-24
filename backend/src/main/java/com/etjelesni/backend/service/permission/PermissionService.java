@@ -121,6 +121,13 @@ public class PermissionService {
                 isAdmin(currentUser));
     }
 
+    public void requireCanViewSectionMembers(Section section) {
+        User currentUser = getCurrentUser();
+        require(isSectionLeader(currentUser, section) ||
+                isProfessor(currentUser) ||
+                isAdmin(currentUser));
+    }
+
 
 
     // ============================================

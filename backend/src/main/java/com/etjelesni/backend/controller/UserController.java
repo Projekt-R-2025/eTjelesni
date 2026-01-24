@@ -32,6 +32,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/section/{sectionId}")
+    public ResponseEntity<List<UserResponseDto>> getUsersBySectionId(@PathVariable Long sectionId) {
+        List<UserResponseDto> response = userService.getUsersBySectionId(sectionId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         UserResponseDto response = userService.getUserById((id));
