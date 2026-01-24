@@ -22,10 +22,22 @@ const Prijave = () => {
   const [appReason, setAppReason] = useState("");
 
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" ili "error"
 
   // Requests (podnesene prijave)
   const [applications, setApplications] = useState([]);
   const [roleRequests, setRoleRequests] = useState([]);
+
+  // Uklanja poruku nakon 3 sekunde
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Dohvati podatke o korisniku
   useEffect(() => {
@@ -95,11 +107,10 @@ const Prijave = () => {
           });
           if (response.ok) {
             const data = await response.json();
-            // Filtriraj samo prijave za sekciju koju voditelj vodi
-            const leaderSectionId = userData.leadingSectionIds[0];
-            const filtered = data.filter(
-              (app) =>
-                app.sectionId === leaderSectionId && app.status === "PENDING",
+            // Zadrži sve statuse; filtriraj samo na sekcije koje voditelj vodi
+            const leaderSectionIds = userData.leadingSectionIds || [];
+            const filtered = data.filter((app) =>
+              leaderSectionIds.includes(app.sectionId),
             );
             setApplications(filtered);
           }
@@ -124,9 +135,8 @@ const Prijave = () => {
           });
           if (response.ok) {
             const data = await response.json();
-            // Filtriraj samo PENDING zahtjeve
-            const filtered = data.filter((req) => req.status === "PENDING");
-            setRoleRequests(filtered);
+            // Zadrži sve statuse; profesor vidi sve zahtjeve
+            setRoleRequests(data);
           }
         } catch (error) {
           console.error("Greška pri dohvaćanju zahtjeva za ulogu:", error);
@@ -156,14 +166,19 @@ const Prijave = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Greška kod slanja zahtjeva");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška kod slanja zahtjeva");
+      }
 
       setMessage("Zahtjev za ulogu voditelja uspješno poslan.");
+      setMessageType("success");
       setRoleReason("");
       setRequestedSectionId("");
       setActiveForm(null);
     } catch (err) {
       setMessage(err.message);
+      setMessageType("error");
     }
   };
 
@@ -186,14 +201,19 @@ const Prijave = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Greška kod prijave na sekciju");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška kod prijave na sekciju");
+      }
 
       setMessage("Uspješno ste se prijavili na sekciju.");
+      setMessageType("success");
       setSectionId("");
       setAppReason("");
       setActiveForm(null);
     } catch (err) {
       setMessage(err.message);
+      setMessageType("error");
     }
   };
 
@@ -201,7 +221,7 @@ const Prijave = () => {
   const approveApplication = async (id) => {
     try {
       const token = getToken();
-      await fetch(`${backendBase}/api/applications/${id}/approve`, {
+      const res = await fetch(`${backendBase}/api/applications/${id}/approve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,16 +231,25 @@ const Prijave = () => {
           reviewNote: "",
         }),
       });
-      setApplications((prev) => prev.filter((a) => a.id !== id));
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška pri odobravanju prijave");
+      }
+
+      // Oznaci kao odobreno umjesto uklanjanja
+      setApplications((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: "APPROVED" } : a)),
+      );
     } catch (error) {
-      console.error("Greška pri odobravanju prijave:", error);
+      console.error("Greška pri odobravanju prijave:", error.message);
     }
   };
 
   const rejectApplication = async (id) => {
     try {
       const token = getToken();
-      await fetch(`${backendBase}/api/applications/${id}/reject`, {
+      const res = await fetch(`${backendBase}/api/applications/${id}/reject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,9 +259,18 @@ const Prijave = () => {
           reviewNote: "",
         }),
       });
-      setApplications((prev) => prev.filter((a) => a.id !== id));
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška pri odbijanju prijave");
+      }
+
+      // Oznaci kao odbijeno umjesto uklanjanja
+      setApplications((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: "REJECTED" } : a)),
+      );
     } catch (error) {
-      console.error("Greška pri odbijanju prijave:", error);
+      console.error("Greška pri odbijanju prijave:", error.message);
     }
   };
 
@@ -240,7 +278,7 @@ const Prijave = () => {
   const approveRoleRequest = async (id) => {
     try {
       const token = getToken();
-      await fetch(`${backendBase}/api/role-requests/${id}/approve`, {
+      const res = await fetch(`${backendBase}/api/role-requests/${id}/approve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -250,16 +288,25 @@ const Prijave = () => {
           reviewNote: "",
         }),
       });
-      setRoleRequests((prev) => prev.filter((r) => r.id !== id));
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška pri odobravanju zahtjeva");
+      }
+
+      // Oznaci kao odobreno umjesto uklanjanja
+      setRoleRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: "APPROVED" } : r)),
+      );
     } catch (error) {
-      console.error("Greška pri odobravanju zahtjeva:", error);
+      console.error("Greška pri odobravanju zahtjeva:", error.message);
     }
   };
 
   const rejectRoleRequest = async (id) => {
     try {
       const token = getToken();
-      await fetch(`${backendBase}/api/role-requests/${id}/reject`, {
+      const res = await fetch(`${backendBase}/api/role-requests/${id}/reject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -269,9 +316,18 @@ const Prijave = () => {
           reviewNote: "",
         }),
       });
-      setRoleRequests((prev) => prev.filter((r) => r.id !== id));
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Greška pri odbijanju zahtjeva");
+      }
+
+      // Oznaci kao odbijeno umjesto uklanjanja
+      setRoleRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: "REJECTED" } : r)),
+      );
     } catch (error) {
-      console.error("Greška pri odbijanju zahtjeva:", error);
+      console.error("Greška pri odbijanju zahtjeva:", error.message);
     }
   };
 
@@ -290,7 +346,9 @@ const Prijave = () => {
       {/* HEADER */}
       <Navbar />
 
-      <h1 className="page-title">PRIJAVE</h1>
+      <h1 className="page-title">
+        {userData?.role === "STUDENT" ? "PRIJAVE" : userData?.role === "PROFESSOR" ? "PRIJAVE ZA VODITELJE SEKCIJA" : "PRIJAVE ZA ČLANSTVO U SEKCIJAMA"}
+      </h1>
 
       {/* KARTICE ZA STUDENTE */}
       {userData?.role === "STUDENT" && !activeForm && (
@@ -428,69 +486,139 @@ const Prijave = () => {
 
       {/* STRANICA ZA VODITELJE - pregled prijava na sekciju */}
       {userData?.role === "LEADER" && (
-        <div className="approval-list">
-          {applications.length === 0 ? (
-            <p className="no-prijave">Nema prijava za vašu sekciju.</p>
-          ) : (
-            applications.map((a) => (
-              <div className="approval-card" key={a.id}>
-                <span className="approval-name">
-                  {a.applicant?.firstName} {a.applicant?.lastName}
-                </span>
-                <span className="approval-reason">{a.reason}</span>
-                <div className="approval-actions">
-                  <button
-                    className="approve-btn"
-                    onClick={() => approveApplication(a.id)}
-                  >
-                    ✓
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => rejectApplication(a.id)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            ))
+        <div>
+          {/* Na čekanju */}
+          <div className="approval-list">
+            {applications.filter((a) => a.status === "PENDING").length ===
+              0 ? (
+              <p className="no-prijave">Nema prijava na čekanju.</p>
+            ) : (
+              applications
+                .filter((a) => a.status === "PENDING")
+                .map((a) => (
+                  <div className="approval-card" key={a.id}>
+                    <span className="approval-name">
+                      {a.applicant?.firstName} {a.applicant?.lastName}
+                    </span>
+                    <span className="approval-section">
+                      <span className="section-label">Sekcija:</span>
+                      <span className="section-name">{a.sectionName || "-"}</span>
+                    </span>
+                    <span className="approval-reason">{a.reason}</span>
+                    <div className="approval-actions">
+                      <button
+                        className="approve-btn"
+                        onClick={() => approveApplication(a.id)}
+                      >
+                        ✓
+                      </button>
+                      <button
+                        className="reject-btn"
+                        onClick={() => rejectApplication(a.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+
+          {/* Pregledane */}
+          {applications.filter((a) => a.status !== "PENDING").length > 0 && (
+            <div className="approval-list" style={{ marginTop: 24 }}>
+              {applications
+                .filter((a) => a.status !== "PENDING")
+                .map((a) => (
+                  <div className="approval-card" key={a.id}>
+                    <span className="approval-name">
+                      {a.applicant?.firstName} {a.applicant?.lastName}
+                    </span>
+                    <span className="approval-section">
+                      <span className="section-label">Sekcija:</span>
+                      <span className="section-name">{a.sectionName || "-"}</span>
+                    </span>
+                    <span className="approval-reason">{a.reason}</span>
+                    <span
+                      className={`status-badge status-${a.status?.toLowerCase()}`}
+                    >
+                      {a.status === "APPROVED" ? "ODOBRENO" : "ODBIJENO"}
+                    </span>
+                  </div>
+                ))}
+            </div>
           )}
         </div>
       )}
 
       {/* STRANICA ZA PROFESORE - pregled zahtjeva za ulogu */}
       {userData?.role === "PROFESSOR" && (
-        <div className="approval-list">
-          {roleRequests.length === 0 ? (
-            <p className="no-prijave">Nema zahtjeva za promjenu uloge.</p>
-          ) : (
-            roleRequests.map((r) => (
-              <div className="approval-card" key={r.id}>
-                <span className="approval-name">
-                  {r.user?.firstName} {r.user?.lastName}
-                </span>
-                <span className="approval-reason">{r.reason}</span>
-                <div className="approval-actions">
-                  <button
-                    className="approve-btn"
-                    onClick={() => approveRoleRequest(r.id)}
-                  >
-                    ✓
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => rejectRoleRequest(r.id)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            ))
+        <div>
+          {/* Na čekanju */}
+          <div className="approval-list">
+            {roleRequests.filter((r) => r.status === "PENDING").length ===
+              0 ? (
+              <p className="no-prijave">Nema zahtjeva na čekanju.</p>
+            ) : (
+              roleRequests
+                .filter((r) => r.status === "PENDING")
+                .map((r) => (
+                  <div className="approval-card" key={r.id}>
+                    <span className="approval-name">
+                      {r.user?.firstName} {r.user?.lastName}
+                    </span>
+                    <span className="approval-section">
+                      <span className="section-label">Sekcija:</span>
+                      <span className="section-name">{r.requestedSectionName || "-"}</span>
+                    </span>
+                    <span className="approval-reason">{r.reason}</span>
+                    <div className="approval-actions">
+                      <button
+                        className="approve-btn"
+                        onClick={() => approveRoleRequest(r.id)}
+                      >
+                        ✓
+                      </button>
+                      <button
+                        className="reject-btn"
+                        onClick={() => rejectRoleRequest(r.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+
+          {/* Pregledane */}
+          {roleRequests.filter((r) => r.status !== "PENDING").length > 0 && (
+            <div className="approval-list" style={{ marginTop: 24 }}>
+              {roleRequests
+                .filter((r) => r.status !== "PENDING")
+                .map((r) => (
+                  <div className="approval-card" key={r.id}>
+                    <span className="approval-name">
+                      {r.user?.firstName} {r.user?.lastName}
+                    </span>
+                    <span className="approval-section">
+                      <span className="section-label">Sekcija:</span>
+                      <span className="section-name">{r.requestedSectionName || "-"}</span>
+                    </span>
+                    <span className="approval-reason">{r.reason}</span>
+                    <span
+                      className={`status-badge status-${r.status?.toLowerCase()}`}
+                    >
+                      {r.status === "APPROVED" ? "ODOBRENO" : "ODBIJENO"}
+                    </span>
+                  </div>
+                ))}
+            </div>
           )}
         </div>
       )}
 
-      {message && <p className="message">{message}</p>}
+      {message && <p className={`message message-${messageType}`}>{message}</p>}
     </div>
   );
 };;

@@ -90,12 +90,12 @@ public class ApplicationService {
 
         // Prevent requesting the same section the user is already in
         if (applicant.getSection() != null && applicant.getSection().getId().equals(requestedSection.getId())) {
-            throw new IllegalStateException("You are already assigned to this section");
+            throw new IllegalStateException("Već ste član sekcije " + requestedSection.getName());
         }
 
         // Prevent multiple same pending requests
         if (applicationRepository.existsByApplicantAndSectionAndStatus(applicant, requestedSection, RequestStatus.PENDING)) {
-            throw new IllegalStateException("You already have a pending request for the section: " + requestedSection.getName());
+            throw new IllegalStateException("Već imate prijavu na čekanju sekciju " + requestedSection.getName());
         }
 
         Application application = new Application();
@@ -114,7 +114,7 @@ public class ApplicationService {
         Application application = getApplicationOrThrow(id);
 
         if (application.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("Only pending applications can be reviewed");
+            throw new IllegalStateException("Samo prijave na čekanju mogu biti pregledane");
         }
 
         User requestUser = application.getApplicant();
@@ -122,7 +122,7 @@ public class ApplicationService {
         // Check if the reviewer has permission (admin, professor, or section leader)
         boolean isLeaderOfSection = sectionLeaderService.isUserLeaderOfSection(reviewer, application.getSection());
         if (!(reviewer.isAdmin() || reviewer.isProfessor() || isLeaderOfSection)) {
-            throw new AccessDeniedException("You do not have permission to review this application");
+            throw new AccessDeniedException("Nemate dopuštenje za pregled ove prijave");
         }
 
         // Update the role request status and review details

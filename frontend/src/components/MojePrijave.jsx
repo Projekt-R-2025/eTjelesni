@@ -86,53 +86,51 @@ const MojePrijave = () => {
 
                 {!loading && error && <p className="message">{error}</p>}
 
-                {!loading && !error && applications.length === 0 && (
-                    <p className="no-prijave">Nemate podnesenih prijava.</p>
-                )}
 
-                {!loading && !error && applications.length > 0 && (
+
+                {!loading && !error && (
                     <div className="data-block">
-                    <h5>Prijave za članstvo u sekcijama:</h5>
-                    <div className="my-applications-table-wrapper">
-                        <table className="my-applications-table">
-                            <thead>
-                                <tr>
-                                    <th>Sekcija</th>
-                                    <th>Razlog prijave</th>
-                                    <th>Predano</th>
-                                    <th>Odobravatelj</th>
-                                    <th>Komentar</th>
-                                    <th>Pregledano</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {applications.map((app) => {
-                                    const statusClass = app.status ? app.status.toLowerCase() : "";
+                        <h5>Prijave za članstvo u sekcijama:</h5>
+                        <div className="my-applications-table-wrapper">
+                            <table className="my-applications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sekcija</th>
+                                        <th>Razlog prijave</th>
+                                        <th>Predano</th>
+                                        <th>Odobravatelj</th>
+                                        <th>Komentar</th>
+                                        <th>Pregledano</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {applications.map((app) => {
+                                        const statusClass = app.status ? app.status.toLowerCase() : "";
 
-                                    return (
-                                        <tr key={app.id}>
-                                            <td>{app.sectionName || "-"}</td>
-                                            <td>{app.reason || "-"}</td>
-                                            <td>{formatTimestamp(app.createdAt)}</td>
-                                            <td>{app.reviewer || "-"}</td>
-                                            <td>{app.reviewNote || "-"}</td>
-                                            <td>{app.reviewedAt ? formatTimestamp(app.reviewedAt) : "-"}</td>
-                                            <td>
-                                                <p className={`status-chip status-${statusClass}`}>
-                                                    {statusLabel[app.status] || app.status}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                        return (
+                                            <tr key={app.id}>
+                                                <td>{app.sectionName || "-"}</td>
+                                                <td>{app.reason || "-"}</td>
+                                                <td>{formatTimestamp(app.createdAt)}</td>
+                                                <td>{app.reviewer || "-"}</td>
+                                                <td>{app.reviewNote || "-"}</td>
+                                                <td>{app.reviewedAt ? formatTimestamp(app.reviewedAt) : "-"}</td>
+                                                <td>
+                                                    <p className={`status-chip status-${statusClass}`}>
+                                                        {statusLabel[app.status] || app.status}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
-                {!loading && !error && roleRequests.length > 0 && (
+                {!loading && !error && (
                     <div className="data-block">
                         <h5>Prijave za voditelja sekcija:</h5>
                         <div className="my-applications-table-wrapper">
