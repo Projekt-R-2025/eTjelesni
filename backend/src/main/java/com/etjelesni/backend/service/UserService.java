@@ -13,7 +13,6 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import com.etjelesni.backend.service.permission.PermissionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

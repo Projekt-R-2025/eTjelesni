@@ -79,14 +79,19 @@ const Navbar = ({ onLogout }) => {
                     ☰
                 </button>
 
-                <h1 className="logo">eTjelesni</h1>
+                <Link to="/home" className="logo-link">
+                    <h1 className="logo">eTjelesni</h1>
+                </Link>
 
                 <div className="user-container">
-                    <span className="user-name">
-                        <Link to="/korisnik">
+                    <Link to="/korisnik" className="user-link">
+                        <svg className="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                        <span className="user-name">
                             {userData?.firstName || "Ime"} {userData?.lastName || "Prezime"}
-                        </Link>
-                    </span>
+                        </span>
+                    </Link>
                 </div>
             </header>
 
@@ -96,7 +101,7 @@ const Navbar = ({ onLogout }) => {
                     <aside className="sidebar">
                         <Link to="/home" className="sidebar-button" onClick={closeSidebar}>HOME</Link>
                         <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
-                         {location.pathname.startsWith("/sekcija") && (
+                        {location.pathname.startsWith("/sekcija") && (
                             <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>
                         )}
                         {userData?.role === "PROFESSOR" && (

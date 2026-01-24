@@ -1,20 +1,6 @@
 /* === POCETNI DIO === */
 .prijave-page {
-  padding: 20px;
   position: relative;
-}
-
-.back-global {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  font-size: 48px;
-  cursor: pointer;
 }
 
 .page-title {
@@ -169,8 +155,16 @@
 
 .message {
   text-align: center;
-  margin-top: 20px;
+  margin: 20px auto;
   font-weight: 500;
+}
+
+.message-error {
+  color: #b91c1c;
+}
+
+.message-success {
+  color: #15803d;
 }
 
 /* === POTVRDE PRIJAVA === */
@@ -179,14 +173,16 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 900px;
+  max-width: 80vw;
   margin: 0 auto;
 }
 
 .approval-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  /* name | section | reason | actions */
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   padding: 14px 20px;
   border: 1px solid #bbb;
   border-radius: 6px;
@@ -195,18 +191,45 @@
 
 .approval-name {
   font-weight: 600;
-  width: 200px;
+  min-width: 0;
+  /* allow equal column sizing */
+}
+
+.approval-section {
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  min-width: 0;
+  /* allow equal column sizing */
+}
+
+.section-label {
+  color: #475569;
+  font-weight: 600;
+}
+
+.section-name {
+  font-weight: 700;
+  text-decoration: underline;
+  word-break: break-word;
 }
 
 .approval-reason {
-  flex: 1;
-  margin: 0 20px;
+  margin: 0;
   color: #333;
+  min-width: 0;
+  /* allow equal column sizing */
 }
 
 .approval-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  margin-left: 0;
+  justify-self: end;
+  /* keep actions snug to the right */
 }
 
 .approve-btn {
@@ -218,6 +241,10 @@
   height: 32px;
   border-radius: 4px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .approve-btn:hover {
@@ -233,10 +260,36 @@
   height: 32px;
   border-radius: 4px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .reject-btn:hover {
   background: #dc3030;
+}
+
+/* === STATUS BADGE === */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.status-approved {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-color: #fca5a5;
 }
 
 /* === LOADING I PRAZNO STANJE === */
@@ -254,4 +307,33 @@
   color: #888;
   padding: 2rem;
   font-size: 1rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* === CTA ZA MOJE PRIJAVE === */
+
+.my-applications-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 34px;
+}
+
+.secondary-btn {
+  padding: 12px 18px;
+  background-color: #2f3136;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.secondary-btn:hover {
+  background-color: #3b3b3b;
+}
+
+.secondary-btn:active {
+  transform: translateY(1px);
 }

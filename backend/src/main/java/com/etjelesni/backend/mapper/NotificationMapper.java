@@ -13,6 +13,7 @@ import java.util.List;
 public interface NotificationMapper {
 
     @Mapping(source = "section.id", target = "sectionId")
+    @Mapping(target = "creator", expression = "java(notification.getCreatedBy().getFirstName() + \" \" + notification.getCreatedBy().getLastName())")
     NotificationResponseDto toResponseDto(Notification notification);
 
     List<NotificationResponseDto> toResponseDtoList(List<Notification> notifications);

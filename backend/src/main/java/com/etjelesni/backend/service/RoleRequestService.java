@@ -79,24 +79,24 @@ public class RoleRequestService {
 
         // Prevent requesting the same role (except LEADER which can be for multiple sections)
         if (user.getRole() == requestedRole && requestedRole != Role.LEADER) {
-            throw new IllegalStateException("You cannot request the same role you already have");
+            throw new IllegalStateException("Ne možete zatražiti istu ulogu koju već imate");
         }
 
         // Validate section requirement for LEADER role
         Section section = null;
         if (requestedRole == Role.LEADER) {
             if (dto.getRequestedSectionId() == null) {
-                throw new IllegalArgumentException("Section ID is required when requesting LEADER role");
+                throw new IllegalArgumentException("ID sekcije je obavezan prilikom traženja uloge voditelja");
             }
             section = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
 
             // Check if user is already a leader of this section
             if (sectionLeaderService.isUserLeaderOfSection(user, section)) {
-                throw new IllegalStateException("You are already a leader of this section");
+                throw new IllegalStateException("Već ste voditelj sekcije " + section.getName());
             }
         } else {
             if (dto.getRequestedSectionId() != null) {
-                throw new IllegalArgumentException("Section ID should only be provided for LEADER role requests");
+                throw new IllegalArgumentException("ID sekcije treba biti naveden samo za zahtjeve za ulogu voditelja");
             }
         }
 
@@ -104,11 +104,11 @@ public class RoleRequestService {
         if (requestedRole == Role.LEADER) {
             if (roleRequestRepository.existsByUserAndRequestedRoleAndRequestedSectionAndStatus(
                     user, requestedRole, section, RequestStatus.PENDING)) {
-                throw new IllegalStateException("You already have a pending request for LEADER role for this section");
+                throw new IllegalStateException("Već imate zahtjev na čekanju za ulogu voditelja za sekciju " + section.getName());
             }
         } else {
             if (roleRequestRepository.existsByUserAndRequestedRoleAndStatus(user, requestedRole, RequestStatus.PENDING)) {
-                throw new IllegalStateException("You already have a pending request for the role: " + requestedRole);
+                throw new IllegalStateException("Već imate zahtjev na čekanju za ulogu: " + requestedRole);
             }
         }
 
@@ -131,14 +131,14 @@ public class RoleRequestService {
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
 
         if (roleRequest.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("Only pending requests can be reviewed");
+            throw new IllegalStateException("Samo zahtjevi na čekanju mogu biti pregledani");
         }
 
         User requestUser = roleRequest.getUser();
 
         // Check if the reviewer has permission to approve/reject this request
         if (!reviewer.getRole().canApprove(requestUser.getRole(), roleRequest.getRequestedRole())) {
-            throw new AccessDeniedException("You do not have permission to review this role request");
+            throw new AccessDeniedException("Nemate dozvolu za pregled ovog zahtjeva za ulogu");
         }
 
         // Update the role request status and review details
@@ -152,9 +152,8 @@ public class RoleRequestService {
         if (status == RequestStatus.APPROVED) {
             if (roleRequest.getRequestedRole() == Role.LEADER) {
                 sectionLeaderService.assignLeaderToSection(requestUser, roleRequest.getRequestedSection());
-            } else {
-                userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
             }
+            userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
         }
 
         return roleRequestMapper.toResponseDto(roleRequest);

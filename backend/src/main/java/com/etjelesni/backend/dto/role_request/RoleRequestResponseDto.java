@@ -13,9 +13,10 @@ public class RoleRequestResponseDto {
     private UserResponseDto user;
     private Role requestedRole;
     private Long requestedSectionId;
+    private String requestedSectionName;
     private RequestStatus status;
     private String reason;
-    private UserResponseDto reviewedBy;
+    private String reviewer;
     private LocalDateTime reviewedAt;
     private String reviewNote;
     private LocalDateTime createdAt;

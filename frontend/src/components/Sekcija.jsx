@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getToken } from "../utils/token";
+import { formatTimestamp } from "../utils/formatters";
 import Navbar from "../components/Navbar";
 import "./Sekcija.css";
 
@@ -364,13 +365,7 @@ const Sekcija = ({ onLogout }) => {
                 <h3>{o.title}</h3>
                 <p>{o.body}</p>
                 <span className="obavijest-date">
-                  {new Date(o.createdAt).toLocaleDateString("hr-HR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {o.creator} | {formatTimestamp(o.createdAt)}
                 </span>
 
                 {canEdit() && (

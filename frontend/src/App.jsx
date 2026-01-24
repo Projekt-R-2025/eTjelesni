@@ -12,6 +12,7 @@ import Home from "./components/Home";
 import Bike from './components/Bike';
 import Sekcija from './components/Sekcija';
 import Prijave from './components/Prijave';
+import MojePrijave from './components/MojePrijave';
 import Korisnik from './components/Korisnik';
 import Treninzi from './components/Treninzi';
 import SectionCreate from './components/SectionCreate';
@@ -133,6 +134,17 @@ function App() {
           element={
             isAuthenticated ? (
               <Prijave onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        <Route
+          path="/prijave/moje"
+          element={
+            isAuthenticated ? (
+              <MojePrijave />
             ) : (
               <Navigate to="/" replace />
             )

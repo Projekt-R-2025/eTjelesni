@@ -12,9 +12,10 @@ public class ApplicationResponseDto {
     private Long id;
     private UserResponseDto applicant;
     private Long sectionId;
+    private String sectionName;
     private RequestStatus status;
     private String reason;
-    private UserResponseDto reviewedBy;
+    private String reviewer;
     private LocalDateTime reviewedAt;
     private String reviewNote;
     private LocalDateTime createdAt;
