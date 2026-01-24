@@ -152,9 +152,8 @@ public class RoleRequestService {
         if (status == RequestStatus.APPROVED) {
             if (roleRequest.getRequestedRole() == Role.LEADER) {
                 sectionLeaderService.assignLeaderToSection(requestUser, roleRequest.getRequestedSection());
-            } else {
-                userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
             }
+            userService.updateUserRole(requestUser, roleRequest.getRequestedRole());
         }
 
         return roleRequestMapper.toResponseDto(roleRequest);

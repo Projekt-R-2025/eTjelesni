@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getToken } from "../utils/token";
+import Navbar from "../components/Navbar";
 import "./Prijave.css";
 
 const backendBase = import.meta.env.VITE_API_BASE_URL;
@@ -8,6 +10,7 @@ const Prijave = () => {
   const [activeForm, setActiveForm] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Role request state
   const [roleReason, setRoleReason] = useState("");
@@ -285,34 +288,45 @@ const Prijave = () => {
   return (
     <div className="prijave-page">
       {/* HEADER */}
-      <div className="back-global">
-        <button className="back-btn" onClick={() => window.history.back()}>
-          ←
-        </button>
-      </div>
+      <Navbar />
 
       <h1 className="page-title">PRIJAVE</h1>
 
       {/* KARTICE ZA STUDENTE */}
       {userData?.role === "STUDENT" && !activeForm && (
-        <div className="cards-container">
-          <div className="prijava-card" onClick={() => setActiveForm("ROLE")}>
-            <div className="card-top">
-              <p>ŽELIŠ BITI VODITELJ?</p>
-              <span>PRIJAVI SE</span>
+        <div>
+          <div className="cards-container">
+            <div
+              className="prijava-card"
+              onClick={() => setActiveForm("ROLE")}
+            >
+              <div className="card-top">
+                <p>ŽELIŠ BITI VODITELJ?</p>
+                <span>PRIJAVI SE</span>
+              </div>
+              <div className="card-bottom image2" />
             </div>
-            <div className="card-bottom image2" />
+
+            <div
+              className="prijava-card"
+              onClick={() => setActiveForm("APPLICATION")}
+            >
+              <div className="card-top">
+                <p>ŽELIŠ BITI DIO NEKE SEKCIJE?</p>
+                <span>PRIJAVI SE</span>
+              </div>
+              <div className="card-bottom image" />
+            </div>
           </div>
 
-          <div
-            className="prijava-card"
-            onClick={() => setActiveForm("APPLICATION")}
-          >
-            <div className="card-top">
-              <p>ŽELIŠ BITI DIO NEKE SEKCIJE?</p>
-              <span>PRIJAVI SE</span>
-            </div>
-            <div className="card-bottom image" />
+          <div className="my-applications-cta">
+            <button
+              className="secondary-btn"
+              type="button"
+              onClick={() => navigate("/prijave/moje")}
+            >
+              Vidi moje prijave
+            </button>
           </div>
         </div>
       )}

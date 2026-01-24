@@ -8,7 +8,7 @@
     margin: 0.5rem;
     border-radius: 6px;
     height: 52px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .menu-button {
@@ -23,17 +23,45 @@
     opacity: 0.8;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
     flex-shrink: 0;
-    cursor: default;
+    cursor: pointer;
+}
+
+.logo:hover {
+    opacity: 0.85;
 }
 
 .user-container {
     margin-left: auto;
-    cursor: pointer;
+}
+
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.user-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-icon {
+    width: 24px;
+    height: 24px;
 }
 
 .user-name {
@@ -65,8 +93,13 @@
 }
 
 @keyframes slideIn {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
 }
 
 .sidebar-button {
@@ -81,21 +114,21 @@
 }
 
 .sidebar-button:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-button.logout {
     margin-top: auto;
-    background-color: rgba(211,47,47,0.3);
+    background-color: rgba(211, 47, 47, 0.3);
 }
 
 .sidebar-button.logout:hover {
-    background-color: rgba(211,47,47,0.5);
+    background-color: rgba(211, 47, 47, 0.5);
 }
 
 .sidebar-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 200;
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getToken } from "../utils/token";
+import { formatTimestamp } from "../utils/formatters";
 import Navbar from "../components/Navbar";
 import "./Home.css";
 
@@ -222,13 +223,7 @@ const Home = ({ onLogout }) => {
                         <h3>{o.title}</h3>
                         <p>{o.body}</p>
                         <span className="obavijest-date">
-                            {new Date(o.createdAt).toLocaleDateString('hr-HR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}
+                            {o.creator} | {formatTimestamp(o.createdAt)}
                         </span>
 
                         {canEdit && (

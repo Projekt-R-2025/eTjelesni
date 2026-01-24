@@ -1,20 +1,6 @@
 /* === POCETNI DIO === */
 .prijave-page {
-  padding: 20px;
   position: relative;
-}
-
-.back-global {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  font-size: 48px;
-  cursor: pointer;
 }
 
 .page-title {
@@ -254,4 +240,31 @@
   color: #888;
   padding: 2rem;
   font-size: 1rem;
+}
+
+/* === CTA ZA MOJE PRIJAVE === */
+
+.my-applications-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 34px;
+}
+
+.secondary-btn {
+  padding: 12px 18px;
+  background-color: #2f3136;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.secondary-btn:hover {
+  background-color: #3b3b3b;
+}
+
+.secondary-btn:active {
+  transform: translateY(1px);
 }

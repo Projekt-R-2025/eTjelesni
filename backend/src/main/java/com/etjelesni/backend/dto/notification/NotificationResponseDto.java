@@ -1,6 +1,5 @@
 package com.etjelesni.backend.dto.notification;
 
-import com.etjelesni.backend.dto.user.UserResponseDto;
 import com.etjelesni.backend.enumeration.NotificationType;
 import lombok.Data;
 
@@ -13,7 +12,7 @@ public class NotificationResponseDto {
     private String body;
     private NotificationType type;
     private Long sectionId;
-    private UserResponseDto createdBy;
+    private String creator;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
