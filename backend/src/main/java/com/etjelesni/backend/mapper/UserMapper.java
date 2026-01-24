@@ -12,6 +12,7 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "section.id", target = "sectionId")
+    @Mapping(source = "section.name", target = "sectionName")
     UserResponseDto toResponseDto(User user);
 
     List<UserResponseDto> toResponseDtoList(List<User> users);

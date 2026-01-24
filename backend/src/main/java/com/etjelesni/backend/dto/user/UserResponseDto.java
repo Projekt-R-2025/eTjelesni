@@ -14,6 +14,7 @@ public class UserResponseDto {
     private String email;
     private Role role;
     private Long sectionId;
+    private String sectionName;
     private Integer currentPoints;
     private List<Long> leadingSectionIds;
     private LocalDateTime createdAt;

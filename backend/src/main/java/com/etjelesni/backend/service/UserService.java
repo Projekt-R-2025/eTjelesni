@@ -30,11 +30,13 @@ public class UserService {
     private final SectionService sectionService;
 
 
+    @Transactional
     public UserResponseDto getCurrentUser() {
         User user = currentUserService.getCurrentUser();
         return userMapper.toResponseDto(user);
     }
 
+    @Transactional
     public List<UserResponseDto> getAllUsers() {
         permissionService.requireCanManageUser();
 
@@ -42,6 +44,7 @@ public class UserService {
         return userMapper.toResponseDtoList(users);
     }
 
+    @Transactional
     public List<UserResponseDto> getUsersBySectionId(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
         permissionService.requireCanViewSectionMembers(section);
@@ -50,6 +53,7 @@ public class UserService {
         return userMapper.toResponseDtoList(users);
     }
 
+    @Transactional
     public UserResponseDto getUserById(Long id) {
         permissionService.requireCanManageUser();
 
