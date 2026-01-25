@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import Navbar from "./Navbar";
 import { getToken } from "../utils/token";
 import { formatTimestamp } from "../utils/formatters";
@@ -49,7 +50,7 @@ const Users = ({ onLogout }) => {
                 const meData = await meRes.json();
                 if (!isMounted) return;
                 setViewerRole(meData.role);
-                // 2) Dohvati sve sekcije radi imena i passingPoints
+                // 2) Dohvati sve sekcije radi name i passingPoints
                 const sectionsRes = await fetch(`${backendBase}/api/sections`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -139,6 +140,80 @@ const Users = ({ onLogout }) => {
         };
     }, []);
 
+    const handleRemoveSection = async (userId) => {
+        try {
+
+            const ok = confirm(`Ovom akcijom student neće više biti član sekcije. Jeste li sigurni da želite nastaviti?`);
+            if (!ok) return;
+
+            const token = getToken();
+            if (!token) {
+                throw new Error("Niste prijavljeni.");
+            }
+
+            const response = await fetch(`${backendBase}/api/users/${userId}/section`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Greška pri izbacivanju korisnika iz sekcije.");
+            }
+
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? { ...user, sectionId: null, sectionName: null, currentPoints: null }
+                        : user
+                )
+            );
+        } catch (err) {
+            setError(err.message || "Neočekivana greška.");
+        }
+    };
+
+    const handleRemoveLeader = async (userId, sectionId) => {
+        try {
+            const ok = confirm(`Ovom akcijom korisnik neće više biti voditelj sekcije. Jeste li sigurni da želite nastaviti?`);
+            if (!ok) return;
+
+            const token = getToken();
+            if (!token) {
+                throw new Error("Niste prijavljeni.");
+            }
+
+            const response = await fetch(`${backendBase}/api/users/${userId}/section/${sectionId}/leader`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Greška pri izbacivanju korisnika iz voditelja sekcije.");
+            }
+
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === userId
+                        ? {
+                            ...user,
+                            leadingSectionIds: (user.leadingSectionIds || []).filter(
+                                (id) => id !== sectionId
+                            ),
+                        }
+                        : user
+                )
+            );
+        } catch (err) {
+            setError(err.message || "Neočekivana greška.");
+        }
+    };
+
     const resolveSectionName = (sectionId) =>
         sectionsMap[sectionId]?.name || "-";
 
@@ -157,7 +232,7 @@ const Users = ({ onLogout }) => {
     const renderPoints = (user) => {
         // LEADER nema bodove ni članstvo
         if (user.role === "LEADER") return "-";
-        // Ako korisnik nije član sekcije ili sekcija nije mapirana, prikazuj "-"
+        // Ako korisnik nije član sekcije ili sekcija nije mapirana
         if (!user.sectionId || !sectionsMap[user.sectionId]) return "-";
 
         const passingPoints = resolvePassingPoints(user.sectionId);
@@ -176,6 +251,59 @@ const Users = ({ onLogout }) => {
             <span className={passed ? "points-pill pass" : "points-pill"}>{label}</span>
         );
     };
+
+    const renderSectionCell = (user) => {
+        const sectionName = user.sectionName;
+
+        // Ako korisnik nije član sekcije
+        if (!user.sectionId || !user.sectionName) {
+            return <td>-</td>;
+        }
+
+        return (
+            <td>
+                <div className="section-cell-container">
+                    <span>{sectionName}</span>
+                    <button
+                        onClick={() => handleRemoveSection(user.id)}
+                        className="remove-btn"
+                    >
+                        <RiDeleteBin5Line color="rgba(255,0,0,1)" />
+                    </button>
+                </div>
+            </td>
+        );
+    };
+
+    const renderLeadingSectionsCell = (user) => {
+        // Ako korisnik nije voditelj
+        if (!user.leadingSectionIds || user.leadingSectionIds.length === 0) {
+            return <td>-</td>;
+        }
+
+        // Samo ADMIN i PROFESSOR mogu da maknuti voditelje
+        const canRemoveLeader = viewerRole === "ADMIN" || viewerRole === "PROFESSOR";
+
+        return (
+            <td>
+                <div className="leader-sections-container">
+                    {user.leadingSectionIds.map((sectionId) => (
+                        <div key={sectionId} className="leader-section-item">
+                            <span>{sectionsMap[sectionId]?.name || "-"}</span>
+                            {canRemoveLeader && (
+                                <button
+                                    onClick={() => handleRemoveLeader(user.id, sectionId)}
+                                    className="remove-btn"
+                                >
+                                    <RiDeleteBin5Line color="rgba(255,0,0,1)" />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </td>
+        );
+    }
 
     return (
         <div>
@@ -223,11 +351,9 @@ const Users = ({ onLogout }) => {
                                             <td>{user.email}</td>
                                             <td>{roleLabel[user.role] || user.role}</td>
                                             <td>{user.createdAt ? formatTimestamp(user.createdAt) : "-"}</td>
-                                            <td>{user.sectionName || "-"}</td>
+                                            {renderSectionCell(user)}
                                             <td>{renderPoints(user)}</td>
-                                            {viewerRole !== "LEADER" && (
-                                                <td>{resolveLeadingSections(user.leadingSectionIds)}</td>
-                                            )}
+                                            {viewerRole !== "LEADER" && renderLeadingSectionsCell(user)}
                                         </tr>
                                     ))}
                                 </tbody>
