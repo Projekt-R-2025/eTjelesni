@@ -11,7 +11,6 @@ import com.etjelesni.backend.repository.AttendanceRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
 import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class AttendanceService {
 
 
     public List<AttendanceResponseDto> getAllAttendances() {
-        permissionService.requireCanViewAllAttendances();
+        //permissionService.requireCanViewAllAttendances();
 
         List<Attendance> attendances = attendanceRepository.findAllByCancelledFalseOrCancelledIsNull();
         return attendanceMapper.toResponseDtoList(attendances);
@@ -39,7 +38,7 @@ public class AttendanceService {
     public AttendanceResponseDto getAttendanceById(Long attendanceId) {
         Attendance attendance = getAttendanceOrThrow(attendanceId);
 
-        permissionService.requireCanViewAttendance(attendance);
+        //permissionService.requireCanViewAttendance(attendance);
 
         return attendanceMapper.toResponseDto(attendance);
     }
@@ -47,7 +46,7 @@ public class AttendanceService {
     public List<AttendanceResponseDto> getSessionAttendances(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
 
-        permissionService.requireCanViewSessionAttendances(session);
+        //permissionService.requireCanViewSessionAttendances(session);
 
         List<Attendance> attendances = attendanceRepository.findAllBySessionAndNotCancelled(session);
         return attendanceMapper.toResponseDtoList(attendances); // safe because associations are initialized
