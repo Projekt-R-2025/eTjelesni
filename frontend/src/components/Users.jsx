@@ -340,7 +340,7 @@ const Users = ({ onLogout }) => {
                                     {users.length === 0 && (
                                         <tr>
                                             <td colSpan={viewerRole !== "LEADER" ? 8 : 7} className="empty-cell">
-                                                Nema dostupnih korisnika.
+                                                Nema dostupnih korisnika
                                             </td>
                                         </tr>
                                     )}

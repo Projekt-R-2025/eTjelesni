@@ -105,6 +105,13 @@ const MojePrijave = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {applications.length === 0 && (
+                                        <tr>
+                                            <td colSpan={7} className="empty-cell">
+                                                Nema dostupnih prijava
+                                            </td>
+                                        </tr>
+                                    )}
                                     {applications.map((app) => {
                                         const statusClass = app.status ? app.status.toLowerCase() : "";
 
@@ -147,6 +154,13 @@ const MojePrijave = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {roleRequests.length === 0 && (
+                                        <tr>
+                                            <td colSpan={7} className="empty-cell">
+                                                Nema dostupnih prijava
+                                            </td>
+                                        </tr>
+                                    )}
                                     {roleRequests.map((req) => {
                                         const statusClass = req.status ? req.status.toLowerCase() : "";
 
