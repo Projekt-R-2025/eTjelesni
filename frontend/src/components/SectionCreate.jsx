@@ -84,7 +84,6 @@ function SectionCreate() {
 
             setMessage({ type: 'success', text: 'Section created successfully!' });
 
-            // Reset form
             setFormData({
                 name: '',
                 sectionType: 'BIKE',
@@ -97,7 +96,6 @@ function SectionCreate() {
         }
     };
 
-    // UI
 
     return (
         <>
