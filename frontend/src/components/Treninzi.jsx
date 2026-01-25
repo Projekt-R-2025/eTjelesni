@@ -513,25 +513,34 @@ function Treninzi() {
                             <div className="approvals-grid">
                                 {allAttendances.filter(att => att.status === 'PENDING' && !att.cancelled).map((attendance) => (
                                     <div key={attendance.id} className="approval-card">
-                                        <h4>Sesija: {attendance.sessionTitle}</h4>
-                                        {userInfoMap[attendance.studentId] && (
-                                            <>
-                                                <p><strong>Ime:</strong> {userInfoMap[attendance.studentId].firstName}</p>
-                                                <p><strong>Prezime:</strong> {userInfoMap[attendance.studentId].lastName}</p>
-                                                <p><strong>Email:</strong> {userInfoMap[attendance.studentId].email}</p>
-                                                <p><strong>Bodovi:</strong> {userInfoMap[attendance.studentId].currentPoints}</p>
-                                            </>
-                                        )}
-                                        {attendance.status === 'PENDING' && !attendance.cancelled && (
-                                            <div className="approval-buttons">
-                                                <button className="approve-btn" onClick={() => approveAttendance(attendance.id)}>
-                                                    Odobri
-                                                </button>
-                                                <button className="cancel-btn" onClick={() => cancelAttendance(attendance.id)}>
-                                                    Otkaži
-                                                </button>
-                                            </div>
-                                        )}
+                                        <div naslovS>
+                                            <h4>Sesija: {attendance.sessionTitle}</h4>
+
+                                        </div>
+                                        <div className='podatciS'>
+                                            {userInfoMap[attendance.studentId] && (
+                                                <>
+                                                    <p><strong>Ime:</strong> {userInfoMap[attendance.studentId].firstName}</p>
+                                                    <p><strong>Prezime:</strong> {userInfoMap[attendance.studentId].lastName}</p>
+                                                    <p><strong>Email:</strong> {userInfoMap[attendance.studentId].email}</p>
+                                                    <p><strong>Bodovi:</strong> {userInfoMap[attendance.studentId].currentPoints}</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <div className='potvrdeS'>
+                                            {attendance.status === 'PENDING' && !attendance.cancelled && (
+                                                <div className="approval-buttons">
+                                                    <button className="approve-btn" onClick={() => approveAttendance(attendance.id)}>
+                                                        Odobri
+                                                    </button>
+                                                    <button className="cancel-btn" onClick={() => cancelAttendance(attendance.id)}>
+                                                        Otkaži
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
+
                                     </div>
                                 ))}
                             </div>
