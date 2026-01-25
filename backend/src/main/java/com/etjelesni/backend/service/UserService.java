@@ -28,6 +28,7 @@ public class UserService {
     private final CurrentUserService currentUserService;
     private final PermissionService permissionService;
     private final SectionService sectionService;
+    private final SectionLeaderService sectionLeaderService;
 
 
     @Transactional
@@ -61,6 +62,7 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @Transactional
     public UserResponseDto createUser(UserCreateDto dto) {
         permissionService.requireCanManageUser();
 
@@ -73,6 +75,7 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
         permissionService.requireCanManageUser();
 
@@ -84,6 +87,7 @@ public class UserService {
         return userMapper.toResponseDto(updatedUser);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         permissionService.requireCanManageUser();
 
@@ -96,6 +100,30 @@ public class UserService {
         permissionService.requireCanManageUser();
 
         userRepository.resetAllPoints();
+    }
+
+    @Transactional
+    public void removeUserFromSection(Long userId) {
+        User user = getUserOrThrow(userId);
+
+        if (user.getSection() == null) {
+            throw new IllegalStateException("User is not assigned to any section");
+        }
+
+        permissionService.requireCanRemoveUserFromSection(user.getSection());
+
+        user.setSection(null);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void removeUserAsLeaderFromSection(Long userId, Long sectionId) {
+        permissionService.requireCanManageUser();
+
+        User user = getUserOrThrow(userId);
+        Section section = sectionService.getSectionOrThrow(sectionId);
+
+        sectionLeaderService.removeLeaderFromSection(user, section);
     }
 
     public User getUserOrThrow(Long id) {

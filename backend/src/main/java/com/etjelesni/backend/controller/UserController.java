@@ -50,11 +50,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserUpdateDto dto) {
-        UserResponseDto response = userService.updateUser(id, dto);
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserUpdateDto dto) {
+//        UserResponseDto response = userService.updateUser(id, dto);
+//        return ResponseEntity.ok(response);
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -65,6 +65,20 @@ public class UserController {
     @PutMapping("/points/reset")
     public ResponseEntity<Void> resetAllStudentsPointsToZero() {
         userService.resetAllStudentsPointsToZero();
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}/section")
+    public ResponseEntity<Void> removeUserFromSection(@PathVariable Long userId) {
+        userService.removeUserFromSection(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}/section/{sectionId}/leader")
+    public ResponseEntity<Void> removeUserAsLeaderFromSection(
+            @PathVariable Long userId,
+            @PathVariable Long sectionId) {
+        userService.removeUserAsLeaderFromSection(userId, sectionId);
         return ResponseEntity.noContent().build();
     }
 

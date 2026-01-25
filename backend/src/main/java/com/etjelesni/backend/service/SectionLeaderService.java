@@ -1,5 +1,6 @@
 package com.etjelesni.backend.service;
 
+import com.etjelesni.backend.enumeration.Role;
 import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.model.SectionLeader;
 import com.etjelesni.backend.model.User;
@@ -36,6 +37,25 @@ public class SectionLeaderService {
             user.setLeadingSectionIds(leadingSectionIds);
             userRepository.save(user);
         }
+    }
+
+    public void removeLeaderFromSection(User user, Section section) {
+        // Find and delete SectionLeader entity
+        SectionLeader sectionLeader = sectionLeaderRepository.findByLeaderAndSection(user, section)
+                .orElseThrow(() -> new IllegalStateException("User is not a leader of this section"));
+        sectionLeaderRepository.delete(sectionLeader);
+
+        // Update user's leadingSectionIds
+        List<Long> leadingSectionIds = user.getLeadingSectionIds();
+        leadingSectionIds.remove(section.getId());
+        user.setLeadingSectionIds(leadingSectionIds);
+
+        // If user is no longer a leader of any section, set role to STUDENT
+        if (leadingSectionIds.isEmpty()) {
+            user.setRole(Role.STUDENT);
+        }
+
+        userRepository.save(user);
     }
 
 }

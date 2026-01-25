@@ -128,6 +128,13 @@ public class PermissionService {
                 isAdmin(currentUser));
     }
 
+    public void requireCanRemoveUserFromSection(Section section) {
+        User currentUser = getCurrentUser();
+        require(isSectionLeader(currentUser, section) ||
+                isProfessor(currentUser) ||
+                isAdmin(currentUser));
+    }
+
 
 
     // ============================================
