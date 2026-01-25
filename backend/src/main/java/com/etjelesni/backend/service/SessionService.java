@@ -40,7 +40,7 @@ public class SessionService {
     public SessionResponseDto createSession(SessionCreateDto dto) {
         Section section = sectionService.getSectionOrThrow(dto.getSectionId());
 
-        permissionService.requireCanManageSession(section);
+        //permissionService.requireCanManageSession(section);
 
         Session session = sessionMapper.toEntity(dto);
         session.setSection(section);
@@ -52,7 +52,7 @@ public class SessionService {
     public void deleteSession(Long id) {
         Session session = getSessionOrThrow(id);
 
-        permissionService.requireCanManageSession(session.getSection());
+        //permissionService.requireCanManageSession(session.getSection());
 
         sessionRepository.delete(session);
     }
