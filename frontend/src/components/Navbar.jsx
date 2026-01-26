@@ -110,7 +110,7 @@ const Navbar = ({ onLogout }) => {
                         <Link to="/bike" className="sidebar-button" onClick={closeSidebar}>BIKE</Link>
                         <Link to="/prijave" className="sidebar-button" onClick={closeSidebar}>PRIJAVE</Link>
                         {userData?.role !== "STUDENT" && (
-                            <Link to="/users" className="sidebar-button" onClick={closeSidebar}>KORISNICI</Link>
+                            <Link to="/korisnici" className="sidebar-button" onClick={closeSidebar}>KORISNICI</Link>
                         )}
                         <Link to="/konzultacije" className="sidebar-button" onClick={closeSidebar}>KONZULTACIJE</Link>
                         <button className="sidebar-button logout" onClick={handleLogout}>ODJAVA</button>

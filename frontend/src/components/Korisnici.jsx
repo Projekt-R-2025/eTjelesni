@@ -3,7 +3,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import Navbar from "./Navbar";
 import { getToken } from "../utils/token";
 import { formatTimestamp } from "../utils/formatters";
-import "./Users.css";
+import "./Korisnici.css";
 
 const backendBase = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,7 +14,7 @@ const roleLabel = {
     STUDENT: "Student",
 };
 
-const Users = ({ onLogout }) => {
+const Korisnici = ({ onLogout }) => {
     const [users, setUsers] = useState([]);
     const [sectionsMap, setSectionsMap] = useState({});
     const [viewerRole, setViewerRole] = useState(null);
@@ -22,8 +22,6 @@ const Users = ({ onLogout }) => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        let isMounted = true;
-
         const fetchData = async () => {
             setLoading(true);
             setError("");
@@ -48,7 +46,6 @@ const Users = ({ onLogout }) => {
                 }
 
                 const meData = await meRes.json();
-                if (!isMounted) return;
                 setViewerRole(meData.role);
                 // 2) Dohvati sve sekcije radi name i passingPoints
                 const sectionsRes = await fetch(`${backendBase}/api/sections`, {
@@ -62,7 +59,6 @@ const Users = ({ onLogout }) => {
                 }
 
                 const sectionsData = await sectionsRes.json();
-                if (!isMounted) return;
 
                 const map = sectionsData.reduce((acc, section) => {
                     acc[section.id] = {
@@ -124,20 +120,15 @@ const Users = ({ onLogout }) => {
                     throw new Error("Nemate dopuštenje za pregled korisnika.");
                 }
 
-                if (!isMounted) return;
                 setUsers(fetchedUsers);
             } catch (err) {
-                if (!isMounted) return;
                 setError(err.message || "Neočekivana greška.");
             } finally {
-                if (isMounted) setLoading(false);
+                setLoading(false);
             }
         };
 
         fetchData();
-        return () => {
-            isMounted = false;
-        };
     }, []);
 
     const handleRemoveSection = async (userId) => {
@@ -248,7 +239,7 @@ const Users = ({ onLogout }) => {
         const label = `${user.currentPoints ?? 0} / ${passingPoints}`;
 
         return (
-            <span className={passed ? "points-pill pass" : "points-pill"}>{label}</span>
+            <span className={passed ? "points pass" : "points"}>{label}</span>
         );
     };
 
@@ -366,4 +357,4 @@ const Users = ({ onLogout }) => {
     );
 };
 
-export default Users;
+export default Korisnici;

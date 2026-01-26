@@ -17,7 +17,7 @@ import Korisnik from './components/Korisnik';
 import Treninzi from './components/Treninzi';
 import SectionCreate from './components/SectionCreate';
 import Konzultacije from './components/konzultacije';
-import Users from './components/Users';
+import Korisnici from './components/Korisnici';
 import { hasToken, removeToken, getToken } from './utils/token';
 
 function App() {
@@ -197,10 +197,10 @@ function App() {
         />
 
         <Route
-          path="/users"
+          path="/korisnici"
           element={
             isAuthenticated ? (
-              <Users onLogout={handleLogout} />
+              <Korisnici onLogout={handleLogout} />
             ) : (
               <Navigate to="/" replace />
             )

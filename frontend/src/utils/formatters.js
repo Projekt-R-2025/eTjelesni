@@ -1,8 +1,3 @@
-/**
- * Formira datum u format: dd.mm.yyyy. hh:mm
- * @param {string} dateString - ISO datumski string
- * @returns {string} Formatirani datum
- */
 export const formatTimestamp = (dateString) => {
     const date = new Date(dateString);
     const d = date.getDate().toString().padStart(2, '0');
