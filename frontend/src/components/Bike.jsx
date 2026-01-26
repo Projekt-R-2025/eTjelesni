@@ -7,33 +7,39 @@ import { getToken } from '../utils/token.js';
 const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 function Bike() {
-    const [data, setData] = useState([]);
-    const [notifications, setNotifications] = useState([]);
-    const [selectedId, setSelectedId] = useState(null);
-    const [showForm, setShowForm] = useState(false);
-    const [newTitle, setNewTitle] = useState('');
-    const [newDescription, setNewDescription] = useState('');
-    const [newPointA, setNewPointA] = useState('');
-    const [newPointB, setNewPointB] = useState('');
-    const [newCapacity, setNewCapacity] = useState('');
-    const [newPoints, setNewPoints] = useState('');
-    const [newStartTime, setNewStartTime] = useState('');
-    const [newEndTime, setNewEndTime] = useState('');
+    const [podaci, setPodaci] = useState([]);
+    const [obavijesti, setObavijesti] = useState([]);
+    const [odabraniId, setOdabraniId] = useState(null);
+    const [prikaziFormu, setPrikaziFormu] = useState(false);
+    const [noviNaslov, setNoviNaslov] = useState('');
+    const [noviOpis, setNoviOpis] = useState('');
+    const [novoPolaziste, setNovoPolaziste] = useState('');
+    const [novaDestinacija, setNovaDestinacija] = useState('');
+    const [noviKapacitet, setNoviKapacitet] = useState('');
+    const [noviBodovi, setNoviBodovi] = useState('');
+    const [novoVrijemePocetka, setNovoVrijemePocetka] = useState('');
+    const [novoVrijemeZavrsetka, setNovoVrijemeZavrsetka] = useState('');
     const [bikeSectionId, setBikeSectionId] = useState(null);
-    const [attendanceCounts, setAttendanceCounts] = useState({});
-    const [userRole, setUserRole] = useState(null);
+    const [brojPrijavljenih, setBrojPrijavljenih] = useState({});
+    const [ulogaKorisnika, setUlogaKorisnika] = useState(null);
     const [studentId, setStudentId] = useState(null);
-    const [isJoining, setIsJoining] = useState(false);
-    const [attendanceStatuses, setAttendanceStatuses] = useState({});
-    const [attendanceIds, setAttendanceIds] = useState({});
-    const [allAttendances, setAllAttendances] = useState([]);
-    const [userInfoMap, setUserInfoMap] = useState({});
+    const [pridruzivanje, setPridruzivanje] = useState(false);
+    const [statusiPrisustva, setStatusiPrisustva] = useState({});
+    const [prijavaId, setPrijavaId] = useState({});
+    const [svePrijave, setSvePrijave] = useState([]);
+    const [mapaKorisnika, setMapaKorisnika] = useState({});
 
-    const isAdminRole = userRole && ['LEADER', 'PROFESSOR', 'ADMIN'].includes(userRole);
-    const canJoin = !isAdminRole;
+    const jeAdminUloga = ulogaKorisnika && ['LEADER', 'PROFESSOR', 'ADMIN'].includes(ulogaKorisnika);
+    const mozeSePridruziti = !jeAdminUloga;
+
+    const statusPrijevodi = {
+        PENDING: 'Na čekanju',
+        APPROVED: 'Odobreno',
+        REJECTED: 'Odbijeno'
+    };
 
     useEffect(() => {
-        const fetchBikeSectionAndSessions = async () => {
+        const dohvatiBikeSekcijuISesije = async () => {
             try {
                 const token = getToken();
                 const response = await fetch(`${backendBase}/api/sections`, {
@@ -50,9 +56,9 @@ function Bike() {
 
                     if (bikeSection) {
                         setBikeSectionId(bikeSection.id);
-                        console.log('Bike section ID:', bikeSection.id);
+                        console.log('ID Bike sekcije:', bikeSection.id);
 
-                        const notificationsResponse = await fetch(`${backendBase}/api/notifications/section/${bikeSection.id}`, {
+                        const obavijestiResponse = await fetch(`${backendBase}/api/notifications/section/${bikeSection.id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -60,13 +66,13 @@ function Bike() {
                             }
                         });
 
-                        if (notificationsResponse.ok) {
-                            const notificationsData = await notificationsResponse.json();
-                            setNotifications(notificationsData);
-                            console.log('Loaded notifications:', notificationsData);
+                        if (obavijestiResponse.ok) {
+                            const obavijestiData = await obavijestiResponse.json();
+                            setObavijesti(obavijestiData);
+                            console.log('Učitane obavijesti:', obavijestiData);
                         }
 
-                        const sessionsResponse = await fetch(`${backendBase}/api/sessions/section/${bikeSection.id}`, {
+                        const sesijeResponse = await fetch(`${backendBase}/api/sessions/section/${bikeSection.id}`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -74,9 +80,9 @@ function Bike() {
                             }
                         });
 
-                        if (sessionsResponse.ok) {
-                            const sessions = await sessionsResponse.json();
-                            const formattedData = sessions.map(session => ({
+                        if (sesijeResponse.ok) {
+                            const sesije = await sesijeResponse.json();
+                            const formatiraniPodaci = sesije.map(session => ({
                                 id: session.id,
                                 title: session.title,
                                 description: session.description,
@@ -88,27 +94,27 @@ function Bike() {
                                 endTime: session.endTime,
                                 selected: false
                             }));
-                            setData(formattedData);
-                            console.log('Loaded sessions:', formattedData);
+                            setPodaci(formatiraniPodaci);
+                            console.log('Učitane sesije:', formatiraniPodaci);
 
-                            fetchAttendanceCounts(sessions);
+                            dohvatiBrojPrijavljenih(sesije);
                         }
                     } else {
-                        console.log('No BIKE section found');
+                        console.log('Nema BIKE sekcije');
                     }
                 } else {
-                    console.error('Failed to fetch sections:', response.status);
+                    console.error('Neuspješno dohvaćanje sekcija:', response.status);
                 }
             } catch (error) {
-                console.error('Error fetching bike section:', error);
+                console.error('Greška kod dohvaćanja bike sekcije:', error);
             }
         };
 
-        fetchBikeSectionAndSessions();
+        dohvatiBikeSekcijuISesije();
     }, []);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const dohvatiKorisnika = async () => {
             try {
                 const token = getToken();
                 const response = await fetch(`${backendBase}/api/users/me`, {
@@ -120,23 +126,23 @@ function Bike() {
                 });
                 if (response.ok) {
                     const user = await response.json();
-                    setUserRole(user.role);
+                    setUlogaKorisnika(user.role);
                     setStudentId(user.id || user.studentId);
                 } else {
-                    console.error('Failed to fetch user:', response.status);
+                    console.error('Neuspješno dohvaćanje korisnika:', response.status);
                 }
             } catch (error) {
-                console.error('Error fetching user:', error);
+                console.error('Greška kod dohvaćanja korisnika:', error);
             }
         };
-        fetchUser();
+        dohvatiKorisnika();
     }, []);
 
-    const fetchAttendanceCounts = async (sessions) => {
+    const dohvatiBrojPrijavljenih = async (sesije) => {
         const token = getToken();
-        const counts = {};
+        const brojevi = {};
 
-        for (const session of sessions) {
+        for (const session of sesije) {
             try {
                 const response = await fetch(`${backendBase}/api/sessions/${session.id}/attendances`, {
                     method: 'GET',
@@ -148,28 +154,28 @@ function Bike() {
 
                 if (response.ok) {
                     const attendances = await response.json();
-                    counts[session.id] = attendances.filter(att => att.status === 'APPROVED' && !att.cancelled).length;
+                    brojevi[session.id] = attendances.filter(att => att.status === 'APPROVED' && !att.cancelled).length;
                 } else {
-                    counts[session.id] = 0;
+                    brojevi[session.id] = 0;
                 }
             } catch (error) {
-                console.error(`Error fetching attendances for session ${session.id}:`, error);
-                counts[session.id] = 0;
+                console.error(`Greška kod dohvaćanja prijava za sesiju ${session.id}:`, error);
+                brojevi[session.id] = 0;
             }
         }
 
-        setAttendanceCounts(counts);
+        setBrojPrijavljenih(brojevi);
     };
 
     useEffect(() => {
-        if (!studentId || data.length === 0) return;
-        const fetchMyAttendances = async () => {
+        if (!studentId || podaci.length === 0) return;
+        const dohvatiMojePrijave = async () => {
             try {
                 const token = getToken();
-                const statusMap = {};
-                const idMap = {};
-                for (const ad of data) {
-                    const response = await fetch(`${backendBase}/api/sessions/${ad.id}/attendances`, {
+                const statusMapa = {};
+                const idMapa = {};
+                for (const oglas of podaci) {
+                    const response = await fetch(`${backendBase}/api/sessions/${oglas.id}/attendances`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -178,35 +184,35 @@ function Bike() {
                     });
                     if (response.ok) {
                         const attendances = await response.json();
-                        const mine = attendances.find(att => att.studentId === studentId);
-                        if (mine) {
-                            statusMap[ad.id] = mine.status;
-                            idMap[ad.id] = mine.id;
+                        const moja = attendances.find(att => att.studentId === studentId);
+                        if (moja) {
+                            statusMapa[oglas.id] = moja.status;
+                            idMapa[oglas.id] = moja.id;
                         }
                     }
                 }
-                if (Object.keys(statusMap).length > 0) {
-                    setAttendanceStatuses(prev => ({ ...prev, ...statusMap }));
+                if (Object.keys(statusMapa).length > 0) {
+                    setStatusiPrisustva(prev => ({ ...prev, ...statusMapa }));
                 }
-                if (Object.keys(idMap).length > 0) {
-                    setAttendanceIds(prev => ({ ...prev, ...idMap }));
+                if (Object.keys(idMapa).length > 0) {
+                    setPrijavaId(prev => ({ ...prev, ...idMapa }));
                 }
             } catch (error) {
-                console.error('Error fetching my attendances:', error);
+                console.error('Greška kod dohvaćanja mojih prijava:', error);
             }
         };
-        fetchMyAttendances();
-    }, [studentId, data]);
+        dohvatiMojePrijave();
+    }, [studentId, podaci]);
 
     useEffect(() => {
-        if (!isAdminRole || data.length === 0) return;
-        const fetchAllAttendances = async () => {
+        if (!jeAdminUloga || podaci.length === 0) return;
+        const dohvatiSvePrijave = async () => {
             try {
                 const token = getToken();
-                const allAtts = [];
-                const studentIdsSet = new Set();
-                for (const ad of data) {
-                    const response = await fetch(`${backendBase}/api/sessions/${ad.id}/attendances`, {
+                const sve = [];
+                const setIdStudenata = new Set();
+                for (const oglas of podaci) {
+                    const response = await fetch(`${backendBase}/api/sessions/${oglas.id}/attendances`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -215,12 +221,12 @@ function Bike() {
                     });
                     if (response.ok) {
                         const attendances = await response.json();
-                        attendances.forEach(att => studentIdsSet.add(att.studentId));
-                        allAtts.push(...attendances.map(att => ({ ...att, sessionTitle: ad.title })));
+                        attendances.forEach(att => setIdStudenata.add(att.studentId));
+                        sve.push(...attendances.map(att => ({ ...att, sessionTitle: oglas.title })));
                     }
                 }
-                setAllAttendances(allAtts);
-                const studentIds = Array.from(studentIdsSet).filter(id => userInfoMap[id] === undefined);
+                setSvePrijave(sve);
+                const studentIds = Array.from(setIdStudenata).filter(id => mapaKorisnika[id] === undefined);
                 if (studentIds.length > 0) {
                     const userResponses = await Promise.all(studentIds.map(async (id) => {
                         try {
@@ -236,7 +242,7 @@ function Bike() {
                                 return { id, user };
                             }
                         } catch (err) {
-                            console.error(`Error fetching user ${id}:`, err);
+                            console.error(`Greška kod dohvaćanja korisnika ${id}:`, err);
                         }
                         return null;
                     }));
@@ -247,21 +253,21 @@ function Bike() {
                         }
                     });
                     if (Object.keys(mapUpdates).length > 0) {
-                        setUserInfoMap(prev => ({ ...prev, ...mapUpdates }));
+                        setMapaKorisnika(prev => ({ ...prev, ...mapUpdates }));
                     }
                 }
             } catch (error) {
-                console.error('Error fetching attendances:', error);
+                console.error('Greška kod dohvaćanja prijava:', error);
             }
         };
-        fetchAllAttendances();
-    }, [isAdminRole, data]);
+        dohvatiSvePrijave();
+    }, [jeAdminUloga, podaci]);
 
-    async function approveAttendance(attendanceId) {
-        const attendance = allAttendances.find(att => att.id === attendanceId);
+    async function odobriPrijavu(prijavaIdZaOdobriti) {
+        const prijava = svePrijave.find(att => att.id === prijavaIdZaOdobriti);
         try {
             const token = getToken();
-            const response = await fetch(`${backendBase}/api/attendances/${attendanceId}/approve`, {
+            const response = await fetch(`${backendBase}/api/attendances/${prijavaIdZaOdobriti}/approve`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -269,10 +275,10 @@ function Bike() {
                 }
             });
             if (response.ok) {
-                setAllAttendances(prev => prev.filter(att => att.id !== attendanceId));
-                if (attendance) {
-                    const sessionId = attendance.sessionId;
-                    setAttendanceCounts(prev => ({
+                setSvePrijave(prev => prev.filter(att => att.id !== prijavaIdZaOdobriti));
+                if (prijava) {
+                    const sessionId = prijava.sessionId;
+                    setBrojPrijavljenih(prev => ({
                         ...prev,
                         [sessionId]: (prev[sessionId] || 0) + 1
                     }));
@@ -281,15 +287,15 @@ function Bike() {
                 alert('Greška pri odobravanju prijave');
             }
         } catch (error) {
-            console.error('Error approving attendance:', error);
+            console.error('Greška kod odobravanja prijave:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     }
 
-    async function cancelAttendance(attendanceId) {
+    async function otkaziPrijavu(prijavaIdZaOtkazati) {
         try {
             const token = getToken();
-            const response = await fetch(`${backendBase}/api/attendances/${attendanceId}/cancel`, {
+            const response = await fetch(`${backendBase}/api/attendances/${prijavaIdZaOtkazati}/cancel`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -297,24 +303,24 @@ function Bike() {
                 }
             });
             if (response.ok) {
-                setAllAttendances(prev => prev.filter(att => att.id !== attendanceId));
+                setSvePrijave(prev => prev.filter(att => att.id !== prijavaIdZaOtkazati));
             } else {
                 alert('Greška pri otkazivanju prijave');
             }
         } catch (error) {
-            console.error('Error cancelling attendance:', error);
+            console.error('Greška kod otkazivanja prijave:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     }
 
-    function joinGroup(sessionId) {
+    function pridruziSeGrupi(sessionId) {
         if (!studentId) {
             alert('Greška: Student ID nije pronađen');
             return;
         }
-        if (isJoining) return;
+        if (pridruzivanje) return;
         const joinAsync = async () => {
-            setIsJoining(true);
+            setPridruzivanje(true);
             try {
                 const token = getToken();
                 const attendanceData = {
@@ -333,12 +339,12 @@ function Bike() {
                 });
                 if (response.ok) {
                     const attendance = await response.json();
-                    setSelectedId(sessionId);
-                    setAttendanceStatuses(prev => ({
+                    setOdabraniId(sessionId);
+                    setStatusiPrisustva(prev => ({
                         ...prev,
                         [sessionId]: attendance.status
                     }));
-                    setAttendanceIds(prev => ({
+                    setPrijavaId(prev => ({
                         ...prev,
                         [sessionId]: attendance.id
                     }));
@@ -346,26 +352,26 @@ function Bike() {
                     alert('Greška pri pridruživanju sesiji');
                 }
             } catch (error) {
-                console.error('Error joining session:', error);
+                console.error('Greška kod pridruživanja sesiji:', error);
                 alert('Greška pri komunikaciji sa serverom');
             } finally {
-                setIsJoining(false);
+                setPridruzivanje(false);
             }
         };
         joinAsync();
     }
 
-    function leaveGroup(sessionId) {
-        const attendanceId = attendanceIds[sessionId];
-        const currentStatus = attendanceStatuses[sessionId];
-        if (!attendanceId) {
+    function napustiGrupu(sessionId) {
+        const idPrijave = prijavaId[sessionId];
+        const trenutniStatus = statusiPrisustva[sessionId];
+        if (!idPrijave) {
             alert('Greška: Prijava nije pronađena');
             return;
         }
         const leaveAsync = async () => {
             try {
                 const token = getToken();
-                const url = `${backendBase}/api/attendances/${attendanceId}/cancel`;
+                const url = `${backendBase}/api/attendances/${idPrijave}/cancel`;
                 const response = await fetch(url, {
                     method: 'PUT',
                     headers: {
@@ -374,17 +380,17 @@ function Bike() {
                     }
                 });
                 if (response.ok) {
-                    setSelectedId(null);
-                    setAttendanceStatuses(prev => ({
+                    setOdabraniId(null);
+                    setStatusiPrisustva(prev => ({
                         ...prev,
                         [sessionId]: undefined
                     }));
-                    setAttendanceIds(prev => ({
+                    setPrijavaId(prev => ({
                         ...prev,
                         [sessionId]: undefined
                     }));
-                    if (currentStatus === 'APPROVED') {
-                        setAttendanceCounts(prev => ({
+                    if (trenutniStatus === 'APPROVED') {
+                        setBrojPrijavljenih(prev => ({
                             ...prev,
                             [sessionId]: Math.max(0, (prev[sessionId] || 0) - 1)
                         }));
@@ -395,32 +401,32 @@ function Bike() {
                     alert('Greška pri odustajanju od sesije: ' + response.status);
                 }
             } catch (error) {
-                console.error('Error leaving session:', error);
+                console.error('Greška kod odustajanja od sesije:', error);
                 alert('Greška pri komunikaciji sa serverom: ' + error.message);
             }
         };
         leaveAsync();
     }
 
-    function openForm() {
-        setShowForm(true);
+    function otvoriFormu() {
+        setPrikaziFormu(true);
     }
 
-    function closeForm() {
-        setShowForm(false);
-        setNewTitle('');
-        setNewDescription('');
-        setNewPointA('');
-        setNewPointB('');
-        setNewCapacity('');
-        setNewPoints('');
-        setNewStartTime('');
-        setNewEndTime('');
+    function zatvoriFormu() {
+        setPrikaziFormu(false);
+        setNoviNaslov('');
+        setNoviOpis('');
+        setNovoPolaziste('');
+        setNovaDestinacija('');
+        setNoviKapacitet('');
+        setNoviBodovi('');
+        setNovoVrijemePocetka('');
+        setNovoVrijemeZavrsetka('');
     }
 
     async function addAd() {
         if (!bikeSectionId) {
-            console.error('Bike section ID not found');
+            console.error('Bike sekcija nije pronađena');
             alert('Greška: Bike sekcija nije pronađena');
             return;
         }
@@ -428,14 +434,14 @@ function Bike() {
         try {
             const token = getToken();
             const sessionData = {
-                title: newTitle,
-                description: newDescription,
-                capacity: parseInt(newCapacity) || 10,
-                points: parseInt(newPoints) || 0,
-                startTime: newStartTime ? new Date(newStartTime).toISOString() : null,
-                endTime: newEndTime ? new Date(newEndTime).toISOString() : null,
-                startLocation: newPointA || 'Point A not entered',
-                endLocation: newPointB || 'Point B not entered',
+                title: noviNaslov,
+                description: noviOpis,
+                capacity: parseInt(noviKapacitet) || 10,
+                points: parseInt(noviBodovi) || 0,
+                startTime: novoVrijemePocetka ? new Date(novoVrijemePocetka).toISOString() : null,
+                endTime: novoVrijemeZavrsetka ? new Date(novoVrijemeZavrsetka).toISOString() : null,
+                startLocation: novoPolaziste || 'Polazište nije uneseno',
+                endLocation: novaDestinacija || 'Odredište nije uneseno',
                 sectionId: bikeSectionId
             };
 
@@ -450,9 +456,9 @@ function Bike() {
 
             if (response.ok) {
                 const newSession = await response.json();
-                console.log('Session created:', newSession);
+                console.log('Sesija kreirana:', newSession);
 
-                const newAd = {
+                const noviOglas = {
                     id: newSession.id,
                     title: newSession.title,
                     description: newSession.description,
@@ -464,14 +470,14 @@ function Bike() {
                     endTime: newSession.endTime,
                     selected: false,
                 };
-                setData([...data, newAd]);
-                closeForm();
+                setPodaci([...podaci, noviOglas]);
+                zatvoriFormu();
             } else {
-                console.error('Failed to create session:', response.status);
+                console.error('Neuspješno kreiranje sesije:', response.status);
                 alert('Greška pri kreiranju treninga');
             }
         } catch (error) {
-            console.error('Error creating session:', error);
+            console.error('Greška pri kreiranju sesije:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     }
@@ -489,18 +495,17 @@ function Bike() {
     return (
         <>
             <Navbar />
-            <div className="obrub">
-                <div className="razdvojnik2">
-                    <div className="naslov">
+            <div className="okvir">
+                <div className="razdjelnik2">
+                    <div className="naslovnica">
                         <h1>🔔 OBAVIJESTI 🔔</h1>
-
                     </div>
-                    <div className="obavijesti">
-                        {notifications.length === 0 ? (
-                            <p className='alert'>Trenutno nemate obavijesti</p>
+                    <div className="obavijesti-lista">
+                        {obavijesti.length === 0 ? (
+                            <p className='upozorenje'>Trenutno nemate obavijesti</p>
                         ) : (
-                            notifications.map((note) => (
-                                <div key={note.id} className="obavijest-item">
+                            obavijesti.map((note) => (
+                                <div key={note.id} className="obavijest-stavka">
                                     <h4>{note.title}</h4>
                                     <p>{note.body}</p>
                                 </div>
@@ -508,99 +513,98 @@ function Bike() {
                         )}
                     </div>
                 </div>
-                <div className="razdvojnik">
-                    <div className="naslov">
+                <div className="razdjelnik">
+                    <div className="naslovnica">
                         <h1>🚴🏼 OGLASNA PLOČA 🚴🏼</h1>
                     </div>
-
-                    <div className="oglasna-grid">
-                        {data.map((ad) => (
+                    <div className="oglasna-mreza">
+                        {podaci.map((oglas) => (
                             <div
-                                key={ad.id}
-                                className="oglas-item"
+                                key={oglas.id}
+                                className="oglas-stavka"
                             >
-                                <h3 className='naslovOglasa'>{ad.title}</h3>
-                                <div className='info-detalji'>
-                                    <div className='info-red'>
+                                <h3 className='naslov-oglasa'>{oglas.title}</h3>
+                                <div className='info-detalji-oglasa'>
+                                    <div className='info-redak'>
                                         <strong>📋 Opis:</strong>
-                                        <span>{ad.description}</span>
+                                        <span>{oglas.description}</span>
                                     </div>
-                                    <div className='info-red'>
+                                    <div className='info-redak'>
                                         <strong>📍 Polazište:</strong>
-                                        <span>{ad.A}</span>
+                                        <span>{oglas.A}</span>
                                     </div>
-                                    <div className='info-red'>
+                                    <div className='info-redak'>
                                         <strong>📍 Odredište:</strong>
-                                        <span>{ad.B}</span>
+                                        <span>{oglas.B}</span>
                                     </div>
-                                    <div className='info-red'>
+                                    <div className='info-redak'>
                                         <strong>👥 Prijavljeni:</strong>
-                                        <span>{attendanceCounts[ad.id] !== undefined ? `${attendanceCounts[ad.id]} / ${ad.capacity}` : (ad.capacity || 'N/A')}</span>
+                                        <span>{brojPrijavljenih[oglas.id] !== undefined ? `${brojPrijavljenih[oglas.id]} / ${oglas.capacity}` : (oglas.capacity || '-')}</span>
                                     </div>
-                                    <div className='info-red'>
+                                    <div className='info-redak'>
                                         <strong>⭐ Bodovi:</strong>
-                                        <span>{ad.points || 0}</span>
+                                        <span>{oglas.points || 0}</span>
                                     </div>
-                                    {ad.startTime && (
-                                        <div className='info-red'>
+                                    {oglas.startTime && (
+                                        <div className='info-redak'>
                                             <strong>🕐 Početak:</strong>
-                                            <span>{new Date(ad.startTime).toLocaleString('hr-HR')}</span>
+                                            <span>{new Date(oglas.startTime).toLocaleString('hr-HR')}</span>
                                         </div>
                                     )}
-                                    {ad.endTime && (
-                                        <div className='info-red'>
+                                    {oglas.endTime && (
+                                        <div className='info-redak'>
                                             <strong>🏁 Završetak:</strong>
-                                            <span>{new Date(ad.endTime).toLocaleString('hr-HR')}</span>
+                                            <span>{new Date(oglas.endTime).toLocaleString('hr-HR')}</span>
                                         </div>
                                     )}
                                 </div>
                                 <button
-                                    className='pregledajRutu'
-                                    onClick={() => openGoogleMaps(ad.A, ad.B)}
+                                    className='prikazi-rutu'
+                                    onClick={() => openGoogleMaps(oglas.A, oglas.B)}
                                 >
                                     Prikaži rutu
                                 </button>
-                                <div className='pridruziSe'>
-                                    {canJoin && (
-                                        attendanceStatuses[ad.id] ? (
+                                <div className='pridruzi-se'>
+                                    {mozeSePridruziti && (
+                                        statusiPrisustva[oglas.id] ? (
                                             <>
-                                                <span className='attendance-status'>Status: {attendanceStatuses[ad.id]}</span>
-                                                {attendanceStatuses[ad.id] === 'PENDING' && (
-                                                    <button disabled={isJoining} onClick={() => leaveGroup(ad.id)}>Napusti grupu</button>
+                                                <span className='status-prisustva'>Status: {statusPrijevodi[statusiPrisustva[oglas.id]] || statusiPrisustva[oglas.id]}</span>
+                                                {statusiPrisustva[oglas.id] === 'PENDING' && (
+                                                    <button disabled={pridruzivanje} onClick={() => napustiGrupu(oglas.id)}>Napusti grupu</button>
                                                 )}
                                             </>
                                         ) : (
-                                            <button disabled={isJoining} onClick={() => joinGroup(ad.id)}>Pridruži se</button>
+                                            <button disabled={pridruzivanje} onClick={() => pridruziSeGrupi(oglas.id)}>Pridruži se</button>
                                         )
                                     )}
                                 </div>
                             </div>
                         ))}
                     </div>
-                    {isAdminRole && (
-                        <div className="approvals-section">
+                    {jeAdminUloga && (
+                        <div className="odobravanja-sekcija">
                             <h2>Prijave polaznika</h2>
-                            {allAttendances.filter(att => att.status === 'PENDING' && !att.cancelled).length === 0 ? (
+                            {svePrijave.filter(att => att.status === 'PENDING' && !att.cancelled).length === 0 ? (
                                 <p>Nema prijava</p>
                             ) : (
-                                <div className="approvals-grid">
-                                    {allAttendances.filter(att => att.status === 'PENDING' && !att.cancelled).map((attendance) => (
-                                        <div key={attendance.id} className="approval-card">
-                                            <h4>Sesija: {attendance.sessionTitle}</h4>
-                                            {userInfoMap[attendance.studentId] && (
+                                <div className="odobravanja-mreza">
+                                    {svePrijave.filter(att => att.status === 'PENDING' && !att.cancelled).map((prijava) => (
+                                        <div key={prijava.id} className="odobravanje-kartica">
+                                            <h4>Sesija: {prijava.sessionTitle}</h4>
+                                            {mapaKorisnika[prijava.studentId] && (
                                                 <>
-                                                    <p><strong>Ime:</strong> {userInfoMap[attendance.studentId].firstName}</p>
-                                                    <p><strong>Prezime:</strong> {userInfoMap[attendance.studentId].lastName}</p>
-                                                    <p><strong>Email:</strong> {userInfoMap[attendance.studentId].email}</p>
-                                                    <p><strong>Bodovi:</strong> {userInfoMap[attendance.studentId].currentPoints}</p>
+                                                    <p><strong>Ime:</strong> {mapaKorisnika[prijava.studentId].firstName}</p>
+                                                    <p><strong>Prezime:</strong> {mapaKorisnika[prijava.studentId].lastName}</p>
+                                                    <p><strong>Email:</strong> {mapaKorisnika[prijava.studentId].email}</p>
+                                                    <p><strong>Bodovi:</strong> {mapaKorisnika[prijava.studentId].currentPoints}</p>
                                                 </>
                                             )}
-                                            {attendance.status === 'PENDING' && !attendance.cancelled && (
-                                                <div className="approval-buttons">
-                                                    <button className="approve-btn" onClick={() => approveAttendance(attendance.id)}>
+                                            {prijava.status === 'PENDING' && !prijava.cancelled && (
+                                                <div className="odobravanje-gumbi">
+                                                    <button className="odobri-gumb" onClick={() => odobriPrijavu(prijava.id)}>
                                                         Odobri
                                                     </button>
-                                                    <button className="cancel-btn" onClick={() => cancelAttendance(attendance.id)}>
+                                                    <button className="otkazi-gumb" onClick={() => otkaziPrijavu(prijava.id)}>
                                                         Otkaži
                                                     </button>
                                                 </div>
@@ -612,69 +616,66 @@ function Bike() {
                         </div>
                     )}
                 </div>
-                <button className="tipkaZaDodavanje" onClick={openForm}>
+                <button className="dodaj-gumb" onClick={otvoriFormu}>
                     +
                 </button>
             </div>
-
-
-            {showForm && (
-                <div className="forma-overlay">
+            {prikaziFormu && (
+                <div className="forma-prekrivac">
                     <div className="forma">
                         <h2>Novi oglas</h2>
                         <input
                             type="text"
                             placeholder="Naslov"
-                            value={newTitle}
-                            onChange={(e) => setNewTitle(e.target.value)}
+                            value={noviNaslov}
+                            onChange={(e) => setNoviNaslov(e.target.value)}
                         />
                         <textarea
                             placeholder="Opis"
-                            value={newDescription}
-                            onChange={(e) => setNewDescription(e.target.value)}
+                            value={noviOpis}
+                            onChange={(e) => setNoviOpis(e.target.value)}
                         />
                         <input
                             type="text"
                             placeholder="📍 Polazište (A)"
-                            value={newPointA}
-                            onChange={(e) => setNewPointA(e.target.value)}
+                            value={novoPolaziste}
+                            onChange={(e) => setNovoPolaziste(e.target.value)}
                         />
                         <input
                             type="text"
                             placeholder="📍 Destinacija (B)"
-                            value={newPointB}
-                            onChange={(e) => setNewPointB(e.target.value)}
+                            value={novaDestinacija}
+                            onChange={(e) => setNovaDestinacija(e.target.value)}
                         />
                         <input
                             type="number"
                             placeholder="Kapacitet"
-                            value={newCapacity}
-                            onChange={(e) => setNewCapacity(e.target.value)}
+                            value={noviKapacitet}
+                            onChange={(e) => setNoviKapacitet(e.target.value)}
                         />
                         <input
                             type="number"
                             placeholder="Bodovi"
-                            value={newPoints}
-                            onChange={(e) => setNewPoints(e.target.value)}
+                            value={noviBodovi}
+                            onChange={(e) => setNoviBodovi(e.target.value)}
                         />
                         <input
                             type="datetime-local"
                             placeholder="Vrijeme početka"
-                            value={newStartTime}
-                            onChange={(e) => setNewStartTime(e.target.value)}
+                            value={novoVrijemePocetka}
+                            onChange={(e) => setNovoVrijemePocetka(e.target.value)}
                         />
                         <input
                             type="datetime-local"
                             placeholder="Vrijeme završetka"
-                            value={newEndTime}
-                            onChange={(e) => setNewEndTime(e.target.value)}
+                            value={novoVrijemeZavrsetka}
+                            onChange={(e) => setNovoVrijemeZavrsetka(e.target.value)}
                         />
                         <button onClick={addAd}>Spremi</button>
-                        <button onClick={closeForm}>Odustani</button>
+                        <button onClick={zatvoriFormu}>Odustani</button>
                     </div>
                 </div>
             )}
-
         </>
     )
 }
