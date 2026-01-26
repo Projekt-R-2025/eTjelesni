@@ -1,4 +1,4 @@
-.obrub {
+.okvir {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     min-height: 35vh;
@@ -17,11 +17,11 @@
     padding: 3%;
 }
 
-.razdvojnik2 {
+.razdjelnik2 {
     flex: 3;
 }
 
-.obavijesti {
+.obavijesti-lista {
 
     padding: 2rem;
     display: flex;
@@ -29,7 +29,7 @@
     gap: 1rem;
 }
 
-.obavijest-item {
+.obavijest-stavka {
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #000;
     border-radius: 8px;
@@ -38,7 +38,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.oglasna-grid {
+.oglasna-mreza {
     display: grid;
     gap: 20px;
     backdrop-filter: blur(1px);
@@ -54,7 +54,7 @@
 }
 
 
-.razdvojnik {
+.razdjelnik {
     flex: 2;
     width: 100%;
     display: flex;
@@ -63,7 +63,7 @@
     align-items: flex-start;
 }
 
-.oglas-item {
+.oglas-stavka {
     background: #fafafa;
     color: black;
     padding: 18px;
@@ -80,7 +80,7 @@
     gap: 0.75rem;
 }
 
-.naslov {
+.naslovnica {
     min-height: 5vh;
     padding-bottom: 2vh;
     text-align: center;
@@ -101,7 +101,7 @@
     padding: 0;
 }
 
-.tipkaZaDodavanje {
+.dodaj-gumb {
     position: absolute !important;
     bottom: 2rem !important;
     right: 2rem !important;
@@ -118,7 +118,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.obavijesti {
+.obavijesti-lista {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
     backdrop-filter: blur(1px);
@@ -127,7 +127,7 @@
 
 }
 
-.alert {
+.upozorenje {
     font-size: 1.2rem;
     color: #ff0000 !important;
     text-align: center;
@@ -139,7 +139,7 @@
     font-style: italic;
 }
 
-.forma-overlay {
+.forma-prekrivac {
     position: fixed;
     top: 0;
     left: 0;
@@ -211,7 +211,7 @@
     background-color: #a71d2a;
 }
 
-.naslovOglasa {
+.naslov-oglasa {
     margin-bottom: 0.5rem;
 }
 
@@ -233,7 +233,7 @@
     width: 100%;
 }
 
-.pregledajRutu {
+.prikazi-rutu {
     margin-top: 0.25rem;
     padding: 0.6rem 1.25rem;
     font-size: 0.95rem;
@@ -248,7 +248,7 @@
     align-self: center;
 }
 
-.pregledajRutu:hover {
+.prikazi-rutu:hover {
     background: linear-gradient(135deg, #0056b3, #1f7fd9);
     border-color: #0056b3;
     transform: translateY(-1px);
@@ -256,14 +256,14 @@
 }
 
 
-.pridruziSe {
+.pridruzi-se {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     margin: 0;
 }
 
-.pridruziSe button {
+.pridruzi-se button {
     padding: 0.6rem 1.4rem;
     font-size: 0.95rem;
     border: 2px solid #28a745;
@@ -277,14 +277,14 @@
     box-shadow: 0 3px 8px rgba(40, 167, 69, 0.35);
 }
 
-.pridruziSe button:hover {
+.pridruzi-se button:hover {
     background: linear-gradient(135deg, #1e7e34, #26a653);
     border-color: #1e7e34;
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
 }
 
-.info-detalji {
+.info-detalji-oglasa {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
@@ -293,7 +293,7 @@
     padding: 0;
 }
 
-.info-red {
+.info-redak {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -301,16 +301,16 @@
     margin-bottom: 0.3rem;
 }
 
-.info-red strong {
+.info-redak strong {
     color: #333;
     font-weight: 600;
 }
 
-.info-red span {
+.info-redak span {
     color: #666;
 }
 
-.approvals-section {
+.odobravanja-sekcija {
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 30px;
@@ -320,13 +320,21 @@
     max-width: 100%;
 }
 
-.approvals-grid {
+.odobravanja-sekcija h2 {
+    text-align: center;
+}
+
+.odobravanja-sekcija p {
+    text-align: center;
+}
+
+.odobravanja-mreza {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 }
 
-.approval-card {
+.odobravanje-kartica {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -334,13 +342,13 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.approval-buttons {
+.odobravanje-gumbi {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
 
-.vrijeme-info {
+.status-prisustva {
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -4,7 +4,7 @@ import './SectionCreate.css';
 import Navbar from './Navbar';
 
 function SectionCreate() {
-    const sectionTypeOptions = [
+    const opcijeTipaSekcije = [
         { label: 'Bike', value: 'BIKE' },
         { label: 'Nogomet', value: 'NOGOMET' },
         { label: 'Rukomet', value: 'RUKOMET' },
@@ -17,56 +17,56 @@ function SectionCreate() {
         { label: 'Ostalo', value: 'OSTALO' }
     ];
 
-    const [formData, setFormData] = useState({
-        name: '',
-        sectionType: 'BIKE',
-        passingPoints: 0
+    const [podaciForme, setPodaciForme] = useState({
+        naziv: '',
+        tipSekcije: 'BIKE',
+        bodoviZaProlaz: 0
     });
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
+    const [ucitavanje, setUcitavanje] = useState(false);
+    const [poruka, setPoruka] = useState({ type: '', text: '' });
 
     const backendBase = import.meta.env.VITE_API_BASE_URL;
 
-    const handleTypeChange = (e) => {
-        const value = e.target.value;
-        setFormData(prev => ({
+    const obradiPromjenuTipa = (e) => {
+        const vrijednost = e.target.value;
+        setPodaciForme(prev => ({
             ...prev,
-            sectionType: value
+            tipSekcije: vrijednost
         }));
     };
 
-    const handleNameChange = (e) => {
-        const val = e.target.value;
-        setFormData(prev => ({
+    const obradiPromjenuNaziva = (e) => {
+        const vrijednost = e.target.value;
+        setPodaciForme(prev => ({
             ...prev,
-            name: val
+            naziv: vrijednost
         }));
     };
 
-    const handlePassingPointsChange = (e) => {
-        setFormData(prev => ({
+    const obradiPromjenuBodova = (e) => {
+        setPodaciForme(prev => ({
             ...prev,
-            passingPoints: Number(e.target.value) || 0
+            bodoviZaProlaz: Number(e.target.value) || 0
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const obradiSlanje = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setMessage({ type: '', text: '' });
+        setUcitavanje(true);
+        setPoruka({ type: '', text: '' });
 
-        if (!formData.name.trim()) {
-            setMessage({ type: 'error', text: 'Please enter a section name' });
-            setLoading(false);
+        if (!podaciForme.naziv.trim()) {
+            setPoruka({ type: 'error', text: 'Molimo unesite naziv sekcije' });
+            setUcitavanje(false);
             return;
         }
 
         try {
             const token = getToken();
             const payload = {
-                name: formData.name,
-                sectionType: formData.sectionType,
-                passingPoints: formData.passingPoints
+                name: podaciForme.naziv,
+                sectionType: podaciForme.tipSekcije,
+                passingPoints: podaciForme.bodoviZaProlaz
             };
 
             const response = await fetch(`${backendBase}/api/sections`, {
@@ -79,20 +79,20 @@ function SectionCreate() {
             });
 
             if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
+                throw new Error(`Greška: ${response.status}`);
             }
 
-            setMessage({ type: 'success', text: 'Section created successfully!' });
+            setPoruka({ type: 'success', text: 'Sekcija uspješno kreirana!' });
 
-            setFormData({
-                name: '',
-                sectionType: 'BIKE',
-                passingPoints: 0
+            setPodaciForme({
+                naziv: '',
+                tipSekcije: 'BIKE',
+                bodoviZaProlaz: 0
             });
         } catch (error) {
-            setMessage({ type: 'error', text: `Failed to create section: ${error.message}` });
+            setPoruka({ type: 'error', text: `Neuspješno kreiranje sekcije: ${error.message}` });
         } finally {
-            setLoading(false);
+            setUcitavanje(false);
         }
     };
 
@@ -100,26 +100,26 @@ function SectionCreate() {
     return (
         <>
             <Navbar />
-            <div className="section-create-container">
-                <div className="section-create-card">
+            <div className="okvir-sekcije">
+                <div className="kartica-sekcije">
                     <h2>Kreiraj Novu Sekciju</h2>
 
-                    {message.text && (
-                        <div className={`message ${message.type}`}>
-                            {message.text}
+                    {poruka.text && (
+                        <div className={`poruka ${poruka.type}`}>
+                            {poruka.text}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="section-form">
-                        <div className="form-group">
+                    <form onSubmit={obradiSlanje} className="forma-sekcije">
+                        <div className="grupa-forme">
                             <label htmlFor="sectionType">Tip sekcije</label>
                             <select
                                 id="sectionType"
-                                value={formData.sectionType}
-                                onChange={handleTypeChange}
-                                className="select-input"
+                                value={podaciForme.tipSekcije}
+                                onChange={obradiPromjenuTipa}
+                                className="odabir-unos"
                             >
-                                {sectionTypeOptions.map(opt => (
+                                {opcijeTipaSekcije.map(opt => (
                                     <option key={opt.value} value={opt.value}>
                                         {opt.label}
                                     </option>
@@ -127,35 +127,35 @@ function SectionCreate() {
                             </select>
                         </div>
 
-                        <div className="form-group">
+                        <div className="grupa-forme">
                             <label htmlFor="name">Naziv sekcije</label>
                             <input
                                 type="text"
                                 id="name"
-                                value={formData.name}
-                                onChange={handleNameChange}
+                                value={podaciForme.naziv}
+                                onChange={obradiPromjenuNaziva}
                                 required
                                 placeholder="Unesite naziv sekcije"
-                                className="text-input"
+                                className="tekst-unos"
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className="grupa-forme">
                             <label htmlFor="passingPoints">Bodovi za Prolaz</label>
                             <input
                                 type="number"
                                 id="passingPoints"
-                                value={formData.passingPoints}
-                                onChange={handlePassingPointsChange}
+                                value={podaciForme.bodoviZaProlaz}
+                                onChange={obradiPromjenuBodova}
                                 required
                                 min="0"
                                 placeholder="Unesite broj bodova"
-                                className="number-input"
+                                className="broj-unos"
                             />
                         </div>
 
-                        <button type="submit" className="submit-btn" disabled={loading}>
-                            {loading ? 'Kreiram...' : 'Kreiraj Sekciju'}
+                        <button type="submit" className="gumb-potvrdi" disabled={ucitavanje}>
+                            {ucitavanje ? 'Kreiram...' : 'Kreiraj Sekciju'}
                         </button>
                     </form>
                 </div>

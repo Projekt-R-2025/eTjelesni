@@ -6,30 +6,36 @@ import Navbar from './Navbar';
 const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 function Treninzi() {
-    const [sectionId, setSectionId] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [sessions, setSessions] = useState([]);
-    const [loadingSessions, setLoadingSessions] = useState(false);
-    const [userRole, setUserRole] = useState(null);
-    const [studentId, setStudentId] = useState(null);
-    const [selectedId, setSelectedId] = useState(null);
-    const [attendanceStatuses, setAttendanceStatuses] = useState({});
-    const [attendanceIds, setAttendanceIds] = useState({});
-    const [showForm, setShowForm] = useState(false);
-    const [isJoining, setIsJoining] = useState(false);
-    const [newTitle, setNewTitle] = useState('');
-    const [newDescription, setNewDescription] = useState('');
-    const [newCapacity, setNewCapacity] = useState('');
-    const [newPoints, setNewPoints] = useState('');
-    const [newStartTime, setNewStartTime] = useState('');
-    const [newEndTime, setNewEndTime] = useState('');
-    const [allAttendances, setAllAttendances] = useState([]);
-    const [userInfoMap, setUserInfoMap] = useState({});
-    const [attendanceCounts, setAttendanceCounts] = useState({});
-    const isAdminRole = userRole && ['LEADER', 'PROFESSOR', 'ADMIN'].includes(userRole);
+    const [idSekcije, setIdSekcije] = useState(null);
+    const [ucitavanje, setUcitavanje] = useState(true);
+    const [sesije, setSesije] = useState([]);
+    const [ucitavanjeSesija, setUcitavanjeSesija] = useState(false);
+    const [ulogaKorisnika, setUlogaKorisnika] = useState(null);
+    const [idStudenta, setIdStudenta] = useState(null);
+    const [odabraniId, setOdabraniId] = useState(null);
+    const [statusiPrijave, setStatusiPrijave] = useState({});
+    const [idjeviPrijava, setIdjeviPrijava] = useState({});
+    const [prikaziFormu, setPrikaziFormu] = useState(false);
+    const [pridruzivanjeUTijeku, setPridruzivanjeUTijeku] = useState(false);
+    const [noviNaslov, setNoviNaslov] = useState('');
+    const [noviOpis, setNoviOpis] = useState('');
+    const [noviKapacitet, setNoviKapacitet] = useState('');
+    const [noviBodovi, setNoviBodovi] = useState('');
+    const [novoVrijemePocetka, setNovoVrijemePocetka] = useState('');
+    const [novoVrijemeZavrsetka, setNovoVrijemeZavrsetka] = useState('');
+    const [svePrijave, setSvePrijave] = useState([]);
+    const [mapaKorisnika, setMapaKorisnika] = useState({});
+    const [brojPrijava, setBrojPrijava] = useState({});
+    const jeAdminUloga = ulogaKorisnika && ['LEADER', 'PROFESSOR', 'ADMIN'].includes(ulogaKorisnika);
+
+    const statusPrijevodi = {
+        PENDING: 'Na čekanju',
+        APPROVED: 'Odobreno',
+        REJECTED: 'Odbijeno'
+    };
 
     useEffect(() => {
-        const fetchUserAndSection = async () => {
+        const dohvatiKorisnikaISekciju = async () => {
             try {
                 const token = getToken();
                 const response = await fetch(`${backendBase}/api/users/me`, {
@@ -41,34 +47,34 @@ function Treninzi() {
                 });
 
                 if (response.ok) {
-                    const user = await response.json();
-                    console.log('Cijeli user objekt:', user);
-                    setSectionId(user.sectionId);
-                    setUserRole(user.role);
-                    setStudentId(user.id || user.studentId);
-                    console.log('Fetched user:', user);
-                    console.log('User role:', user.role);
-                    console.log('Student ID:', user.id || user.studentId);
+                    const korisnik = await response.json();
+                    console.log('Cijeli user objekt:', korisnik);
+                    setIdSekcije(korisnik.sectionId);
+                    setUlogaKorisnika(korisnik.role);
+                    setIdStudenta(korisnik.id || korisnik.studentId);
+                    console.log('Dohvaćen korisnik:', korisnik);
+                    console.log('Uloga korisnika:', korisnik.role);
+                    console.log('ID studenta:', korisnik.id || korisnik.studentId);
                 } else {
-                    console.error('Failed to fetch user:', response.status);
+                    console.error('Neuspješno dohvaćanje korisnika:', response.status);
                 }
             } catch (error) {
-                console.error('Error fetching user:', error);
+                console.error('Greška pri dohvaćanju korisnika:', error);
             } finally {
-                setLoading(false);
+                setUcitavanje(false);
             }
         };
 
-        fetchUserAndSection();
+        dohvatiKorisnikaISekciju();
     }, []);
 
     useEffect(() => {
-        if (sectionId) {
-            const fetchSessions = async () => {
-                setLoadingSessions(true);
+        if (idSekcije) {
+            const dohvatiSesije = async () => {
+                setUcitavanjeSesija(true);
                 try {
                     const token = getToken();
-                    const response = await fetch(`${backendBase}/api/sessions/section/${sectionId}`, {
+                    const response = await fetch(`${backendBase}/api/sessions/section/${idSekcije}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -77,34 +83,34 @@ function Treninzi() {
                     });
 
                     if (response.ok) {
-                        const sessionsData = await response.json();
-                        setSessions(sessionsData);
-                        console.log('Fetched sessions:', sessionsData);
-                        fetchAttendanceCounts(sessionsData);
+                        const podaciSesija = await response.json();
+                        setSesije(podaciSesija);
+                        console.log('Dohvaćene sesije:', podaciSesija);
+                        dohvatiBrojPrijava(podaciSesija);
                     } else {
-                        console.error('Failed to fetch sessions:', response.status);
+                        console.error('Neuspješno dohvaćanje sesija:', response.status);
                     }
                 } catch (error) {
-                    console.error('Error fetching sessions:', error);
+                    console.error('Greška pri dohvaćanju sesija:', error);
                 } finally {
-                    setLoadingSessions(false);
+                    setUcitavanjeSesija(false);
                 }
             };
 
-            fetchSessions();
+            dohvatiSesije();
         }
-    }, [sectionId]);
+    }, [idSekcije]);
 
     useEffect(() => {
-        if (isAdminRole && sessions.length > 0) {
-            const fetchAllAttendances = async () => {
+        if (jeAdminUloga && sesije.length > 0) {
+            const dohvatiSvePrijave = async () => {
                 try {
                     const token = getToken();
-                    const allAtts = [];
-                    const studentIdsSet = new Set();
+                    const svePrijaveTemp = [];
+                    const skupIdjevaStudenata = new Set();
 
-                    for (const session of sessions) {
-                        const response = await fetch(`${backendBase}/api/sessions/${session.id}/attendances`, {
+                    for (const sesija of sesije) {
+                        const response = await fetch(`${backendBase}/api/sessions/${sesija.id}/attendances`, {
                             method: 'GET',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -113,18 +119,18 @@ function Treninzi() {
                         });
 
                         if (response.ok) {
-                            const attendances = await response.json();
-                            attendances.forEach(att => studentIdsSet.add(att.studentId));
-                            allAtts.push(...attendances.map(att => ({ ...att, sessionTitle: session.title })));
+                            const prijave = await response.json();
+                            prijave.forEach(prijava => skupIdjevaStudenata.add(prijava.studentId));
+                            svePrijaveTemp.push(...prijave.map(prijava => ({ ...prijava, sessionTitle: sesija.title })));
                         }
                     }
 
-                    setAllAttendances(allAtts);
-                    console.log('All attendances:', allAtts);
+                    setSvePrijave(svePrijaveTemp);
+                    console.log('Sve prijave:', svePrijaveTemp);
 
-                    const studentIds = Array.from(studentIdsSet).filter(id => userInfoMap[id] === undefined);
-                    if (studentIds.length > 0) {
-                        const userResponses = await Promise.all(studentIds.map(async (id) => {
+                    const idjeviStudenata = Array.from(skupIdjevaStudenata).filter(id => mapaKorisnika[id] === undefined);
+                    if (idjeviStudenata.length > 0) {
+                        const odgovoriKorisnika = await Promise.all(idjeviStudenata.map(async (id) => {
                             try {
                                 const resp = await fetch(`${backendBase}/api/users/${id}`, {
                                     method: 'GET',
@@ -134,47 +140,47 @@ function Treninzi() {
                                     }
                                 });
                                 if (resp.ok) {
-                                    const user = await resp.json();
-                                    return { id, user };
+                                    const korisnik = await resp.json();
+                                    return { id, user: korisnik };
                                 }
                             } catch (err) {
-                                console.error(`Error fetching user ${id}:`, err);
+                                console.error(`Greška pri dohvaćanju korisnika ${id}:`, err);
                             }
                             return null;
                         }));
 
-                        const mapUpdates = {};
-                        userResponses.forEach(entry => {
-                            if (entry && entry.user) {
-                                mapUpdates[entry.id] = entry.user;
+                        const azuriranjaMape = {};
+                        odgovoriKorisnika.forEach(unos => {
+                            if (unos && unos.user) {
+                                azuriranjaMape[unos.id] = unos.user;
                             }
                         });
-                        if (Object.keys(mapUpdates).length > 0) {
-                            setUserInfoMap(prev => ({ ...prev, ...mapUpdates }));
+                        if (Object.keys(azuriranjaMape).length > 0) {
+                            setMapaKorisnika(prev => ({ ...prev, ...azuriranjaMape }));
                         }
                     }
                 } catch (error) {
-                    console.error('Error fetching attendances:', error);
+                    console.error('Greška pri dohvaćanju prijava:', error);
                 }
             };
 
-            fetchAllAttendances();
+            dohvatiSvePrijave();
         }
-    }, [isAdminRole, sessions]);
+    }, [jeAdminUloga, sesije]);
 
     useEffect(() => {
-        if (!studentId || sessions.length === 0) {
+        if (!idStudenta || sesije.length === 0) {
             return;
         }
 
-        const fetchMyAttendances = async () => {
+        const dohvatiMojePrijave = async () => {
             try {
                 const token = getToken();
-                const statusMap = {};
-                const idMap = {};
+                const mapaStatusa = {};
+                const mapaIdjeva = {};
 
-                for (const session of sessions) {
-                    const response = await fetch(`${backendBase}/api/sessions/${session.id}/attendances`, {
+                for (const sesija of sesije) {
+                    const response = await fetch(`${backendBase}/api/sessions/${sesija.id}/attendances`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -183,35 +189,35 @@ function Treninzi() {
                     });
 
                     if (response.ok) {
-                        const attendances = await response.json();
-                        const mine = attendances.find(att => att.studentId === studentId);
-                        if (mine) {
-                            statusMap[session.id] = mine.status;
-                            idMap[session.id] = mine.id;
+                        const prijave = await response.json();
+                        const mojaPrijava = prijave.find(prijava => prijava.studentId === idStudenta);
+                        if (mojaPrijava) {
+                            mapaStatusa[sesija.id] = mojaPrijava.status;
+                            mapaIdjeva[sesija.id] = mojaPrijava.id;
                         }
                     }
                 }
 
-                if (Object.keys(statusMap).length > 0) {
-                    setAttendanceStatuses(prev => ({ ...prev, ...statusMap }));
+                if (Object.keys(mapaStatusa).length > 0) {
+                    setStatusiPrijave(prev => ({ ...prev, ...mapaStatusa }));
                 }
-                if (Object.keys(idMap).length > 0) {
-                    setAttendanceIds(prev => ({ ...prev, ...idMap }));
+                if (Object.keys(mapaIdjeva).length > 0) {
+                    setIdjeviPrijava(prev => ({ ...prev, ...mapaIdjeva }));
                 }
             } catch (error) {
-                console.error('Error fetching my attendances:', error);
+                console.error('Greška pri dohvaćanju mojih prijava:', error);
             }
         };
 
-        fetchMyAttendances();
-    }, [studentId, sessions]);
+        dohvatiMojePrijave();
+    }, [idStudenta, sesije]);
 
-    const fetchAttendanceCounts = async (sessions) => {
+    const dohvatiBrojPrijava = async (sesijeZaBrojanje) => {
         const token = getToken();
-        const counts = {};
-        for (const session of sessions) {
+        const brojevi = {};
+        for (const sesija of sesijeZaBrojanje) {
             try {
-                const response = await fetch(`${backendBase}/api/sessions/${session.id}/attendances`, {
+                const response = await fetch(`${backendBase}/api/sessions/${sesija.id}/attendances`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -219,27 +225,27 @@ function Treninzi() {
                     }
                 });
                 if (response.ok) {
-                    const attendances = await response.json();
-                    counts[session.id] = attendances.filter(att => att.status === 'APPROVED' && !att.cancelled).length;
+                    const prijave = await response.json();
+                    brojevi[sesija.id] = prijave.filter(prijava => prijava.status === 'APPROVED' && !prijava.cancelled).length;
                 } else {
-                    counts[session.id] = 0;
+                    brojevi[sesija.id] = 0;
                 }
             } catch (error) {
-                console.error(`Error fetching attendances for session ${session.id}:`, error);
-                counts[session.id] = 0;
+                console.error(`Greška pri dohvaćanju prijava za sesiju ${sesija.id}:`, error);
+                brojevi[sesija.id] = 0;
             }
         }
-        setAttendanceCounts(counts);
+        setBrojPrijava(brojevi);
     };
 
-    const canCreateSession = isAdminRole;
-    const canJoin = !isAdminRole;
+    const mozeKreiratiSesiju = jeAdminUloga;
+    const mozeSePridruziti = !jeAdminUloga;
 
-    async function approveAttendance(attendanceId) {
-        const attendance = allAttendances.find(att => att.id === attendanceId);
+    async function odobriPrijavu(id_prijave) {
+        const prijava = svePrijave.find(att => att.id === id_prijave);
         try {
             const token = getToken();
-            const response = await fetch(`${backendBase}/api/attendances/${attendanceId}/approve`, {
+            const response = await fetch(`${backendBase}/api/attendances/${id_prijave}/approve`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -248,28 +254,28 @@ function Treninzi() {
             });
 
             if (response.ok) {
-                setAllAttendances(prev => prev.filter(att => att.id !== attendanceId));
-                if (attendance) {
-                    const sessionId = attendance.sessionId;
-                    setAttendanceCounts(prev => ({
+                setSvePrijave(prev => prev.filter(att => att.id !== id_prijave));
+                if (prijava) {
+                    const idSesije = prijava.sessionId;
+                    setBrojPrijava(prev => ({
                         ...prev,
-                        [sessionId]: (prev[sessionId] || 0) + 1
+                        [idSesije]: (prev[idSesije] || 0) + 1
                     }));
                 }
-                console.log('Attendance approved');
+                console.log('Prijava odobrena');
             } else {
                 alert('Greška pri odobravanju prijave');
             }
         } catch (error) {
-            console.error('Error approving attendance:', error);
+            console.error('Greška pri odobravanju prijave:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     }
 
-    async function cancelAttendance(attendanceId) {
+    async function otkaziPrijavu(id_prijave) {
         try {
             const token = getToken();
-            const response = await fetch(`${backendBase}/api/attendances/${attendanceId}/cancel`, {
+            const response = await fetch(`${backendBase}/api/attendances/${id_prijave}/cancel`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -278,91 +284,91 @@ function Treninzi() {
             });
 
             if (response.ok) {
-                setAllAttendances(prev => prev.filter(att => att.id !== attendanceId));
-                console.log('Attendance cancelled');
+                setSvePrijave(prev => prev.filter(att => att.id !== attendanceId));
+                console.log('Prijava otkazana');
             } else {
                 alert('Greška pri otkazivanju prijave');
             }
         } catch (error) {
-            console.error('Error cancelling attendance:', error);
+            console.error('Greška pri otkazivanju prijave:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     }
 
-    function joinGroup(sessionId) {
-        if (!studentId) {
+    function pridruziSeGrupi(idSesije) {
+        if (!idStudenta) {
             alert('Greška: Student ID nije pronađen');
             return;
         }
 
-        if (isJoining) {
+        if (pridruzivanjeUTijeku) {
             return;
         }
 
-        const joinAsync = async () => {
-            setIsJoining(true);
+        const pridruziAsinkrono = async () => {
+            setPridruzivanjeUTijeku(true);
             try {
                 const token = getToken();
-                const attendanceData = {
+                const podaciPrijave = {
                     cancelled: false,
                     status: 'PENDING',
-                    sessionId: sessionId,
-                    studentId: studentId
+                    sessionId: idSesije,
+                    studentId: idStudenta
                 };
 
-                const response = await fetch(`${backendBase}/api/sessions/${sessionId}/attendances`, {
+                const response = await fetch(`${backendBase}/api/sessions/${idSesije}/attendances`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(attendanceData)
+                    body: JSON.stringify(podaciPrijave)
                 });
 
                 if (response.ok) {
-                    const attendance = await response.json();
-                    setSelectedId(sessionId);
-                    setAttendanceStatuses(prev => ({
+                    const prijava = await response.json();
+                    setOdabraniId(idSesije);
+                    setStatusiPrijave(prev => ({
                         ...prev,
-                        [sessionId]: attendance.status
+                        [idSesije]: prijava.status
                     }));
-                    setAttendanceIds(prev => ({
+                    setIdjeviPrijava(prev => ({
                         ...prev,
-                        [sessionId]: attendance.id
+                        [idSesije]: prijava.id
                     }));
-                    console.log('Attendance created:', attendance);
+                    console.log('Prijava kreirana:', prijava);
                 } else {
                     alert('Greška pri pridruživanju sesiji');
                 }
             } catch (error) {
-                console.error('Error joining session:', error);
+                console.error('Greška pri pridruživanju sesiji:', error);
                 alert('Greška pri komunikaciji sa serverom');
             } finally {
-                setIsJoining(false);
+                setPridruzivanjeUTijeku(false);
             }
         };
 
-        joinAsync();
+        pridruziAsinkrono();
     }
 
-    function leaveGroup(sessionId) {
-        const attendanceId = attendanceIds[sessionId];
+    function napustiGrupu(idSesije) {
+        const id_prijave = idjeviPrijava[idSesije];
 
-        console.log('Attempting to leave - sessionId:', sessionId);
-        console.log('AttendanceIds state:', attendanceIds);
-        console.log('AttendanceId for this session:', attendanceId);
+        console.log('Pokušaj napuštanja - sessionId:', idSesije);
+        console.log('Stanje attendanceIds:', idjeviPrijava);
+        console.log('AttendanceId za ovu sesiju:', id_prijave);
 
-        if (!attendanceId) {
-            alert('Greška: Aplikacija nije pronađena');
-            console.log('No attendanceId found for sessionId:', sessionId);
+        if (!id_prijave) {
+            alert('Greška: Prijava nije pronađena');
+            console.log('Nije pronađen attendanceId za sessionId:', idSesije);
             return;
         }
 
-        const leaveAsync = async () => {
+        const napustiAsinkrono = async () => {
             try {
                 const token = getToken();
-                const url = `${backendBase}/api/attendances/${attendanceId}/cancel`;
-                console.log('Sending request to:', url);
+                const url = `${backendBase}/api/attendances/${id_prijave}/cancel`;
+                console.log('Slanje zahtjeva na:', url);
 
                 const response = await fetch(url, {
                     method: 'PUT',
@@ -372,50 +378,50 @@ function Treninzi() {
                     }
                 });
 
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
+                console.log('Status odgovora:', response.status);
+                console.log('Odgovor ok:', response.ok);
 
                 if (response.ok) {
-                    setSelectedId(null);
-                    setAttendanceStatuses(prev => ({
+                    setOdabraniId(null);
+                    setStatusiPrijave(prev => ({
                         ...prev,
-                        [sessionId]: undefined
+                        [idSesije]: undefined
                     }));
-                    setAttendanceIds(prev => ({
+                    setIdjeviPrijava(prev => ({
                         ...prev,
-                        [sessionId]: undefined
+                        [idSesije]: undefined
                     }));
-                    console.log('Attendance cancelled successfully');
+                    console.log('Prijava uspješno otkazana');
                 } else {
-                    const errorText = await response.text();
-                    console.error('Response error:', errorText);
+                    const tekstGreske = await response.text();
+                    console.error('Greška u odgovoru:', tekstGreske);
                     alert('Greška pri odustajanju od sesije: ' + response.status);
                 }
             } catch (error) {
-                console.error('Error leaving session:', error);
+                console.error('Greška pri napuštanju sesije:', error);
                 alert('Greška pri komunikaciji sa serverom: ' + error.message);
             }
         };
 
-        leaveAsync();
+        napustiAsinkrono();
     }
 
-    const handleCreateSession = async () => {
-        if (!sectionId) {
+    const obradiKreiranjeSesije = async () => {
+        if (!idSekcije) {
             alert('Greška: Sekcija nije pronađena');
             return;
         }
 
         try {
             const token = getToken();
-            const sessionData = {
-                title: newTitle,
-                description: newDescription,
-                capacity: parseInt(newCapacity) || 10,
-                points: parseInt(newPoints) || 0,
-                startTime: newStartTime ? new Date(newStartTime).toISOString() : null,
-                endTime: newEndTime ? new Date(newEndTime).toISOString() : null,
-                sectionId: sectionId
+            const podaciSesije = {
+                title: noviNaslov,
+                description: noviOpis,
+                capacity: parseInt(noviKapacitet) || 10,
+                points: parseInt(noviBodovi) || 0,
+                startTime: novoVrijemePocetka ? new Date(novoVrijemePocetka).toISOString() : null,
+                endTime: novoVrijemeZavrsetka ? new Date(novoVrijemeZavrsetka).toISOString() : null,
+                sectionId: idSekcije
             };
 
             const response = await fetch(`${backendBase}/api/sessions`, {
@@ -424,76 +430,75 @@ function Treninzi() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(sessionData)
+                body: JSON.stringify(podaciSesije)
             });
 
             if (response.ok) {
-                const newSession = await response.json();
-                setSessions([...sessions, newSession]);
-                closeForm();
+                const novaSesija = await response.json();
+                setSesije([...sesije, novaSesija]);
+                zatvoriFormu();
             } else {
                 alert('Greška pri kreiranju sesije');
             }
         } catch (error) {
-            console.error('Error creating session:', error);
+            console.error('Greška pri kreiranju sesije:', error);
             alert('Greška pri komunikaciji sa serverom');
         }
     };
 
-    const closeForm = () => {
-        setShowForm(false);
-        setNewTitle('');
-        setNewDescription('');
-        setNewCapacity('');
-        setNewPoints('');
-        setNewStartTime('');
-        setNewEndTime('');
+    const zatvoriFormu = () => {
+        setPrikaziFormu(false);
+        setNoviNaslov('');
+        setNoviOpis('');
+        setNoviKapacitet('');
+        setNoviBodovi('');
+        setNovoVrijemePocetka('');
+        setNovoVrijemeZavrsetka('');
     };
 
-    if (loading) {
+    if (ucitavanje) {
         return <p>Učitavanje...</p>;
     }
 
 
     return (
         <>
-
             <Navbar />
             <div className="pozadina">
                 <h1>Treninzi</h1>
-                <div className="containerTreninzi">
+                <div className="kontejnerTreninzi">
                     <div className="trenutniTreninzi">
-                        {loadingSessions ? (
+                        {ucitavanjeSesija ? (
                             <p>Učitavanje sesija...</p>
-                        ) : sessions.length === 0 ? (
+                        ) : sesije.length === 0 ? (
                             <p>Nema dostupnih sesija</p>
                         ) : (
-                            <div className="sessions-grid">
-                                {sessions.map((session) => (
-                                    <div key={session.id} className="session-card">
-                                        <h3>{session.title}</h3>
-                                        <div className="session-details">
-                                            <p><strong>📋 Opis:</strong> {session.description}</p>
-                                            <p><strong>Prijavljeni:</strong> {attendanceCounts[session.id] !== undefined ? `${attendanceCounts[session.id]} / ${session.capacity}` : session.capacity}</p>
-                                            <p><strong>⭐ Bodovi:</strong> {session.points}</p>
-                                            {session.startTime && (
-                                                <p><strong>🕐 Početak:</strong> {new Date(session.startTime).toLocaleString('hr-HR')}</p>
+                            <div className="sesije-mreza">
+                                {sesije.map((sesija) => (
+                                    <div key={sesija.id} className="sesija-kartica">
+                                        <h3>{sesija.title}</h3>
+                                        <div className="detalji-sesije">
+                                            <p><strong>📋 Opis:</strong> {sesija.description}</p>
+                                            <p><strong>Prijavljeni:</strong> {brojPrijava[sesija.id] !== undefined ? `${brojPrijava[sesija.id]} / ${sesija.capacity}` : sesija.capacity}</p>
+                                            <p><strong>⭐ Bodovi:</strong> {sesija.points}</p>
+                                            {sesija.startTime && (
+                                                <p><strong>🕐 Početak:</strong> {new Date(sesija.startTime).toLocaleString('hr-HR')}</p>
                                             )}
-                                            {session.endTime && (
-                                                <p><strong>🏁 Završetak:</strong> {new Date(session.endTime).toLocaleString('hr-HR')}</p>
+                                            {sesija.endTime && (
+                                                <p><strong>🏁 Završetak:</strong> {new Date(sesija.endTime).toLocaleString('hr-HR')}</p>
                                             )}
                                         </div>
-                                        <div className='pridruziSe'>
-                                            {canJoin && (
-                                                attendanceStatuses[session.id] ? (
+                                        <div className='pridruzi-se'>
+                                            {mozeSePridruziti && (
+                                                statusiPrijave[sesija.id] ? (
                                                     <>
-                                                        <span className='attendance-status'>Status: {attendanceStatuses[session.id]}</span>
-                                                        {attendanceStatuses[session.id] === 'PENDING' && (
-                                                            <button onClick={() => leaveGroup(session.id)}>Napusti grupu</button>
+                                                        <span className='status-prisustva'>Status: {statusPrijevodi[statusiPrijave[sesija.id]] || statusiPrijave[sesija.id]}</span>
+                                                        {statusiPrijave[sesija.id] === 'PENDING' && (
+                                                            <button onClick={() => napustiGrupu(sesija.id)}>Napusti grupu</button>
                                                         )}
                                                     </>
                                                 ) : (
-                                                    <button disabled={isJoining} onClick={() => joinGroup(session.id)}>Pridruži se</button>
+                                                    <button disabled={pridruzivanjeUTijeku} onClick={() => pridruziSeGrupi(sesija.id)}>Pridruži se</button>
                                                 )
                                             )}
                                         </div>
@@ -504,30 +509,30 @@ function Treninzi() {
                     </div>
                 </div>
 
-                {canCreateSession && (
-                    <div className="approvals-section">
+                {mozeKreiratiSesiju && (
+                    <div className="odobravanja-sekcija">
                         <h2>Prijave polaznika</h2>
-                        {allAttendances.filter(att => att.status === 'PENDING' && !att.cancelled).length === 0 ? (
-                            <p>Nema prijava</p>
+                        {svePrijave.filter(prijava => prijava.status === 'PENDING' && !prijava.cancelled).length === 0 ? (
+                            <div>Nema prijava</div>
                         ) : (
-                            <div className="approvals-grid">
-                                {allAttendances.filter(att => att.status === 'PENDING' && !att.cancelled).map((attendance) => (
-                                    <div key={attendance.id} className="approval-card">
-                                        <h4>Sesija: {attendance.sessionTitle}</h4>
-                                        {userInfoMap[attendance.studentId] && (
+                            <div className="odobravanja-mreza">
+                                {svePrijave.filter(prijava => prijava.status === 'PENDING' && !prijava.cancelled).map((prijava) => (
+                                    <div key={prijava.id} className="odobravanje-kartica">
+                                        <h4>Sesija: {prijava.sessionTitle}</h4>
+                                        {mapaKorisnika[prijava.studentId] && (
                                             <>
-                                                <p><strong>Ime:</strong> {userInfoMap[attendance.studentId].firstName}</p>
-                                                <p><strong>Prezime:</strong> {userInfoMap[attendance.studentId].lastName}</p>
-                                                <p><strong>Email:</strong> {userInfoMap[attendance.studentId].email}</p>
-                                                <p><strong>Bodovi:</strong> {userInfoMap[attendance.studentId].currentPoints}</p>
+                                                <p><strong>Ime:</strong> {mapaKorisnika[prijava.studentId].firstName}</p>
+                                                <p><strong>Prezime:</strong> {mapaKorisnika[prijava.studentId].lastName}</p>
+                                                <p><strong>Email:</strong> {mapaKorisnika[prijava.studentId].email}</p>
+                                                <p><strong>Bodovi:</strong> {mapaKorisnika[prijava.studentId].currentPoints}</p>
                                             </>
                                         )}
-                                        {attendance.status === 'PENDING' && !attendance.cancelled && (
-                                            <div className="approval-buttons">
-                                                <button className="approve-btn" onClick={() => approveAttendance(attendance.id)}>
+                                        {prijava.status === 'PENDING' && !prijava.cancelled && (
+                                            <div className="odobravanje-gumbi">
+                                                <button className="odobri-gumb" onClick={() => odobriPrijavu(prijava.id)}>
                                                     Odobri
                                                 </button>
-                                                <button className="cancel-btn" onClick={() => cancelAttendance(attendance.id)}>
+                                                <button className="otkazi-gumb" onClick={() => otkaziPrijavu(prijava.id)}>
                                                     Otkaži
                                                 </button>
                                             </div>
@@ -538,56 +543,56 @@ function Treninzi() {
                         )}
                     </div>
                 )}
-                {canCreateSession && (
-                    <div className="create-session-button-container">
-                        <button className="create-session-btn" onClick={() => setShowForm(true)}>
+                {mozeKreiratiSesiju && (
+                    <div className="kontejner-gumb-nova-sesija">
+                        <button className="gumb-nova-sesija" onClick={() => setPrikaziFormu(true)}>
                             +
                         </button>
                     </div>
                 )}
 
-                {showForm && (
-                    <div className="form-overlay">
-                        <div className="form-modal">
+                {prikaziFormu && (
+                    <div className="prekrivac-forme">
+                        <div className="modal-forme">
                             <h2>Kreiraj novu sesiju</h2>
                             <input
                                 type="text"
                                 placeholder="Naslov"
-                                value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
+                                value={noviNaslov}
+                                onChange={(e) => setNoviNaslov(e.target.value)}
                             />
                             <textarea
                                 placeholder="Opis"
-                                value={newDescription}
-                                onChange={(e) => setNewDescription(e.target.value)}
+                                value={noviOpis}
+                                onChange={(e) => setNoviOpis(e.target.value)}
                             />
                             <input
                                 type="number"
                                 placeholder="Kapacitet"
-                                value={newCapacity}
-                                onChange={(e) => setNewCapacity(e.target.value)}
+                                value={noviKapacitet}
+                                onChange={(e) => setNoviKapacitet(e.target.value)}
                             />
                             <input
                                 type="number"
                                 placeholder="Bodovi"
-                                value={newPoints}
-                                onChange={(e) => setNewPoints(e.target.value)}
+                                value={noviBodovi}
+                                onChange={(e) => setNoviBodovi(e.target.value)}
                             />
                             <input
                                 type="datetime-local"
                                 placeholder="Vrijeme početka"
-                                value={newStartTime}
-                                onChange={(e) => setNewStartTime(e.target.value)}
+                                value={novoVrijemePocetka}
+                                onChange={(e) => setNovoVrijemePocetka(e.target.value)}
                             />
                             <input
                                 type="datetime-local"
                                 placeholder="Vrijeme završetka"
-                                value={newEndTime}
-                                onChange={(e) => setNewEndTime(e.target.value)}
+                                value={novoVrijemeZavrsetka}
+                                onChange={(e) => setNovoVrijemeZavrsetka(e.target.value)}
                             />
-                            <div className="form-buttons">
-                                <button className="btn-save" onClick={handleCreateSession}>Spremi</button>
-                                <button className="btn-cancel" onClick={closeForm}>Odustani</button>
+                            <div className="gumbi-forme">
+                                <button className="spremi-gumb" onClick={obradiKreiranjeSesije}>Spremi</button>
+                                <button className="odustani-gumb" onClick={zatvoriFormu}>Odustani</button>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-.containerTreninzi {
+.kontejnerTreninzi {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     min-height: 100vh;
@@ -65,7 +65,7 @@
     padding: 60px 20px;
 }
 
-.sessions-grid {
+.sesije-mreza {
     display: grid;
     gap: 20px;
     backdrop-filter: blur(10px);
@@ -79,7 +79,7 @@
     justify-items: stretch;
 }
 
-.session-card {
+.sesija-kartica {
     background: #fafafa;
     color: black;
     padding: 18px;
@@ -102,13 +102,13 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.session-card h3 {
+.sesija-kartica h3 {
     color: #333;
     margin-bottom: 0.5rem;
     font-size: 1.3rem;
 }
 
-.session-details {
+.detalji-sesije {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
@@ -117,7 +117,7 @@
     padding: 0;
 }
 
-.session-details p {
+.detalji-sesije p {
     margin: 0;
     color: #555;
     font-size: 0.9rem;
@@ -128,12 +128,12 @@
     margin-bottom: 0.3rem;
 }
 
-.session-details strong {
+.detalji-sesije strong {
     color: #333;
     font-weight: 600;
 }
 
-.create-session-button-container {
+.kontejner-gumb-nova-sesija {
     max-width: 1200px;
     margin: 20px auto;
     padding: 0 20px;
@@ -141,7 +141,7 @@
     justify-content: flex-end;
 }
 
-.create-session-btn {
+.gumb-nova-sesija {
     position: absolute !important;
     bottom: 2rem !important;
     right: 2rem !important;
@@ -159,7 +159,7 @@
 }
 
 
-.form-overlay {
+.prekrivac-forme {
     position: fixed;
     top: 0;
     left: 0;
@@ -172,7 +172,7 @@
     z-index: 1000;
 }
 
-.form-modal {
+.modal-forme {
     background-color: white;
     border-radius: 8px;
     padding: 30px;
@@ -183,15 +183,15 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.form-modal h2 {
+.modal-forme h2 {
     margin-top: 0;
     margin-bottom: 20px;
     color: #333;
     text-align: center;
 }
 
-.form-modal input,
-.form-modal textarea {
+.modal-forme input,
+.modal-forme textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -202,26 +202,26 @@
     box-sizing: border-box;
 }
 
-.form-modal textarea {
+.modal-forme textarea {
     resize: vertical;
     min-height: 100px;
 }
 
-.form-modal input:focus,
-.form-modal textarea:focus {
+.modal-forme input:focus,
+.modal-forme textarea:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.form-buttons {
+.gumbi-forme {
     display: flex;
     gap: 10px;
     margin-top: 20px;
 }
 
-.btn-save,
-.btn-cancel {
+.spremi-gumb,
+.odustani-gumb {
     flex: 1;
     padding: 12px;
     border: none;
@@ -232,25 +232,25 @@
     transition: background-color 0.3s ease;
 }
 
-.btn-save {
+.spremi-gumb {
     background-color: #007bff;
     color: white;
 }
 
-.btn-save:hover {
+.spremi-gumb:hover {
     background-color: #0056b3;
 }
 
-.btn-cancel {
+.odustani-gumb {
     background-color: #6c757d;
     color: white;
 }
 
-.btn-cancel:hover {
+.odustani-gumb:hover {
     background-color: #545b62;
 }
 
-.pridruziSe {
+.pridruzi-se {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -259,7 +259,7 @@
     gap: 12px;
 }
 
-.pridruziSe button {
+.pridruzi-se button {
     padding: 0.6rem 1.4rem;
     font-size: 0.95rem;
     border: 2px solid #28a745;
@@ -275,14 +275,14 @@
     max-width: 200px;
 }
 
-.pridruziSe button:hover {
+.pridruzi-se button:hover {
     background: linear-gradient(135deg, #1e7e34, #26a653);
     border-color: #1e7e34;
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
 }
 
-.attendance-status {
+.status-prisustva {
     display: block;
     text-align: center;
     margin-top: 0;
@@ -292,27 +292,27 @@
     font-size: 0.9rem;
 }
 
-.approvals-section {
+.odobravanja-sekcija {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 30px;
     margin-top: 30px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.approvals-section h2 {
+.odobravanja-sekcija h2 {
     color: #333;
     margin-top: 0;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-.approvals-grid {
+.odobravanja-mreza {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 }
 
-.approval-card {
+.odobravanje-kartica {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -320,7 +320,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.approval-card h4 {
+.odobravanje-kartica h4 {
     color: #333;
     margin-top: 0;
     margin-bottom: 15px;
@@ -328,20 +328,20 @@
     padding-bottom: 10px;
 }
 
-.approval-card p {
+.odobravanje-kartica p {
     margin: 10px 0;
     color: #555;
     font-size: 0.95rem;
 }
 
-.approval-buttons {
+.odobravanje-gumbi {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
 
-.approve-btn,
-.cancel-btn {
+.odobri-gumb,
+.otkazi-gumb {
     flex: 1;
     padding: 10px;
     border: none;
@@ -352,20 +352,20 @@
     transition: background-color 0.3s ease;
 }
 
-.approve-btn {
+.odobri-gumb {
     background-color: #28a745;
     color: white;
 }
 
-.approve-btn:hover {
+.odobri-gumb:hover {
     background-color: #218838;
 }
 
-.cancel-btn {
+.otkazi-gumb {
     background-color: #dc3545;
     color: white;
 }
 
-.cancel-btn:hover {
+.otkazi-gumb:hover {
     background-color: #c82333;
 }
