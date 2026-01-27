@@ -8,7 +8,7 @@
     position: relative;
     overflow: hidden;
     justify-content: start;
-    background-image: url('images/treninzipozadina.jpg');
+    background-image: url('/images/treninzipozadina.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -16,7 +16,7 @@
 }
 
 .pozadina {
-    background-image: url('images/treninzipozadina.jpg');
+    background-image: url('/images/treninzipozadina.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
