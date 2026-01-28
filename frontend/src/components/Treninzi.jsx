@@ -469,9 +469,9 @@ function Treninzi() {
                 <div className="kontejnerTreninzi">
                     <div className="trenutniTreninzi">
                         {ucitavanjeSesija ? (
-                            <p>Učitavanje sesija...</p>
+                            <p>Učitavanje treninga...</p>
                         ) : sesije.length === 0 ? (
-                            <p>Nema dostupnih sesija</p>
+                            <p>Nema dostupnih treninga</p>
                         ) : (
                             <div className="sesije-mreza">
                                 {sesije.map((sesija) => (
@@ -554,7 +554,7 @@ function Treninzi() {
                 {prikaziFormu && (
                     <div className="prekrivac-forme">
                         <div className="modal-forme">
-                            <h2>Kreiraj novu sesiju</h2>
+                            <h2>Kreiraj novi trening</h2>
                             <input
                                 type="text"
                                 placeholder="Naslov"
