@@ -26,9 +26,14 @@ public class SessionService {
     private final PermissionService permissionService;
     
 
-    public List<SessionResponseDto> getAllSessions(Long sectionId) {
+    public List<SessionResponseDto> getAllSessionsBySection(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
         List<Session> sessions = sessionRepository.findAllBySectionId(sectionId);
+        return sessionMapper.toResponseDtoList(sessions);
+    }
+
+    public List<SessionResponseDto> getAllSessions() {
+        List<Session> sessions = sessionRepository.findAll();
         return sessionMapper.toResponseDtoList(sessions);
     }
 

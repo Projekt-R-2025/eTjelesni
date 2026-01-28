@@ -10,6 +10,7 @@ const Navbar = ({ onLogout }) => {
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [userData, setUserData] = useState(null);
     const [sectionType, setSectionType] = useState(null);
+    const [leadingSectionTypes, setLeadingSectionTypes] = useState([]);
 
     const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
     const closeSidebar = () => setSidebarVisible(false);
@@ -67,8 +68,41 @@ const Navbar = ({ onLogout }) => {
         fetchSectionType();
     }, [userData]);
 
+    // Dohvati tipove svih sekcija koje korisnik vodi
+    useEffect(() => {
+        const fetchLeadingSectionTypes = async () => {
+            if (!userData?.leadingSectionIds || userData.leadingSectionIds.length === 0) {
+                setLeadingSectionTypes([]);
+                return;
+            }
+
+            try {
+                const token = getToken();
+                const typesPromises = userData.leadingSectionIds.map(async (sectionId) => {
+                    const response = await fetch(`${backendBase}/api/sections/${sectionId}`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.sectionType;
+                    }
+                    return null;
+                });
+
+                const types = await Promise.all(typesPromises);
+                setLeadingSectionTypes(types.filter(type => type !== null));
+            } catch (error) {
+                console.error("Greška pri dohvaćanju tipova sekcija:", error);
+            }
+        };
+
+        fetchLeadingSectionTypes();
+    }, [userData]);
+
     const isBikeMember = sectionType === "BIKE";
     const hasSection = Boolean(userData?.sectionId);
+    const isBikeLeader = userData?.role === "LEADER" && leadingSectionTypes.includes("BIKE");
+    const isNonBikeLeader = userData?.role === "LEADER" && leadingSectionTypes.some(type => type !== "BIKE");
 
     const handleLogout = async () => {
         try {
@@ -129,10 +163,10 @@ const Navbar = ({ onLogout }) => {
                 <>
                     <aside className="sidebar">
                         <Link to="/home" className="sidebar-button" onClick={closeSidebar}>HOME</Link>
-                        {(userData?.role === "PROFESSOR" || (hasSection && isBikeMember)) && (
+                        {(userData?.role === "PROFESSOR" || (hasSection && isBikeMember) || isBikeLeader) && (
                             <Link to="/bike" className="sidebar-button" onClick={closeSidebar}>BIKE</Link>
                          )}
-                        {(userData?.role === "PROFESSOR" || userData?.role === "LEADER" || (hasSection && !isBikeMember)) && (
+                        {(userData?.role === "PROFESSOR" || isNonBikeLeader || (hasSection && !isBikeMember)) && (
                             <>
                                 <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
                                 <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>

@@ -48,7 +48,7 @@ public class UserService {
     @Transactional
     public List<UserResponseDto> getUsersBySectionId(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
-        permissionService.requireCanViewSectionMembers(section);
+        //permissionService.requireCanViewSectionMembers(section);
 
         List<User> users = userRepository.findBySectionId(sectionId);
         return userMapper.toResponseDtoList(users);
@@ -56,7 +56,7 @@ public class UserService {
 
     @Transactional
     public UserResponseDto getUserById(Long id) {
-        permissionService.requireCanManageUser();
+        //permissionService.requireCanManageUser();
 
         User user = getUserOrThrow(id);
         return userMapper.toResponseDto(user);

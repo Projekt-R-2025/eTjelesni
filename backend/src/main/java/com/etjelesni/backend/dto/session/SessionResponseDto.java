@@ -10,6 +10,8 @@ public class SessionResponseDto {
     private String description;
     private Integer capacity;
     private Integer points;
+    private String sectionName;
+    private String sectionType;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String startLocation;
