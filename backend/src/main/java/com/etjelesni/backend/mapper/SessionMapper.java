@@ -12,6 +12,8 @@ import java.util.List;
 public interface SessionMapper {
 
     @Mapping(target = "sectionId", source = "section.id")
+    @Mapping(target = "sectionName", source = "section.name")
+    @Mapping(target = "sectionType", source = "section.sectionType")
     SessionResponseDto toResponseDto(Session session);
 
     List<SessionResponseDto> toResponseDtoList(List<Session> sessions);

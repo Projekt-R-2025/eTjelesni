@@ -20,8 +20,14 @@ public class SessionController {
     }
 
     @GetMapping("/section/{id}")
-    public ResponseEntity<List<SessionResponseDto>> getAllSessions(@PathVariable Long id) {
-        List<SessionResponseDto> response = sessionService.getAllSessions((id));
+    public ResponseEntity<List<SessionResponseDto>> getAllSessionsBySection(@PathVariable Long id) {
+        List<SessionResponseDto> response = sessionService.getAllSessionsBySection(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SessionResponseDto>> getAllSessions() {
+        List<SessionResponseDto> response = sessionService.getAllSessions();
         return ResponseEntity.ok(response);
     }
 

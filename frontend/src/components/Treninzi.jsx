@@ -7,6 +7,7 @@ const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 function Treninzi() {
     const [idSekcije, setIdSekcije] = useState(null);
+    const [leadingSectionIds, setLeadingSectionIds] = useState([]);
     const [ucitavanje, setUcitavanje] = useState(true);
     const [sesije, setSesije] = useState([]);
     const [ucitavanjeSesija, setUcitavanjeSesija] = useState(false);
@@ -26,6 +27,8 @@ function Treninzi() {
     const [svePrijave, setSvePrijave] = useState([]);
     const [mapaKorisnika, setMapaKorisnika] = useState({});
     const [brojPrijava, setBrojPrijava] = useState({});
+    const [dostupneSekcije, setDostupneSekcije] = useState([]);
+    const [odabranaSekcija, setOdabranaSekcija] = useState('');
     const jeAdminUloga = ulogaKorisnika && ['LEADER', 'PROFESSOR', 'ADMIN'].includes(ulogaKorisnika);
 
     const statusPrijevodi = {
@@ -50,6 +53,7 @@ function Treninzi() {
                     const korisnik = await response.json();
                     console.log('Cijeli user objekt:', korisnik);
                     setIdSekcije(korisnik.sectionId);
+                    setLeadingSectionIds(korisnik.leadingSectionIds || []);
                     setUlogaKorisnika(korisnik.role);
                     setIdStudenta(korisnik.id || korisnik.studentId);
                     console.log('Dohvaćen korisnik:', korisnik);
@@ -69,27 +73,66 @@ function Treninzi() {
     }, []);
 
     useEffect(() => {
-        if (idSekcije) {
+        if (ulogaKorisnika) {
             const dohvatiSesije = async () => {
                 setUcitavanjeSesija(true);
                 try {
                     const token = getToken();
-                    const response = await fetch(`${backendBase}/api/sessions/section/${idSekcije}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                    let podaciSesija = [];
 
-                    if (response.ok) {
-                        const podaciSesija = await response.json();
-                        setSesije(podaciSesija);
-                        console.log('Dohvaćene sesije:', podaciSesija);
-                        dohvatiBrojPrijava(podaciSesija);
-                    } else {
-                        console.error('Neuspješno dohvaćanje sesija:', response.status);
+                    if (ulogaKorisnika === 'STUDENT' && idSekcije) {
+                        // STUDENT dohvaća sesije samo za svoju sekciju
+                        const response = await fetch(`${backendBase}/api/sessions/section/${idSekcije}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            podaciSesija = await response.json();
+                        } else {
+                            console.error('Neuspješno dohvaćanje sesija:', response.status);
+                        }
+                    } else if (ulogaKorisnika === 'LEADER' && leadingSectionIds.length > 0) {
+                        // LEADER dohvaća sesije za sve sekcije koje vodi
+                        const sveSekcijeSesije = await Promise.all(
+                            leadingSectionIds.map(async (sectionId) => {
+                                const response = await fetch(`${backendBase}/api/sessions/section/${sectionId}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                if (response.ok) {
+                                    return await response.json();
+                                }
+                                return [];
+                            })
+                        );
+                        podaciSesija = sveSekcijeSesije.flat();
+                    } else if (ulogaKorisnika === 'PROFESSOR' || ulogaKorisnika === 'ADMIN') {
+                        // PROFESSOR i ADMIN dohvaćaju sve sesije
+                        const response = await fetch(`${backendBase}/api/sessions`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            podaciSesija = await response.json();
+                        } else {
+                            console.error('Neuspješno dohvaćanje sesija:', response.status);
+                        }
                     }
+
+                    // Filtriraj sesije da ne prikazuje one koje pripadaju BIKE sekcijama
+                    const filtriraneSesije = podaciSesija.filter(sesija => sesija.sectionType !== 'BIKE');
+                    setSesije(filtriraneSesije);
+                    console.log('Dohvaćene sesije:', filtriraneSesije);
+                    dohvatiBrojPrijava(filtriraneSesije);
                 } catch (error) {
                     console.error('Greška pri dohvaćanju sesija:', error);
                 } finally {
@@ -99,7 +142,7 @@ function Treninzi() {
 
             dohvatiSesije();
         }
-    }, [idSekcije]);
+    }, [ulogaKorisnika, idSekcije, leadingSectionIds]);
 
     useEffect(() => {
         if (jeAdminUloga && sesije.length > 0) {
@@ -211,6 +254,53 @@ function Treninzi() {
 
         dohvatiMojePrijave();
     }, [idStudenta, sesije]);
+
+    useEffect(() => {
+        if (jeAdminUloga) {
+            const dohvatiDostupneSekcije = async () => {
+                try {
+                    const token = getToken();
+
+                    if (ulogaKorisnika === 'LEADER' && leadingSectionIds.length > 0) {
+                        // LEADER dohvaća detalje sekcija koje vodi
+                        const sekcije = await Promise.all(
+                            leadingSectionIds.map(async (sectionId) => {
+                                const response = await fetch(`${backendBase}/api/sections/${sectionId}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                if (response.ok) {
+                                    return await response.json();
+                                }
+                                return null;
+                            })
+                        );
+                        setDostupneSekcije(sekcije.filter(s => s !== null && s.sectionType !== 'BIKE'));
+                    } else if (ulogaKorisnika === 'PROFESSOR' || ulogaKorisnika === 'ADMIN') {
+                        // PROFESSOR i ADMIN dohvaćaju sve sekcije
+                        const response = await fetch(`${backendBase}/api/sections`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            const sekcije = await response.json();
+                            setDostupneSekcije(sekcije.filter(s => s.sectionType !== 'BIKE'));
+                        }
+                    }
+                } catch (error) {
+                    console.error('Greška pri dohvaćanju sekcija:', error);
+                }
+            };
+
+            dohvatiDostupneSekcije();
+        }
+    }, [jeAdminUloga, ulogaKorisnika, leadingSectionIds]);
 
     const dohvatiBrojPrijava = async (sesijeZaBrojanje) => {
         const token = getToken();
@@ -407,8 +497,8 @@ function Treninzi() {
     }
 
     const obradiKreiranjeSesije = async () => {
-        if (!idSekcije) {
-            alert('Greška: Sekcija nije pronađena');
+        if (!odabranaSekcija) {
+            alert('Greška: Molimo odaberite sekciju');
             return;
         }
 
@@ -421,7 +511,7 @@ function Treninzi() {
                 points: parseInt(noviBodovi) || 0,
                 startTime: novoVrijemePocetka ? new Date(novoVrijemePocetka).toISOString() : null,
                 endTime: novoVrijemeZavrsetka ? new Date(novoVrijemeZavrsetka).toISOString() : null,
-                sectionId: idSekcije
+                sectionId: parseInt(odabranaSekcija)
             };
 
             const response = await fetch(`${backendBase}/api/sessions`, {
@@ -454,6 +544,7 @@ function Treninzi() {
         setNoviBodovi('');
         setNovoVrijemePocetka('');
         setNovoVrijemeZavrsetka('');
+        setOdabranaSekcija('');
     };
 
     if (ucitavanje) {
@@ -469,15 +560,16 @@ function Treninzi() {
                 <div className="kontejnerTreninzi">
                     <div className="trenutniTreninzi">
                         {ucitavanjeSesija ? (
-                            <p>Učitavanje sesija...</p>
+                            <p>Učitavanje treninga...</p>
                         ) : sesije.length === 0 ? (
-                            <p>Nema dostupnih sesija</p>
+                            <p>Nema dostupnih treninga</p>
                         ) : (
                             <div className="sesije-mreza">
                                 {sesije.map((sesija) => (
                                     <div key={sesija.id} className="sesija-kartica">
                                         <h3>{sesija.title}</h3>
                                         <div className="detalji-sesije">
+                                            <p><strong>Sekcija:</strong> {sesija.sectionName}</p>
                                             <p><strong>📋 Opis:</strong> {sesija.description}</p>
                                             <p><strong>Prijavljeni:</strong> {brojPrijava[sesija.id] !== undefined ? `${brojPrijava[sesija.id]} / ${sesija.capacity}` : sesija.capacity}</p>
                                             <p><strong>⭐ Bodovi:</strong> {sesija.points}</p>
@@ -554,7 +646,20 @@ function Treninzi() {
                 {prikaziFormu && (
                     <div className="prekrivac-forme">
                         <div className="modal-forme">
-                            <h2>Kreiraj novu sesiju</h2>
+                            <h2>Kreiraj novi trening</h2>
+                            <select
+                                className="odabir-sekcije"
+                                value={odabranaSekcija}
+                                onChange={(e) => setOdabranaSekcija(e.target.value)}
+                                required
+                            >
+                                <option value="">-- Odaberite sekciju --</option>
+                                {dostupneSekcije.map((sekcija) => (
+                                    <option key={sekcija.id} value={sekcija.id}>
+                                        {sekcija.name}
+                                    </option>
+                                ))}
+                            </select>
                             <input
                                 type="text"
                                 placeholder="Naslov"
