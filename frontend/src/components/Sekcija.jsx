@@ -157,6 +157,7 @@ const Sekcija = ({ onLogout }) => {
             'ODBOJKA': '/images/odbojka.png',
             'PLIVANJE': '/images/plivanje2.png',
             'TENIS': '/images/tenis.png',
+            'ATLETIKA': '/images/atletika.png',
             'OSTALO': '/images/ostalo.png'
         };
         return backgrounds[sectionType?.toUpperCase()] || '/images/ostalo.png';
