@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { removeToken, getToken } from "../utils/token";
 import "./Navbar.css";
 
@@ -7,9 +7,9 @@ const backendBase = import.meta.env.VITE_API_BASE_URL;
 
 const Navbar = ({ onLogout }) => {
     const navigate = useNavigate();
-    const location = useLocation();
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [userData, setUserData] = useState(null);
+    const [sectionType, setSectionType] = useState(null);
 
     const toggleSidebar = () => setSidebarVisible(!sidebarVisible);
     const closeSidebar = () => setSidebarVisible(false);
@@ -40,6 +40,35 @@ const Navbar = ({ onLogout }) => {
 
         fetchUserData();
     }, []);
+
+    // Dohvati tip sekcije (za bike/sekcije filtraciju)
+    useEffect(() => {
+        const fetchSectionType = async () => {
+            if (!userData?.sectionId) {
+                setSectionType(null);
+                return;
+            }
+
+            try {
+                const token = getToken();
+                const response = await fetch(`${backendBase}/api/sections/${userData.sectionId}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setSectionType(data.sectionType);
+                }
+            } catch (error) {
+                console.error("Greška pri dohvaćanju sekcije:", error);
+            }
+        };
+
+        fetchSectionType();
+    }, [userData]);
+
+    const isBikeMember = sectionType === "BIKE";
+    const hasSection = Boolean(userData?.sectionId);
 
     const handleLogout = async () => {
         try {
@@ -100,14 +129,18 @@ const Navbar = ({ onLogout }) => {
                 <>
                     <aside className="sidebar">
                         <Link to="/home" className="sidebar-button" onClick={closeSidebar}>HOME</Link>
-                        <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
-                        {location.pathname.startsWith("/sekcija") && (
-                            <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>
+                        {hasSection && isBikeMember && (
+                            <Link to="/bike" className="sidebar-button" onClick={closeSidebar}>BIKE</Link>
+                         )}
+                        {hasSection && !isBikeMember && (
+                            <>
+                                <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
+                                <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>
+                            </>
                         )}
                         {userData?.role === "PROFESSOR" && (
                             <Link to="/sectionCreate" className="sidebar-button" onClick={closeSidebar}>NOVA SEKCIJA</Link>
                         )}
-                        <Link to="/bike" className="sidebar-button" onClick={closeSidebar}>BIKE</Link>
                         <Link to="/prijave" className="sidebar-button" onClick={closeSidebar}>PRIJAVE</Link>
                         {userData?.role !== "STUDENT" && (
                             <Link to="/korisnici" className="sidebar-button" onClick={closeSidebar}>KORISNICI</Link>
