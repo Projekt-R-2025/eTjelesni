@@ -120,6 +120,9 @@ const Korisnici = ({ onLogout }) => {
                     throw new Error("Nemate dopuštenje za pregled korisnika.");
                 }
 
+                // Sortiraj korisnike po ID-u
+                fetchedUsers.sort((a, b) => a.id - b.id);
+
                 setUsers(fetchedUsers);
             } catch (err) {
                 setError(err.message || "Neočekivana greška.");
