@@ -590,7 +590,7 @@ function Bike() {
                                 <div className="odobravanja-mreza">
                                     {svePrijave.filter(att => att.status === 'PENDING' && !att.cancelled).map((prijava) => (
                                         <div key={prijava.id} className="odobravanje-kartica">
-                                            <h4>Sesija: {prijava.sessionTitle}</h4>
+                                            <h4>{prijava.sessionTitle}</h4>
                                             {mapaKorisnika[prijava.studentId] && (
                                                 <>
                                                     <p><strong>Ime:</strong> {mapaKorisnika[prijava.studentId].firstName}</p>
