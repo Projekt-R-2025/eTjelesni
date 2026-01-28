@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { getToken } from "../utils/token";
 import { formatTimestamp } from "../utils/formatters";
 import Navbar from "../components/Navbar";
@@ -25,7 +24,6 @@ const Home = ({ onLogout }) => {
     // Delete confirmation state
     const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-    const isJoined = Boolean(userData?.sectionId);
     const canEdit = userData?.role === "PROFESSOR";
 
     // Dohvati korisnika
@@ -218,7 +216,7 @@ const Home = ({ onLogout }) => {
                     </div>
                 )}
 
-                {!loading && !error && obavijesti.map(o => (
+                {!loading && !error && obavijesti.slice().reverse().map(o => (
                     <div key={o.id} className="obavijest-card">
                         <h3>{o.title}</h3>
                         <p>{o.body}</p>
@@ -303,11 +301,6 @@ const Home = ({ onLogout }) => {
                 </div>
             )}
 
-            {!isJoined && (
-                <Link to="/prijave" className="btn-prijavi-se">
-                    PRIJAVI SE
-                </Link>
-            )}
         </div>
     );
 };
