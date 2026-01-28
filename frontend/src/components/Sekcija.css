@@ -11,12 +11,27 @@
 
 .sekcija-content.with-background {
     margin-top: 3%;
+    min-height: calc(100vh - 100px);
+    padding: 2rem 1rem;
+    position: relative;
+    background: none;
+}
+
+.sekcija-bg-image {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    height: 120vh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    min-height: calc(100vh - 100px);
-    padding: 2rem 1rem;
+    z-index: -1;
+}
+
+.sekcija-bg-white {
+    display: none;
 }
 
 /* NASLOV SEKCIJE */
@@ -59,8 +74,7 @@
     text-align: center;
     font-size: 2.2rem;
     font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    color: #fff;
     margin: 0;
 }
 

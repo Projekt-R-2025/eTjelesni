@@ -155,7 +155,7 @@ const Sekcija = ({ onLogout }) => {
             'RUKOMET': '/images/rukomet.png',
             'KOSARKA': '/images/kosarka.png',
             'ODBOJKA': '/images/odbojka.png',
-            'PLIVANJE': '/images/plivanje.png',
+            'PLIVANJE': '/images/plivanje2.png',
             'TENIS': '/images/tenis.png',
             'OSTALO': '/images/ostalo.png'
         };
@@ -169,7 +169,7 @@ const Sekcija = ({ onLogout }) => {
         return userData.role === "LEADER" && userData.leadingSectionIds?.includes(currentSection.id);
     };
 
-    // CRUD funkcije za obavijesti
+    // Funkcije za obavijesti
     const handleNewObavijest = () => {
         setEditingObavijest(null);
         setFormData({ title: "", body: "" });
@@ -328,12 +328,15 @@ const Sekcija = ({ onLogout }) => {
       <div className="sekcija-page">
         <Navbar onLogout={onLogout} />
 
-        <main
-          className="sekcija-content with-background"
-          style={{
-            backgroundImage: `url(${getSectionBackground(currentSection?.sectionType)})`,
-          }}
-        >
+        <main className="sekcija-content with-background">
+            {/* Pozadinska slika s desne strane */}
+            <div 
+                className="sekcija-bg-image"
+                style={{
+                backgroundImage: `url(${getSectionBackground(currentSection?.sectionType)})`,
+            }}
+            />
+            <div className="sekcija-bg-white" />
           {/* Header s naslovom i back buttonom */}
           <div className="sekcija-header">
             {userData?.role === "PROFESSOR" && (
@@ -360,7 +363,7 @@ const Sekcija = ({ onLogout }) => {
 
           {/* Lista obavijesti */}
           {!loadingObavijesti &&
-            obavijesti.map((o) => (
+            obavijesti.slice().reverse().map((o) => (
               <div key={o.id} className="obavijest-card">
                 <h3>{o.title}</h3>
                 <p>{o.body}</p>
