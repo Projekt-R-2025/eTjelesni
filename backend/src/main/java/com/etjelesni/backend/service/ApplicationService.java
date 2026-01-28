@@ -14,6 +14,7 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ApplicationService {
     private final SectionLeaderService sectionLeaderService;
 
 
+    @Transactional
     public List<ApplicationResponseDto> getAllApplications(String status) {
         User currentUser = currentUserService.getCurrentUser();
 
@@ -78,12 +80,14 @@ public class ApplicationService {
         throw new AccessDeniedException("You do not have permission to view applications");
     }
 
+    @Transactional
     public List<ApplicationResponseDto> getMyApplications() {
         User applicant = currentUserService.getCurrentUser();
         List<Application> applications = applicationRepository.findByApplicant(applicant);
         return applicationMapper.toResponseDtoList(applications);
     }
 
+    @Transactional
     public ApplicationResponseDto createApplication(ApplicationCreateDto dto) {
         User applicant = userService.getUserOrThrow(dto.getUserId());
         Section requestedSection = sectionService.getSectionOrThrow(dto.getRequestedSectionId());
@@ -109,6 +113,7 @@ public class ApplicationService {
         return applicationMapper.toResponseDto(application);
     }
 
+    @Transactional
     public ApplicationResponseDto reviewApplication(Long id, RequestStatus status, ApplicationReviewDto dto) {
         User reviewer = currentUserService.getCurrentUser();
         Application application = getApplicationOrThrow(id);
@@ -140,6 +145,7 @@ public class ApplicationService {
         return applicationMapper.toResponseDto(application);
     }
 
+    @Transactional
     public void deleteApplication(Long id) {
         Application application = getApplicationOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();

@@ -12,6 +12,7 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class AttendanceService {
     private final PermissionService permissionService;
 
 
+    @Transactional
     public List<AttendanceResponseDto> getAllAttendances() {
         //permissionService.requireCanViewAllAttendances();
 
@@ -35,6 +37,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDtoList(attendances);
     }
 
+    @Transactional
     public AttendanceResponseDto getAttendanceById(Long attendanceId) {
         Attendance attendance = getAttendanceOrThrow(attendanceId);
 
@@ -43,6 +46,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDto(attendance);
     }
 
+    @Transactional
     public List<AttendanceResponseDto> getSessionAttendances(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
 
@@ -52,6 +56,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDtoList(attendances); // safe because associations are initialized
     }
 
+    @Transactional
     public AttendanceResponseDto createAttendance(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
 
@@ -65,6 +70,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDto(attendance);
     }
 
+    @Transactional
     public AttendanceResponseDto cancelAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
@@ -86,6 +92,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDto(updatedAttendance);
     }
 
+    @Transactional
     public AttendanceResponseDto approveAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
@@ -101,6 +108,7 @@ public class AttendanceService {
         return attendanceMapper.toResponseDto(updatedAttendance);
     }
 
+    @Transactional
     public AttendanceResponseDto rejectAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 

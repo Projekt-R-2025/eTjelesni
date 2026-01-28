@@ -14,6 +14,7 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,11 +30,13 @@ public class NotificationService {
     private final PermissionService permissionService;
 
 
+    @Transactional
     public List<NotificationResponseDto> getAllGenericNotifications() {
         List<Notification> notifications = notificationRepository.findAllByType(NotificationType.GENERAL);
         return notificationMapper.toResponseDtoList(notifications);
     }
 
+    @Transactional
     public List<NotificationResponseDto> getSectionNotifications(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
         List<Notification> notifications =
@@ -41,11 +44,13 @@ public class NotificationService {
         return notificationMapper.toResponseDtoList(notifications);
     }
 
+    @Transactional
     public NotificationResponseDto getNotificationById(Long id) {
         Notification notification = getNotificationOrThrow(id);
         return notificationMapper.toResponseDto(notification);
     }
 
+    @Transactional
     public NotificationResponseDto createGeneralNotification(GeneralNotificationCreateDto dto) {
         permissionService.requireCanCreateGeneralNotification();
 
@@ -57,6 +62,7 @@ public class NotificationService {
         return notificationMapper.toResponseDto(notification);
     }
 
+    @Transactional
     public NotificationResponseDto createSectionNotification(SectionNotificationCreateDto dto) {
         Section section = sectionService.getSectionOrThrow(dto.getSectionId());
 
@@ -71,6 +77,7 @@ public class NotificationService {
         return notificationMapper.toResponseDto(notification);
     }
 
+    @Transactional
     public NotificationResponseDto updateNotification(Long id, NotificationUpdateDto dto) {
         Notification notification = getNotificationOrThrow(id);
 
@@ -83,6 +90,7 @@ public class NotificationService {
         return notificationMapper.toResponseDto(updatedNotification);
     }
 
+    @Transactional
     public void deleteNotification(Long id) {
         Notification notification = getNotificationOrThrow(id);
 

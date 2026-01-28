@@ -10,6 +10,7 @@ import com.etjelesni.backend.repository.SectionRepository;
 import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,16 +24,19 @@ public class SectionService {
     private final PermissionService permissionService;
 
 
+    @Transactional
     public List<SectionResponseDto> getAllSections() {
         List<Section> sections = sectionRepository.findAll();
         return sectionMapper.toResponseDtoList(sections);
     }
 
+    @Transactional
     public SectionResponseDto getSectionById(Long id) {
         Section section = getSectionOrThrow(id);
         return sectionMapper.toResponseDto(section);
     }
 
+    @Transactional
     public SectionResponseDto createSection(SectionCreateDto dto) {
         permissionService.requireCanManageSection();
 
@@ -42,6 +46,7 @@ public class SectionService {
         return sectionMapper.toResponseDto(section);
     }
 
+    @Transactional
     public SectionResponseDto updateSection(Long id, SectionUpdateDto dto) {
         permissionService.requireCanManageSection();
 
@@ -54,6 +59,7 @@ public class SectionService {
         return sectionMapper.toResponseDto(updatedSection);
     }
 
+    @Transactional
     public void deleteSection(Long id) {
         permissionService.requireCanManageSection();
 

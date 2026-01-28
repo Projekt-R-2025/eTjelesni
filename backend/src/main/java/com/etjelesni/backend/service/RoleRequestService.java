@@ -12,6 +12,7 @@ import com.etjelesni.backend.model.User;
 import com.etjelesni.backend.model.Section;
 import com.etjelesni.backend.repository.RoleRequestRepository;
 import com.etjelesni.backend.service.auth.CurrentUserService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class RoleRequestService {
     private final SectionLeaderService sectionLeaderService;
 
 
+    @Transactional
     public List<RoleRequestResponseDto> getAllRoleRequests(String status) {
         User currentUser = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests;
@@ -67,12 +69,14 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDtoList(roleRequests);
     }
 
+    @Transactional
     public List<RoleRequestResponseDto> getMyRoleRequests() {
         User user = currentUserService.getCurrentUser();
         List<RoleRequest> roleRequests = roleRequestRepository.findByUser(user);
         return roleRequestMapper.toResponseDtoList(roleRequests);
     }
 
+    @Transactional
     public RoleRequestResponseDto createRoleRequest(RoleRequestCreateDto dto) {
         User user = userService.getUserOrThrow(dto.getUserId());
         Role requestedRole = dto.getRequestedRole();
@@ -126,6 +130,7 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
+    @Transactional
     public RoleRequestResponseDto reviewRoleRequest(Long id, RequestStatus status, RoleRequestReviewDto dto) {
         User reviewer = currentUserService.getCurrentUser();
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
@@ -159,6 +164,7 @@ public class RoleRequestService {
         return roleRequestMapper.toResponseDto(roleRequest);
     }
 
+    @Transactional
     public void deleteRoleRequest(Long id) {
         RoleRequest roleRequest = getRoleRequestOrThrow(id);
         User currentUser = currentUserService.getCurrentUser();

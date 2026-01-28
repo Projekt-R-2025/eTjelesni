@@ -12,6 +12,7 @@ import com.etjelesni.backend.service.auth.CurrentUserService;
 import com.etjelesni.backend.service.permission.PermissionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,24 +25,28 @@ public class SessionService {
 
     private final SectionService sectionService;
     private final PermissionService permissionService;
-    
 
+
+    @Transactional
     public List<SessionResponseDto> getAllSessionsBySection(Long sectionId) {
         Section section = sectionService.getSectionOrThrow(sectionId);
         List<Session> sessions = sessionRepository.findAllBySectionId(sectionId);
         return sessionMapper.toResponseDtoList(sessions);
     }
 
+    @Transactional
     public List<SessionResponseDto> getAllSessions() {
         List<Session> sessions = sessionRepository.findAll();
         return sessionMapper.toResponseDtoList(sessions);
     }
 
+    @Transactional
     public SessionResponseDto getSessionById(Long id) {
         Session session = getSessionOrThrow(id);
         return sessionMapper.toResponseDto(session);
     }
 
+    @Transactional
     public SessionResponseDto createSession(SessionCreateDto dto) {
         Section section = sectionService.getSectionOrThrow(dto.getSectionId());
 
@@ -54,6 +59,7 @@ public class SessionService {
         return sessionMapper.toResponseDto(session);
     }
 
+    @Transactional
     public void deleteSession(Long id) {
         Session session = getSessionOrThrow(id);
 
