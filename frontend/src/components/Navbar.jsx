@@ -129,10 +129,10 @@ const Navbar = ({ onLogout }) => {
                 <>
                     <aside className="sidebar">
                         <Link to="/home" className="sidebar-button" onClick={closeSidebar}>HOME</Link>
-                        {hasSection && isBikeMember && (
+                        {(userData?.role === "PROFESSOR" || (hasSection && isBikeMember)) && (
                             <Link to="/bike" className="sidebar-button" onClick={closeSidebar}>BIKE</Link>
                          )}
-                        {hasSection && !isBikeMember && (
+                        {(userData?.role === "PROFESSOR" || userData?.role === "LEADER" || (hasSection && !isBikeMember)) && (
                             <>
                                 <Link to="/sekcija" className="sidebar-button" onClick={closeSidebar}>SEKCIJA</Link>
                                 <Link to="/treninzi" className="sidebar-button" onClick={closeSidebar}>TRENINZI</Link>
