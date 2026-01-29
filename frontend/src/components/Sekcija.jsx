@@ -365,7 +365,7 @@ const Sekcija = ({ onLogout }) => {
 
           {/* Lista obavijesti */}
           {!loadingObavijesti &&
-            obavijesti.slice().reverse().map((o) => (
+            obavijesti.slice().sort((a, b) => b.id - a.id).map((o) => (
               <div key={o.id} className="obavijest-card">
                 <h3>{o.title}</h3>
                 <p>{o.body}</p>
