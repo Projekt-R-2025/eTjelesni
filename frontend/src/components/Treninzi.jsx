@@ -130,8 +130,9 @@ function Treninzi() {
 
                     // Filtriraj sesije da ne prikazuje one koje pripadaju BIKE sekcijama
                     const filtriraneSesije = podaciSesija.filter(sesija => sesija.sectionType !== 'BIKE');
-                    setSesije(filtriraneSesije);
-                    console.log('Dohvaćene sesije:', filtriraneSesije);
+                    const sortiraneSesije = filtriraneSesije.sort((a, b) => a.id - b.id);
+                    setSesije(sortiraneSesije);
+                    console.log('Dohvaćene sesije:', sortiraneSesije);
                     dohvatiBrojPrijava(filtriraneSesije);
                 } catch (error) {
                     console.error('Greška pri dohvaćanju sesija:', error);
@@ -525,7 +526,8 @@ function Treninzi() {
 
             if (response.ok) {
                 const novaSesija = await response.json();
-                setSesije([...sesije, novaSesija]);
+                const azuriraneSesije = [...sesije, novaSesija].sort((a, b) => a.id - b.id);
+                setSesije(azuriraneSesije);
                 zatvoriFormu();
             } else {
                 alert('Greška pri kreiranju sesije');
@@ -610,7 +612,7 @@ function Treninzi() {
                             <div className="odobravanja-mreza">
                                 {svePrijave.filter(prijava => prijava.status === 'PENDING' && !prijava.cancelled).map((prijava) => (
                                     <div key={prijava.id} className="odobravanje-kartica">
-                                        <h4>Sesija: {prijava.sessionTitle}</h4>
+                                        <h4>{prijava.sessionTitle}</h4>
                                         {mapaKorisnika[prijava.studentId] && (
                                             <>
                                                 <p><strong>Ime:</strong> {mapaKorisnika[prijava.studentId].firstName}</p>

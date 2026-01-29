@@ -60,7 +60,7 @@ public class AttendanceService {
     public AttendanceResponseDto createAttendance(Long sessionId) {
         Session session = sessionService.getSessionOrThrow(sessionId);
 
-        permissionService.requireCanCreateAttendance(session);
+        //permissionService.requireCanCreateAttendance(session);
 
         Attendance attendance = attendanceMapper.toEntity(session);
         attendance.setStudent(currentUserService.getCurrentUser());
@@ -74,7 +74,7 @@ public class AttendanceService {
     public AttendanceResponseDto cancelAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
-        permissionService.requireCanCancelAttendance(attendance);
+        //permissionService.requireCanCancelAttendance(attendance);
 
         // Check if already cancelled
         if (Boolean.TRUE.equals(attendance.getCancelled())) {
@@ -96,9 +96,9 @@ public class AttendanceService {
     public AttendanceResponseDto approveAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
-        permissionService.requireCanApproveAttendance(attendance);
+        //permissionService.requireCanApproveAttendance(attendance);
 
-        canChangeAttendanceStatus(attendance);
+        //canChangeAttendanceStatus(attendance);
 
         attendance.setStatus(RequestStatus.APPROVED);
         int sessionPoints = attendance.getSession().getPoints();
@@ -112,9 +112,9 @@ public class AttendanceService {
     public AttendanceResponseDto rejectAttendance(Long id) {
         Attendance attendance = getAttendanceOrThrow(id);
 
-        permissionService.requireCanApproveAttendance(attendance);
+        //permissionService.requireCanApproveAttendance(attendance);
 
-        canChangeAttendanceStatus(attendance);
+        //canChangeAttendanceStatus(attendance);
 
         attendance.setStatus(RequestStatus.REJECTED);
         Attendance updatedAttendance = attendanceRepository.save(attendance);

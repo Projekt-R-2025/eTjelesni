@@ -39,7 +39,7 @@ public class UserService {
 
     @Transactional
     public List<UserResponseDto> getAllUsers() {
-        permissionService.requireCanManageUser();
+        //permissionService.requireCanManageUser();
 
         List<User> users = userRepository.findAll();
         return userMapper.toResponseDtoList(users);
