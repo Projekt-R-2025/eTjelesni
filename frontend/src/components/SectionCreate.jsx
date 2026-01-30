@@ -102,7 +102,7 @@ function SectionCreate() {
             <Navbar />
             <div className="okvir-sekcije">
                 <div className="kartica-sekcije">
-                    <h2>Kreiraj Novu Sekciju</h2>
+                    <h2>Kreiraj novu sekciju</h2>
 
                     {poruka.text && (
                         <div className={`poruka ${poruka.type}`}>
